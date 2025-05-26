@@ -9,10 +9,51 @@ import { formatDistanceToNow } from "date-fns";
 export default function RecentActivity() {
   const { user } = useAuth();
   
-  const { data: activities, loading } = useCollection("activities", [
-    orderBy("createdAt", "desc"),
-    limit(10)
+  const { data: projects } = useCollection("projects", [
+    where("ownerId", "==", user?.uid || ""),
+    orderBy("updatedAt", "desc"),
+    limit(3)
   ]);
+  
+  const { data: documents } = useCollection("documents", [
+    where("ownerId", "==", user?.uid || ""),
+    orderBy("updatedAt", "desc"),
+    limit(3)
+  ]);
+  
+  const { data: timeEntries } = useCollection("timeEntries", [
+    where("userId", "==", user?.uid || ""),
+    orderBy("startTime", "desc"),
+    limit(3)
+  ]);
+
+  // Create combined activities array
+  const activities = [
+    ...(projects?.map(p => ({
+      id: `project-${p.id}`,
+      type: "project_updated",
+      description: `Updated project "${p.name}"`,
+      createdAt: p.updatedAt
+    })) || []),
+    ...(documents?.map(d => ({
+      id: `document-${d.id}`,
+      type: "document_updated", 
+      description: `Modified document "${d.title}"`,
+      createdAt: d.updatedAt
+    })) || []),
+    ...(timeEntries?.map(t => ({
+      id: `time-${t.id}`,
+      type: "time_logged",
+      description: `Logged ${Math.floor((t.duration || 0) / 60)}h ${(t.duration || 0) % 60}m for "${t.description}"`,
+      createdAt: t.startTime
+    })) || [])
+  ].sort((a, b) => {
+    const aTime = a.createdAt?.toDate?.() || a.createdAt || new Date(0);
+    const bTime = b.createdAt?.toDate?.() || b.createdAt || new Date(0);
+    return bTime.getTime() - aTime.getTime();
+  }).slice(0, 10);
+
+  const loading = false;
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -99,7 +140,7 @@ export default function RecentActivity() {
                   <div className="flex-1">
                     <p className="text-sm text-slate-200">{activity.description}</p>
                     <p className="text-xs text-slate-400 mt-1">
-                      {formatDistanceToNow(activity.createdAt?.toDate() || new Date(), { 
+                      {formatDistanceToNow(activity.createdAt?.toDate?.() || activity.createdAt || new Date(), { 
                         addSuffix: true 
                       })}
                     </p>

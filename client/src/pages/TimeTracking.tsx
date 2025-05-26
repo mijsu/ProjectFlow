@@ -31,7 +31,7 @@ export default function TimeTracking() {
   const { user } = useAuth();
   const { toast } = useToast();
   
-  const { data: timeEntries } = useCollection("timeEntries", [
+  const { data: timeEntries, loading: timeEntriesLoading } = useCollection("timeEntries", [
     where("userId", "==", user?.uid || ""),
     orderBy("startTime", "desc"),
     limit(10)
@@ -327,7 +327,16 @@ export default function TimeTracking() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {timeEntries?.length === 0 ? (
+              {timeEntriesLoading ? (
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="p-3 bg-slate-900 rounded-lg border border-slate-800 animate-pulse">
+                      <div className="h-5 bg-slate-700 rounded w-3/4 mb-2"></div>
+                      <div className="h-4 bg-slate-700 rounded w-1/2"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : timeEntries?.length === 0 ? (
                 <p className="text-slate-400 text-center py-4">No time entries yet</p>
               ) : (
                 timeEntries?.map((entry) => (

@@ -27,7 +27,7 @@ export function useDocument(collectionName: string, id: string) {
     }
 
     const docRef = doc(db, collectionName, id);
-    
+
     const unsubscribe = onSnapshot(docRef, 
       (doc) => {
         if (doc.exists()) {
@@ -56,12 +56,12 @@ export function useCollection(collectionName: string, constraints: QueryConstrai
 
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
-    
+
     const setupListener = () => {
       const q = constraints.length > 0 
         ? query(collection(db, collectionName), ...constraints)
         : collection(db, collectionName);
-      
+
       unsubscribe = onSnapshot(q,
         (snapshot) => {
           const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -73,7 +73,7 @@ export function useCollection(collectionName: string, constraints: QueryConstrai
           console.warn(`Firestore error for ${collectionName}:`, err);
           setError(err.message);
           setLoading(false);
-          
+
           // Retry connection after 5 seconds
           setTimeout(setupListener, 5000);
         }
@@ -105,22 +105,16 @@ export async function addDocument(collectionName: string, data: any) {
   }
 }
 
-export async function updateDocument(collectionName: string, id: string, data: any) {
+// Update document function
+export const updateDocument = async (collection: string, docId: string, data: any) => {
   try {
-    const docRef = doc(db, collectionName, id);
-    await updateDoc(docRef, {
-      ...data,
-      updatedAt: new Date(),
-    });
+    const docRef = doc(db, collection, docId);
+    await updateDoc(docRef, data);
+    return docRef;
   } catch (error) {
-    throw new Error(`Failed to update document: ${error}`);
+    console.error(`Error updating document in ${collection}:`, error);
+    throw error;
   }
-}
+};
 
-export async function deleteDocument(collectionName: string, id: string) {
-  try {
-    await deleteDoc(doc(db, collectionName, id));
-  } catch (error) {
-    throw new Error(`Failed to delete document: ${error}`);
-  }
-}
+export { addDocument, updateDocument };
