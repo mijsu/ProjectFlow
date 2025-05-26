@@ -370,7 +370,7 @@ export default function TimeTracking() {
             <CardTitle className="text-slate-100">Recent Time Entries</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className={`space-y-3 ${(timeEntries?.length || 0) > 5 ? 'max-h-[500px] overflow-y-auto' : ''}`}>
               {timeEntries?.length === 0 ? (
                 <p className="text-slate-400 text-center py-4">No time entries yet</p>
               ) : (
