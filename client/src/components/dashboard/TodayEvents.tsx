@@ -11,20 +11,31 @@ import { Link } from "wouter";
 export default function TodayEvents() {
   const { user } = useAuth();
   
-  const { data: events, loading } = useCollection("events", [
+  const { data: events, loading, error } = useCollection("events", [
     where("userId", "==", user?.uid || ""),
-    where("startTime", ">=", Timestamp.fromDate(startOfDay(new Date()))),
-    where("startTime", "<=", Timestamp.fromDate(endOfDay(addDays(new Date(), 7)))),
     orderBy("startTime", "asc")
   ]);
 
-  const todayEvents = events?.filter(event => 
-    event.startTime && isToday(event.startTime.toDate())
-  ) || [];
+  // Filter events for today and upcoming week
+  const todayEvents = events?.filter(event => {
+    if (!event.startTime) return false;
+    const eventDate = event.startTime.toDate();
+    return isToday(eventDate);
+  }) || [];
 
-  const upcomingEvents = events?.filter(event => 
-    event.startTime && !isToday(event.startTime.toDate())
-  ).slice(0, 3) || [];
+  const upcomingEvents = events?.filter(event => {
+    if (!event.startTime) return false;
+    const eventDate = event.startTime.toDate();
+    const now = new Date();
+    const nextWeek = addDays(now, 7);
+    return eventDate > endOfDay(now) && eventDate <= nextWeek;
+  }).slice(0, 3) || [];
+
+  // Debug logging
+  console.log("TodayEvents - All events:", events?.length || 0);
+  console.log("TodayEvents - Today's events:", todayEvents.length);
+  console.log("TodayEvents - Upcoming events:", upcomingEvents.length);
+  console.log("TodayEvents - Error:", error);
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
@@ -44,9 +55,36 @@ export default function TodayEvents() {
   if (loading) {
     return (
       <Card className="bg-slate-950 border-slate-800">
+        <CardHeader className="flex flex-row items-center justify-between pb-4">
+          <CardTitle className="text-lg font-semibold text-slate-100 flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-emerald-500" />
+            Today's Schedule
+          </CardTitle>
+        </CardHeader>
         <CardContent className="p-6">
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+            <span className="ml-3 text-slate-400">Loading events...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="bg-slate-950 border-slate-800">
+        <CardHeader className="flex flex-row items-center justify-between pb-4">
+          <CardTitle className="text-lg font-semibold text-slate-100 flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-emerald-500" />
+            Today's Schedule
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="text-center py-6">
+            <Calendar className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+            <p className="text-slate-400 text-sm mb-2">Connection issue</p>
+            <p className="text-slate-500 text-xs">Reconnecting...</p>
           </div>
         </CardContent>
       </Card>
