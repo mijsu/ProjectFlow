@@ -130,7 +130,7 @@ export default function RecentActivity() {
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className={`space-y-4 ${activities?.length > 5 ? 'max-h-80 overflow-y-auto pr-2' : ''}`}>
           {activities?.length === 0 ? (
             <p className="text-slate-400 text-center py-4">
               No recent activity

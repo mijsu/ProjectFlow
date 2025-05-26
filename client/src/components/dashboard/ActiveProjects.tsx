@@ -94,7 +94,7 @@ export default function ActiveProjects() {
         </Link>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className={`space-y-4 ${projects?.length > 2 ? 'max-h-64 overflow-y-auto pr-2' : ''}`}>
           {projects?.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-slate-400 mb-4">No projects yet</p>

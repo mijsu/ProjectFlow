@@ -76,7 +76,7 @@ export default function RecentDocuments() {
         </Link>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className={`space-y-3 ${documents?.length > 5 ? 'max-h-80 overflow-y-auto pr-2' : ''}`}>
           {documents?.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-slate-400 mb-4">No documents yet</p>
