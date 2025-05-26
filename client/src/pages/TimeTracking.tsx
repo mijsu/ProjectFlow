@@ -18,6 +18,7 @@ export default function TimeTracking() {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [pausedTime, setPausedTime] = useState(0);
   const [currentTask, setCurrentTask] = useState("");
   const [isManualEntryOpen, setIsManualEntryOpen] = useState(false);
   
@@ -30,6 +31,37 @@ export default function TimeTracking() {
   
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  // Load timer state from localStorage on component mount
+  useEffect(() => {
+    const savedTimerState = localStorage.getItem('timer-state');
+    if (savedTimerState) {
+      const { isRunning, start, paused, task, project } = JSON.parse(savedTimerState);
+      if (isRunning && start) {
+        setIsTimerRunning(true);
+        setStartTime(new Date(start));
+        setPausedTime(paused || 0);
+        setCurrentTask(task || "");
+        setEntryProject(project || "");
+      }
+    }
+  }, []);
+
+  // Save timer state to localStorage whenever it changes
+  useEffect(() => {
+    if (isTimerRunning && startTime) {
+      const timerState = {
+        isRunning: isTimerRunning,
+        start: startTime.toISOString(),
+        paused: pausedTime,
+        task: currentTask,
+        project: entryProject
+      };
+      localStorage.setItem('timer-state', JSON.stringify(timerState));
+    } else {
+      localStorage.removeItem('timer-state');
+    }
+  }, [isTimerRunning, startTime, pausedTime, currentTask, entryProject]);
   
   const { data: timeEntries } = useCollection("timeEntries", [
     where("userId", "==", user?.uid || "")
@@ -46,14 +78,15 @@ export default function TimeTracking() {
     
     if (isTimerRunning && startTime) {
       interval = setInterval(() => {
-        setElapsedTime(Date.now() - startTime.getTime());
+        const currentElapsed = Date.now() - startTime.getTime() + pausedTime;
+        setElapsedTime(currentElapsed);
       }, 1000);
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isTimerRunning, startTime]);
+  }, [isTimerRunning, startTime, pausedTime]);
 
   const handleStartTimer = () => {
     if (!currentTask.trim()) {
@@ -67,18 +100,29 @@ export default function TimeTracking() {
     
     setStartTime(new Date());
     setIsTimerRunning(true);
-    setElapsedTime(0);
+    setElapsedTime(pausedTime);
   };
 
   const handlePauseTimer = () => {
+    if (startTime) {
+      const currentElapsed = Date.now() - startTime.getTime() + pausedTime;
+      setPausedTime(currentElapsed);
+      setElapsedTime(currentElapsed);
+    }
     setIsTimerRunning(false);
   };
 
+  const handleResumeTimer = () => {
+    setStartTime(new Date());
+    setIsTimerRunning(true);
+  };
+
   const handleStopTimer = async () => {
-    if (!startTime || !user) return;
+    if (!user) return;
 
     const endTime = new Date();
-    const duration = Math.floor((endTime.getTime() - startTime.getTime()) / 1000 / 60); // in minutes
+    const totalElapsed = elapsedTime || (startTime ? Date.now() - startTime.getTime() + pausedTime : pausedTime);
+    const duration = Math.floor(totalElapsed / 1000 / 60); // in minutes
 
     if (duration < 1) {
       toast({
@@ -108,7 +152,9 @@ export default function TimeTracking() {
       setIsTimerRunning(false);
       setStartTime(null);
       setElapsedTime(0);
+      setPausedTime(0);
       setCurrentTask("");
+      localStorage.removeItem('timer-state');
     } catch (error: any) {
       toast({
         title: "Error",
@@ -254,11 +300,11 @@ export default function TimeTracking() {
               <div className="flex justify-center space-x-4">
                 {!isTimerRunning ? (
                   <Button
-                    onClick={handleStartTimer}
+                    onClick={pausedTime > 0 ? handleResumeTimer : handleStartTimer}
                     className="bg-emerald-600 hover:bg-emerald-700 text-white px-8"
                   >
                     <Play className="w-4 h-4 mr-2" />
-                    Start
+                    {pausedTime > 0 ? "Resume" : "Start"}
                   </Button>
                 ) : (
                   <>
