@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import TopBar from "@/components/layout/TopBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,16 +8,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { useAuth } from "@/hooks/useAuth";
 import { useCollection, addDocument } from "@/hooks/useFirestore";
 import { where, orderBy } from "firebase/firestore";
-import { format, startOfMonth, endOfMonth, isSameDay } from "date-fns";
-import { Plus, Calendar as CalendarIcon, Clock } from "lucide-react";
+import { format, startOfMonth, endOfMonth, isSameDay, getDaysInMonth, startOfWeek, endOfWeek, addDays, isToday } from "date-fns";
+import { Plus, Calendar as CalendarIcon, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [isEventFormOpen, setIsEventFormOpen] = useState(false);
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
@@ -28,14 +29,51 @@ export default function Calendar() {
   const { user } = useAuth();
   const { toast } = useToast();
   
-  const { data: events } = useCollection("events", [
+  // Fetch events with better error handling
+  const { data: events, loading: eventsLoading, error } = useCollection("events", [
     where("userId", "==", user?.uid || ""),
     orderBy("startTime", "asc")
   ]);
 
+  // Handle Firestore connection errors
+  useEffect(() => {
+    if (error) {
+      console.warn("Firestore connection error:", error);
+      toast({
+        title: "Connection Issue",
+        description: "There might be a connection issue. Events will reload automatically.",
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
+
   const eventsForSelectedDate = events?.filter(event => 
     event.startTime && isSameDay(event.startTime.toDate(), selectedDate)
   ) || [];
+
+  // Get events for a specific date
+  const getEventsForDate = (date: Date) => {
+    return events?.filter(event => 
+      event.startTime && isSameDay(event.startTime.toDate(), date)
+    ) || [];
+  };
+
+  // Generate calendar days
+  const generateCalendarDays = () => {
+    const start = startOfWeek(startOfMonth(currentMonth));
+    const end = endOfWeek(endOfMonth(currentMonth));
+    const days = [];
+    let current = start;
+
+    while (current <= end) {
+      days.push(current);
+      current = addDays(current, 1);
+    }
+
+    return days;
+  };
+
+  const calendarDays = generateCalendarDays();
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,31 +131,114 @@ export default function Calendar() {
     }
   };
 
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    const newMonth = new Date(currentMonth);
+    if (direction === 'prev') {
+      newMonth.setMonth(newMonth.getMonth() - 1);
+    } else {
+      newMonth.setMonth(newMonth.getMonth() + 1);
+    }
+    setCurrentMonth(newMonth);
+  };
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       <TopBar title="Calendar" />
       
       <div className="flex-1 overflow-y-auto p-6 bg-slate-900">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Calendar */}
-          <Card className="lg:col-span-2 bg-slate-950 border-slate-800">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+          {/* Modern Calendar */}
+          <Card className="xl:col-span-3 bg-slate-950 border-slate-800">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-slate-100">Calendar</CardTitle>
-              <Button 
-                onClick={() => setIsEventFormOpen(true)}
-                className="bg-emerald-600 hover:bg-emerald-700"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                New Event
-              </Button>
+              <CardTitle className="text-slate-100">
+                {format(currentMonth, "MMMM yyyy")}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateMonth('prev')}
+                  className="border-slate-700 text-slate-300 hover:bg-slate-800"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateMonth('next')}
+                  className="border-slate-700 text-slate-300 hover:bg-slate-800"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+                <Button 
+                  onClick={() => setIsEventFormOpen(true)}
+                  className="bg-emerald-600 hover:bg-emerald-700"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Event
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <CalendarComponent
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => date && setSelectedDate(date)}
-                className="rounded-md border border-slate-700 bg-slate-900"
-              />
+              <div className="grid grid-cols-7 gap-1 mb-4">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  <div key={day} className="p-3 text-center text-sm font-medium text-slate-400">
+                    {day}
+                  </div>
+                ))}
+              </div>
+              
+              <div className="grid grid-cols-7 gap-1">
+                {calendarDays.map((day, index) => {
+                  const dayEvents = getEventsForDate(day);
+                  const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
+                  const isSelected = isSameDay(day, selectedDate);
+                  const isTodayDate = isToday(day);
+                  
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => setSelectedDate(day)}
+                      className={`
+                        min-h-[120px] p-2 border border-slate-800 cursor-pointer transition-colors
+                        hover:bg-slate-800/50 rounded-lg
+                        ${isSelected ? 'bg-emerald-600/20 border-emerald-600' : ''}
+                        ${isTodayDate ? 'bg-blue-600/10 border-blue-600/50' : ''}
+                        ${!isCurrentMonth ? 'opacity-30' : ''}
+                      `}
+                    >
+                      <div className={`
+                        text-sm font-medium mb-1 flex items-center justify-center w-6 h-6 rounded-full
+                        ${isTodayDate ? 'bg-blue-600 text-white' : 'text-slate-300'}
+                        ${isSelected ? 'text-emerald-400' : ''}
+                      `}>
+                        {day.getDate()}
+                      </div>
+                      
+                      <div className="space-y-1">
+                        {dayEvents.slice(0, 3).map((event, eventIndex) => (
+                          <div
+                            key={eventIndex}
+                            className={`
+                              text-xs p-1 rounded truncate text-white
+                              ${event.type === 'meeting' ? 'bg-blue-600' : 
+                                event.type === 'deadline' ? 'bg-red-600' : 'bg-green-600'}
+                            `}
+                            title={event.title}
+                          >
+                            {event.title}
+                          </div>
+                        ))}
+                        {dayEvents.length > 3 && (
+                          <div className="text-xs text-slate-400 p-1">
+                            +{dayEvents.length - 3} more
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </CardContent>
           </Card>
 
@@ -130,8 +251,20 @@ export default function Calendar() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {eventsForSelectedDate.length === 0 ? (
-                  <p className="text-slate-400 text-sm">No events scheduled</p>
+                {eventsLoading ? (
+                  <p className="text-slate-400 text-sm">Loading events...</p>
+                ) : eventsForSelectedDate.length === 0 ? (
+                  <div className="text-center py-4">
+                    <p className="text-slate-400 text-sm mb-3">No events scheduled</p>
+                    <Button 
+                      onClick={() => setIsEventFormOpen(true)}
+                      size="sm"
+                      className="bg-emerald-600 hover:bg-emerald-700"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Add Event
+                    </Button>
+                  </div>
                 ) : (
                   eventsForSelectedDate.map((event) => (
                     <div key={event.id} className="p-3 bg-slate-900 rounded-lg border border-slate-800">
@@ -141,17 +274,15 @@ export default function Calendar() {
                         {format(event.startTime.toDate(), "h:mm a")} - {format(event.endTime.toDate(), "h:mm a")}
                       </div>
                       {event.description && (
-                        <p className="text-sm text-slate-400">{event.description}</p>
+                        <p className="text-sm text-slate-400 mb-2">{event.description}</p>
                       )}
-                      <div className="mt-2">
-                        <span className={`inline-block px-2 py-1 rounded text-xs ${
-                          event.type === "meeting" ? "bg-blue-600/20 text-blue-400" :
-                          event.type === "deadline" ? "bg-red-600/20 text-red-400" :
-                          "bg-green-600/20 text-green-400"
-                        }`}>
-                          {event.type}
-                        </span>
-                      </div>
+                      <span className={`inline-block px-2 py-1 rounded text-xs ${
+                        event.type === "meeting" ? "bg-blue-600/20 text-blue-400" :
+                        event.type === "deadline" ? "bg-red-600/20 text-red-400" :
+                        "bg-green-600/20 text-green-400"
+                      }`}>
+                        {event.type}
+                      </span>
                     </div>
                   ))
                 )}
