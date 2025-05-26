@@ -80,8 +80,8 @@ export default function ActiveProjects() {
   }
 
   return (
-    <Card className="bg-slate-950 border-slate-800">
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card className="bg-slate-950 border-slate-800 h-[400px] flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between flex-shrink-0">
         <CardTitle className="text-slate-100">Active Projects</CardTitle>
         <Link href="/projects">
           <Button
@@ -93,8 +93,8 @@ export default function ActiveProjects() {
           </Button>
         </Link>
       </CardHeader>
-      <CardContent>
-        <div className={`space-y-4 ${projects?.length > 2 ? 'max-h-64 overflow-y-auto pr-2' : ''}`}>
+      <CardContent className="flex-1 overflow-hidden">
+        <div className={`space-y-4 h-full ${projects?.length > 2 ? 'overflow-y-auto pr-2' : ''}`}>
           {projects?.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-slate-400 mb-4">No projects yet</p>
