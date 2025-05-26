@@ -34,9 +34,8 @@ export default function Calendar() {
   const startOfRange = startOfMonth(subMonths(currentMonth, 1));
   const endOfRange = endOfMonth(addMonths(currentMonth, 1));
   
-  const { data: events, loading: eventsLoading, error } = useCollection("events", [
-    where("userId", "==", user?.uid || ""),
-    orderBy("startTime", "asc")
+  const { data: events } = useCollection("events", [
+    where("userId", "==", user?.uid || "")
   ]);
 
   // Filter events to current view range and combine with local events

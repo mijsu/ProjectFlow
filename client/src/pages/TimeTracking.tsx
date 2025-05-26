@@ -32,9 +32,7 @@ export default function TimeTracking() {
   const { toast } = useToast();
   
   const { data: timeEntries } = useCollection("timeEntries", [
-    where("userId", "==", user?.uid || ""),
-    orderBy("startTime", "desc"),
-    limit(10)
+    where("userId", "==", user?.uid || "")
   ]);
 
   const { data: projects } = useCollection("projects", [
@@ -242,7 +240,7 @@ export default function TimeTracking() {
                     <SelectValue placeholder="Select a project" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-700">
-                    <SelectItem value="">No project</SelectItem>
+                    <SelectItem value="none">No project</SelectItem>
                     {projects?.map((project) => (
                       <SelectItem key={project.id} value={project.id}>
                         {project.name}
@@ -409,7 +407,7 @@ export default function TimeTracking() {
                     <SelectValue placeholder="Select a project" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-700">
-                    <SelectItem value="">No project</SelectItem>
+                    <SelectItem value="none">No project</SelectItem>
                     {projects?.map((project) => (
                       <SelectItem key={project.id} value={project.id}>
                         {project.name}
