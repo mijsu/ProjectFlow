@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Bell, Search, Settings } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Bell, Search, Settings, User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { signOutUser } from "@/lib/auth";
+import { useLocation } from "wouter";
 
 interface TopBarProps {
   title: string;
@@ -13,6 +15,7 @@ interface TopBarProps {
 export default function TopBar({ title, subtitle }: TopBarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
+  const [, navigate] = useLocation();
 
   const handleSignOut = async () => {
     try {
@@ -20,6 +23,10 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
     } catch (error) {
       console.error("Error signing out:", error);
     }
+  };
+
+  const handleMyAccount = () => {
+    navigate("/profile");
   };
 
   return (
@@ -54,25 +61,35 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
           <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
         </Button>
         
-        {/* Settings */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-slate-300 hover:text-slate-100 hover:bg-slate-800"
-        >
-          <Settings className="w-4 h-4" />
-        </Button>
-
-        {/* User Menu */}
+        {/* Settings Dropdown */}
         {user && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSignOut}
-            className="text-slate-300 hover:text-slate-100 hover:bg-slate-800"
-          >
-            Sign Out
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-slate-300 hover:text-slate-100 hover:bg-slate-800"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-slate-900 border-slate-700">
+              <DropdownMenuItem 
+                onClick={handleMyAccount}
+                className="text-slate-200 hover:bg-slate-800 cursor-pointer"
+              >
+                <User className="w-4 h-4 mr-2" />
+                My Account
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={handleSignOut}
+                className="text-slate-200 hover:bg-slate-800 cursor-pointer"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
     </header>

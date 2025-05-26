@@ -12,6 +12,7 @@ import Calendar from "@/pages/Calendar";
 import TimeTracking from "@/pages/TimeTracking";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import Profile from "@/pages/Profile";
 import NotFound from "@/pages/not-found";
 
 function AppContent() {
@@ -43,6 +44,7 @@ function AppContent() {
         <Route path="/projects" component={Projects} />
         <Route path="/calendar" component={Calendar} />
         <Route path="/time-tracking" component={TimeTracking} />
+        <Route path="/profile" component={Profile} />
         <Route component={NotFound} />
       </Switch>
     </div>
