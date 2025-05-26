@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +31,7 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
   const [content, setContent] = useState("");
   const [type, setType] = useState("document");
   const [saving, setSaving] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -95,11 +96,9 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
   };
 
   const formatText = (command: string) => {
-    // This is a simplified implementation
-    // In a real app, you'd want to use a proper rich text editor like TipTap or React-Quill
-    const textarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement;
-    if (!textarea) return;
+    if (!textareaRef.current) return;
 
+    const textarea = textareaRef.current;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = content.substring(start, end);
@@ -107,27 +106,33 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
     let formattedText = selectedText;
     switch (command) {
       case "bold":
-        formattedText = `**${selectedText}**`;
+        formattedText = selectedText ? `**${selectedText}**` : "**bold text**";
         break;
       case "italic":
-        formattedText = `*${selectedText}*`;
+        formattedText = selectedText ? `*${selectedText}*` : "*italic text*";
         break;
       case "underline":
-        formattedText = `<u>${selectedText}</u>`;
+        formattedText = selectedText ? `<u>${selectedText}</u>` : "<u>underlined text</u>";
         break;
       case "list":
-        formattedText = `\n- ${selectedText}`;
+        formattedText = selectedText ? `\n- ${selectedText}` : "\n- list item";
         break;
       case "listOrdered":
-        formattedText = `\n1. ${selectedText}`;
+        formattedText = selectedText ? `\n1. ${selectedText}` : "\n1. numbered item";
         break;
       case "link":
-        formattedText = `[${selectedText}](url)`;
+        formattedText = selectedText ? `[${selectedText}](url)` : "[link text](url)";
         break;
     }
 
     const newContent = content.substring(0, start) + formattedText + content.substring(end);
     setContent(newContent);
+    
+    // Restore focus and cursor position
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + formattedText.length, start + formattedText.length);
+    }, 0);
   };
 
   return (
@@ -238,6 +243,7 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
 
         <div className="flex-1 overflow-hidden">
           <Textarea
+            ref={textareaRef}
             name="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
