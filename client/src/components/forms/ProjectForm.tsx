@@ -59,7 +59,9 @@ export default function ProjectForm({
   // Fetch existing tasks for this project
   const { data: projectTasks } = useCollection("tasks", project?.id ? [
     where("projectId", "==", project.id)
-  ] : []);
+  ] : [
+    where("projectId", "==", "non-existent-project-id") // This ensures no tasks are returned for new projects
+  ]);
 
   // Update form when project changes
   useEffect(() => {
