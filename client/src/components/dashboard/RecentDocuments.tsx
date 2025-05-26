@@ -76,7 +76,7 @@ export default function RecentDocuments() {
         </Link>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden">
-        <div className={`space-y-3 h-full ${documents?.length > 5 ? 'overflow-y-auto pr-2' : ''}`}>
+        <div className={`space-y-3 h-full ${documents?.length > 5 ? 'overflow-y-auto pr-2' : 'overflow-y-hidden'}`}>
           {documents?.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-slate-400 mb-4">No documents yet</p>
