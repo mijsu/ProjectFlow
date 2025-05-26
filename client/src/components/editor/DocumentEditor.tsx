@@ -103,25 +103,28 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
     const end = textarea.selectionEnd;
     const selectedText = content.substring(start, end);
     
-    let formattedText = selectedText;
+    let formattedText = "";
     switch (command) {
       case "bold":
-        formattedText = selectedText ? `**${selectedText}**` : "**bold text**";
+        formattedText = selectedText ? `**${selectedText}**` : "**text**";
         break;
       case "italic":
-        formattedText = selectedText ? `*${selectedText}*` : "*italic text*";
+        formattedText = selectedText ? `*${selectedText}*` : "*text*";
         break;
       case "underline":
-        formattedText = selectedText ? `<u>${selectedText}</u>` : "<u>underlined text</u>";
+        formattedText = selectedText ? `<u>${selectedText}</u>` : "<u>text</u>";
         break;
       case "list":
-        formattedText = selectedText ? `\n- ${selectedText}` : "\n- list item";
+        formattedText = selectedText ? `\n- ${selectedText}` : "\n- ";
         break;
       case "listOrdered":
-        formattedText = selectedText ? `\n1. ${selectedText}` : "\n1. numbered item";
+        formattedText = selectedText ? `\n1. ${selectedText}` : "\n1. ";
         break;
       case "link":
-        formattedText = selectedText ? `[${selectedText}](url)` : "[link text](url)";
+        formattedText = selectedText ? `[${selectedText}](url)` : "[text](url)";
+        break;
+      case "image":
+        formattedText = "![image description](image-url)";
         break;
     }
 
@@ -131,7 +134,8 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
     // Restore focus and cursor position
     setTimeout(() => {
       textarea.focus();
-      textarea.setSelectionRange(start + formattedText.length, start + formattedText.length);
+      const newPosition = start + formattedText.length;
+      textarea.setSelectionRange(newPosition, newPosition);
     }, 0);
   };
 
@@ -234,6 +238,7 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
             <Button
               variant="ghost"
               size="sm"
+              onClick={() => formatText("image")}
               className="hover:bg-slate-800"
             >
               <Image className="w-4 h-4" />
