@@ -118,8 +118,8 @@ export default function RecentActivity() {
   }
 
   return (
-    <Card className="lg:col-span-2 bg-slate-950 border-slate-800 h-fit">
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card className="lg:col-span-2 bg-slate-950 border-slate-800 h-[500px] flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between flex-shrink-0">
         <CardTitle className="text-slate-100">Recent Activity</CardTitle>
         <Button
           variant="ghost"
@@ -129,8 +129,8 @@ export default function RecentActivity() {
           View All
         </Button>
       </CardHeader>
-      <CardContent>
-        <div className={`space-y-4 ${activities?.length > 6 ? 'max-h-80 overflow-y-auto pr-2' : ''}`}>
+      <CardContent className="flex-1 overflow-hidden">
+        <div className={`space-y-4 h-full ${activities?.length > 6 ? 'overflow-y-auto pr-2' : ''}`}>
           {activities?.length === 0 ? (
             <p className="text-slate-400 text-center py-4">
               No recent activity

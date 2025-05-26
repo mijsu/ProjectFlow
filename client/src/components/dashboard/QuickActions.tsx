@@ -51,12 +51,12 @@ export default function QuickActions() {
   ];
 
   return (
-    <Card className="bg-slate-950 border-slate-800">
-      <CardHeader>
+    <Card className="bg-slate-950 border-slate-800 h-[500px] flex flex-col">
+      <CardHeader className="flex-shrink-0">
         <CardTitle className="text-slate-100">Quick Actions</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
+      <CardContent className="flex-1 flex flex-col overflow-hidden">
+        <div className="space-y-3 flex-shrink-0">
           {quickActions.map((action) => {
             const Icon = action.icon;
             return (
@@ -73,9 +73,9 @@ export default function QuickActions() {
         </div>
 
         {/* Upcoming Events */}
-        <div className="mt-8">
-          <h4 className="text-sm font-medium text-slate-400 mb-3">Upcoming Events</h4>
-          <div className={`space-y-3 ${upcomingEvents?.length > 3 ? 'max-h-64 overflow-y-auto pr-2' : ''}`}>
+        <div className="mt-8 flex-1 flex flex-col overflow-hidden">
+          <h4 className="text-sm font-medium text-slate-400 mb-3 flex-shrink-0">Upcoming Events</h4>
+          <div className={`space-y-3 flex-1 ${upcomingEvents?.length > 3 ? 'overflow-y-auto pr-2' : ''}`}>
             {upcomingEvents?.length === 0 ? (
               <p className="text-slate-500 text-sm">No upcoming events</p>
             ) : (
