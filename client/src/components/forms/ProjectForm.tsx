@@ -25,7 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, Plus, Trash2, CheckCircle } from "lucide-react";
+import { CalendarIcon, Plus, Trash2, CheckCircle, Pencil, Check, X } from "lucide-react";
 import { format } from "date-fns";
 import { useCollection } from "@/hooks/useFirestore";
 import { where } from "firebase/firestore";
@@ -51,6 +51,8 @@ export default function ProjectForm({
   const [loading, setLoading] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskProgress, setNewTaskProgress] = useState("");
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editingTaskTitle, setEditingTaskTitle] = useState("");
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -132,6 +134,40 @@ export default function ProjectForm({
         variant: "destructive",
       });
     }
+  };
+
+  const handleEditTask = (task: any) => {
+    setEditingTaskId(task.id);
+    setEditingTaskTitle(task.title);
+  };
+
+  const handleSaveTaskEdit = async () => {
+    if (!editingTaskId || !editingTaskTitle.trim()) return;
+
+    try {
+      await updateDocument("tasks", editingTaskId, {
+        title: editingTaskTitle.trim()
+      });
+
+      setEditingTaskId(null);
+      setEditingTaskTitle("");
+      
+      toast({
+        title: "Task Updated",
+        description: "Task name updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update task",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTaskId(null);
+    setEditingTaskTitle("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -350,11 +386,47 @@ export default function ProjectForm({
                       <div className="space-y-2 max-h-[28rem] overflow-y-auto border border-slate-700 rounded-lg p-3 bg-slate-900/50">
                         {projectTasks.map((task) => (
                           <div key={task.id} className="flex items-center justify-between p-3 bg-slate-900 rounded-lg border border-slate-700 hover:bg-slate-800 transition-colors">
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2 flex-1">
                               <CheckCircle className="w-4 h-4 text-green-400" />
-                              <span className="text-sm text-slate-200">{task.title}</span>
+                              {editingTaskId === task.id ? (
+                                <div className="flex items-center space-x-2 flex-1">
+                                  <Input
+                                    value={editingTaskTitle}
+                                    onChange={(e) => setEditingTaskTitle(e.target.value)}
+                                    className="flex-1 text-sm bg-slate-800 border-slate-600 text-slate-100"
+                                    autoFocus
+                                  />
+                                  <Button
+                                    size="sm"
+                                    onClick={handleSaveTaskEdit}
+                                    className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700"
+                                  >
+                                    <Check className="w-3 h-3" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    onClick={handleCancelEdit}
+                                    variant="outline"
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              ) : (
+                                <>
+                                  <span className="text-sm text-slate-200 flex-1">{task.title}</span>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleEditTask(task)}
+                                    variant="ghost"
+                                    className="h-6 w-6 p-0 text-slate-400 hover:text-slate-200"
+                                  >
+                                    <Pencil className="w-3 h-3" />
+                                  </Button>
+                                </>
+                              )}
                             </div>
-                            <span className="text-sm font-medium text-emerald-400">
+                            <span className="text-sm font-medium text-emerald-400 ml-2">
                               +{task.progressContribution || 0}%
                             </span>
                           </div>
