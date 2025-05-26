@@ -244,7 +244,7 @@ export default function ProjectForm({
           <form onSubmit={handleSubmit} className="space-y-6 p-1">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Column - Project Details */}
-              <div className="space-y-4 h-96">
+              <div className="space-y-4">
                 <h3 className="text-base font-medium text-emerald-400 border-b border-slate-700 pb-2">Project Details</h3>
                 
                 {/* Project name input */}
@@ -333,7 +333,7 @@ export default function ProjectForm({
               </div>
 
               {/* Right Column - Task Progress Tracking */}
-              <div className="space-y-4 h-96">
+              <div className="space-y-4">
                 <h3 className="text-base font-medium text-emerald-400 border-b border-slate-700 pb-2">Progress Tracking</h3>
                 
                 {project ? (
