@@ -20,7 +20,7 @@ export default function QuickActions() {
     where("userId", "==", user?.uid || ""),
     where("startTime", ">=", new Date()),
     orderBy("startTime", "asc"),
-    limit(3)
+    limit(10)
   ]);
 
   const quickActions = [
