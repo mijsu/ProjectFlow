@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Bell, Search, Settings, User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { signOutUser } from "@/lib/auth";
@@ -14,12 +15,14 @@ interface TopBarProps {
 
 export default function TopBar({ title, subtitle }: TopBarProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
   const { user } = useAuth();
   const [, navigate] = useLocation();
 
   const handleSignOut = async () => {
     try {
       await signOutUser();
+      setShowSignOutModal(false);
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -27,6 +30,10 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
 
   const handleMyAccount = () => {
     navigate("/profile");
+  };
+
+  const handleSignOutClick = () => {
+    setShowSignOutModal(true);
   };
 
   return (
@@ -82,7 +89,7 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
                 My Account
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={handleSignOut}
+                onClick={handleSignOutClick}
                 className="text-slate-200 hover:bg-slate-800 cursor-pointer"
               >
                 <LogOut className="w-4 h-4 mr-2" />
@@ -92,6 +99,29 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
           </DropdownMenu>
         )}
       </div>
+
+      {/* Sign Out Confirmation Modal */}
+      <AlertDialog open={showSignOutModal} onOpenChange={setShowSignOutModal}>
+        <AlertDialogContent className="bg-slate-900 border-slate-700">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-slate-100">Sign Out</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-400">
+              Are you sure you want to sign out? You'll need to sign back in to access your account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleSignOut}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Sign Out
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </header>
   );
 }
