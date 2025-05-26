@@ -21,6 +21,8 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [dismissedNotifications, setDismissedNotifications] = useState<string[]>([]);
+  const [viewedNotifications, setViewedNotifications] = useState<string[]>([]);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const { user } = useAuth();
   const [, navigate] = useLocation();
 
@@ -151,10 +153,32 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
 
   const notifications = generateNotifications();
 
+  // Calculate unread notifications (new notifications that haven't been viewed)
+  const unreadNotifications = notifications.filter(notification => 
+    !viewedNotifications.includes(notification.id)
+  );
+
   const dismissNotification = (notificationId: string, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     setDismissedNotifications(prev => [...prev, notificationId]);
+  };
+
+  const handleNotificationDropdownOpen = (open: boolean) => {
+    setIsNotificationOpen(open);
+    if (open && notifications.length > 0) {
+      // Mark all current notifications as viewed when dropdown opens
+      const currentNotificationIds = notifications.map(n => n.id);
+      setViewedNotifications(prev => {
+        const newViewed = [...prev];
+        currentNotificationIds.forEach(id => {
+          if (!newViewed.includes(id)) {
+            newViewed.push(id);
+          }
+        });
+        return newViewed;
+      });
+    }
   };
 
   const handleSignOut = async () => {
@@ -206,7 +230,7 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
         </div>
         
         {/* Notifications */}
-        <DropdownMenu>
+        <DropdownMenu onOpenChange={handleNotificationDropdownOpen}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
@@ -214,12 +238,12 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
               className="relative text-slate-300 hover:text-slate-100 hover:bg-slate-800"
             >
               <Bell className="w-4 h-4" />
-              {notifications.length > 0 && (
+              {unreadNotifications.length > 0 && (
                 <Badge 
                   variant="destructive" 
                   className="absolute -top-1 -right-1 h-4 w-4 rounded-full p-0 flex items-center justify-center text-xs bg-red-600"
                 >
-                  {notifications.length}
+                  {unreadNotifications.length}
                 </Badge>
               )}
             </Button>
