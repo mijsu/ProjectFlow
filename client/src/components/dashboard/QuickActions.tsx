@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, FolderPlus, CalendarPlus, Play } from "lucide-react";
@@ -6,10 +7,14 @@ import { useCollection } from "@/hooks/useFirestore";
 import { where, orderBy, limit } from "firebase/firestore";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
+import DocumentEditor from "@/components/editor/DocumentEditor";
+import ProjectForm from "@/components/forms/ProjectForm";
 
 export default function QuickActions() {
   const [, navigate] = useLocation();
   const { user } = useAuth();
+  const [isDocumentEditorOpen, setIsDocumentEditorOpen] = useState(false);
+  const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
   
   const { data: upcomingEvents } = useCollection("events", [
     where("userId", "==", user?.uid || ""),
@@ -22,26 +27,26 @@ export default function QuickActions() {
     {
       label: "New Document",
       icon: Plus,
-      action: () => navigate("/documents/new"),
+      action: () => setIsDocumentEditorOpen(true),
       bgColor: "bg-emerald-600 hover:bg-emerald-700",
     },
     {
       label: "Create Project",
       icon: FolderPlus,
-      action: () => navigate("/projects/new"),
+      action: () => setIsProjectFormOpen(true),
       bgColor: "bg-blue-600 hover:bg-blue-700",
     },
     {
       label: "Schedule Event",
       icon: CalendarPlus,
       action: () => navigate("/calendar"),
-      bgColor: "bg-slate-700 hover:bg-slate-600",
+      bgColor: "bg-purple-600 hover:bg-purple-700",
     },
     {
       label: "Start Time Tracking",
       icon: Play,
       action: () => navigate("/time-tracking"),
-      bgColor: "bg-slate-700 hover:bg-slate-600",
+      bgColor: "bg-orange-600 hover:bg-orange-700",
     },
   ];
 
@@ -86,6 +91,17 @@ export default function QuickActions() {
           </div>
         </div>
       </CardContent>
+
+      {/* Modals */}
+      <DocumentEditor
+        isOpen={isDocumentEditorOpen}
+        onClose={() => setIsDocumentEditorOpen(false)}
+      />
+      
+      <ProjectForm
+        isOpen={isProjectFormOpen}
+        onClose={() => setIsProjectFormOpen(false)}
+      />
     </Card>
   );
 }

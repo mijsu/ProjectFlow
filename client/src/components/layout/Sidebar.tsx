@@ -101,8 +101,8 @@ export default function Sidebar() {
             return (
               <li key={item.name}>
                 <Link href={item.href}>
-                  <a
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                  <div
+                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
                       isActive
                         ? "bg-emerald-600/10 text-emerald-400 border border-emerald-600/20"
                         : "text-slate-300 hover:bg-slate-800/50"
@@ -110,7 +110,7 @@ export default function Sidebar() {
                   >
                     <Icon className="w-4 h-4" />
                     <span>{item.name}</span>
-                  </a>
+                  </div>
                 </Link>
               </li>
             );
@@ -126,10 +126,10 @@ export default function Sidebar() {
             {recentProjects?.map((project) => (
               <li key={project.id}>
                 <Link href={`/projects/${project.id}`}>
-                  <a className="flex items-center space-x-2 px-2 py-1 text-sm rounded hover:bg-slate-800/30 transition-colors text-slate-300">
+                  <div className="flex items-center space-x-2 px-2 py-1 text-sm rounded hover:bg-slate-800/30 transition-colors text-slate-300 cursor-pointer">
                     <div className={`w-2 h-2 rounded-full ${getStatusColor(project.status)}`} />
                     <span className="truncate">{project.name}</span>
-                  </a>
+                  </div>
                 </Link>
               </li>
             ))}
