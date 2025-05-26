@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCollection, addDocument } from "@/hooks/useFirestore";
 import { where } from "firebase/firestore";
 import { format, isSameDay } from "date-fns";
-import { Plus, Calendar as CalendarIcon, Clock } from "lucide-react";
+import { Plus, Calendar as CalendarIcon, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Calendar() {
