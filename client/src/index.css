@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Replit-inspired dark color scheme */
+  --background: 222 84% 5%; /* #0E1117 */
+  --foreground: 213 31% 91%; /* #F0F6FC */
+  --muted: 215 28% 17%; /* #161B22 */
+  --muted-foreground: 217 9% 55%; /* #8B949E */
+  --popover: 222 84% 5%; /* #0E1117 */
+  --popover-foreground: 213 31% 91%; /* #F0F6FC */
+  --card: 215 28% 17%; /* #161B22 */
+  --card-foreground: 213 31% 91%; /* #F0F6FC */
+  --border: 215 14% 22%; /* #30363D */
+  --input: 215 14% 22%; /* #30363D */
+  --primary: 212 100% 48%; /* #1F6FEB */
+  --primary-foreground: 210 40% 98%; /* #F0F6FC */
+  --secondary: 215 28% 17%; /* #161B22 */
+  --secondary-foreground: 213 31% 91%; /* #F0F6FC */
+  --accent: 215 28% 17%; /* #161B22 */
+  --accent-foreground: 213 31% 91%; /* #F0F6FC */
+  --destructive: 0 84% 60%; /* #F85149 */
+  --destructive-foreground: 210 40% 98%; /* #F0F6FC */
+  --ring: 212 100% 48%; /* #1F6FEB */
+  --radius: 0.5rem;
+  
+  /* Chart colors */
+  --chart-1: 142 76% 36%; /* #238636 */
+  --chart-2: 212 100% 48%; /* #1F6FEB */
+  --chart-3: 48 96% 53%; /* #F7CC5A */
+  --chart-4: 271 91% 65%; /* #A855F7 */
+  --chart-5: 0 84% 60%; /* #F85149 */
+  
+  /* Sidebar colors */
+  --sidebar-background: 215 28% 17%; /* #161B22 */
+  --sidebar-foreground: 213 31% 91%; /* #F0F6FC */
+  --sidebar-primary: 142 76% 36%; /* #238636 */
+  --sidebar-primary-foreground: 210 40% 98%; /* #F0F6FC */
+  --sidebar-accent: 215 14% 22%; /* #30363D */
+  --sidebar-accent-foreground: 213 31% 91%; /* #F0F6FC */
+  --sidebar-border: 215 14% 22%; /* #30363D */
+  --sidebar-ring: 212 100% 48%; /* #1F6FEB */
+}
+
+.dark {
+  /* Same colors for dark mode */
+  --background: 222 84% 5%; /* #0E1117 */
+  --foreground: 213 31% 91%; /* #F0F6FC */
+  --muted: 215 28% 17%; /* #161B22 */
+  --muted-foreground: 217 9% 55%; /* #8B949E */
+  --popover: 222 84% 5%; /* #0E1117 */
+  --popover-foreground: 213 31% 91%; /* #F0F6FC */
+  --card: 215 28% 17%; /* #161B22 */
+  --card-foreground: 213 31% 91%; /* #F0F6FC */
+  --border: 215 14% 22%; /* #30363D */
+  --input: 215 14% 22%; /* #30363D */
+  --primary: 212 100% 48%; /* #1F6FEB */
+  --primary-foreground: 210 40% 98%; /* #F0F6FC */
+  --secondary: 215 28% 17%; /* #161B22 */
+  --secondary-foreground: 213 31% 91%; /* #F0F6FC */
+  --accent: 215 28% 17%; /* #161B22 */
+  --accent-foreground: 213 31% 91%; /* #F0F6FC */
+  --destructive: 0 84% 60%; /* #F85149 */
+  --destructive-foreground: 210 40% 98%; /* #F0F6FC */
+  --ring: 212 100% 48%; /* #1F6FEB */
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  
+  /* Custom scrollbar for dark theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--accent-foreground));
+  }
+}
+
+@layer utilities {
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+}
