@@ -97,7 +97,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-8 max-w-4xl mx-auto overflow-y-auto h-full">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-100 mb-2">My Account</h1>
         <p className="text-slate-400">Manage your profile information and preferences</p>
