@@ -8,7 +8,8 @@ import { where, orderBy, limit } from "firebase/firestore";
 import { format } from "date-fns";
 import { Link } from "wouter";
 import { useState } from "react";
-import ProjectForm from "@/components/forms/ProjectForm"; // Add this import at the top
+import { Clock } from "lucide-react";
+import ProjectForm from "@/components/forms/ProjectForm";
 
 export default function ActiveProjects() {
   const { user } = useAuth();
@@ -17,6 +18,11 @@ export default function ActiveProjects() {
     where("ownerId", "==", user?.uid || ""),
     orderBy("updatedAt", "desc"),
     limit(5),
+  ]);
+
+  // Get time entries for calculating project time totals
+  const { data: timeEntries } = useCollection("timeEntries", [
+    where("userId", "==", user?.uid || "")
   ]);
 
   const getStatusColor = (status: string) => {
@@ -45,6 +51,21 @@ export default function ActiveProjects() {
       default:
         return "bg-slate-600";
     }
+  };
+
+  // Calculate total time spent on each project
+  const getProjectTotalTime = (projectId: string) => {
+    if (!timeEntries) return 0;
+    return timeEntries
+      .filter(entry => entry.projectId === projectId)
+      .reduce((total, entry) => total + (entry.duration || 0), 0);
+  };
+
+  const formatDurationMinutes = (minutes: number) => {
+    if (minutes === 0) return "0h";
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
 
   const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
@@ -127,10 +148,16 @@ export default function ActiveProjects() {
                 </p>
 
                 <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-4">
                     <span className="text-xs text-slate-400">
                       {project.teamMembers?.length || 0} members
                     </span>
+                    <div className="flex items-center space-x-1">
+                      <Clock className="w-3 h-3 text-slate-400" />
+                      <span className="text-xs text-emerald-400 font-medium">
+                        {formatDurationMinutes(getProjectTotalTime(project.id))}
+                      </span>
+                    </div>
                   </div>
                   {project.deadline && (
                     <span className="text-xs text-slate-400">
