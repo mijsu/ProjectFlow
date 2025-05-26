@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCollection } from "@/hooks/useFirestore";
 import { where, orderBy } from "firebase/firestore";
 import { format } from "date-fns";
-import { Plus, Search, FolderOpen, Calendar, Users, Edit } from "lucide-react";
+import { Plus, Search, FolderOpen, Calendar, Users, Edit, Clock } from "lucide-react";
 import ProjectForm from "@/components/forms/ProjectForm";
 
 export default function Projects() {
@@ -21,6 +21,11 @@ export default function Projects() {
   const { data: projects, loading } = useCollection("projects", [
     where("ownerId", "==", user?.uid || ""),
     orderBy("updatedAt", "desc"),
+  ]);
+
+  // Get time entries for calculating project time totals
+  const { data: timeEntries } = useCollection("timeEntries", [
+    where("userId", "==", user?.uid || "")
   ]);
 
   const getStatusColor = (status: string) => {
@@ -36,6 +41,21 @@ export default function Projects() {
       default:
         return "bg-slate-600/10 text-slate-400 border-slate-600/20";
     }
+  };
+
+  // Calculate total time spent on each project
+  const getProjectTotalTime = (projectId: string) => {
+    if (!timeEntries) return 0;
+    return timeEntries
+      .filter(entry => entry.projectId === projectId)
+      .reduce((total, entry) => total + (entry.duration || 0), 0);
+  };
+
+  const formatDurationMinutes = (minutes: number) => {
+    if (minutes === 0) return "0h";
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
 
   const filteredProjects =
@@ -174,6 +194,17 @@ export default function Projects() {
                           </span>
                         </div>
                       )}
+                    </div>
+
+                    {/* Time Tracking Display */}
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center space-x-1 text-slate-400">
+                        <Clock className="w-4 h-4" />
+                        <span>Time logged</span>
+                      </div>
+                      <span className="text-emerald-400 font-medium">
+                        {formatDurationMinutes(getProjectTotalTime(project.id))}
+                      </span>
                     </div>
 
                     <div>
