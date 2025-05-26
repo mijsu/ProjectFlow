@@ -347,9 +347,9 @@ export default function ProjectForm({
 
                     {/* Existing Tasks - More Scrollable */}
                     {projectTasks && projectTasks.length > 0 ? (
-                      <div className="space-y-2 max-h-64 overflow-y-auto border border-slate-700 rounded-lg p-2 bg-slate-900/50">
+                      <div className="space-y-2 max-h-80 overflow-y-auto border border-slate-700 rounded-lg p-3 bg-slate-900/50">
                         {projectTasks.map((task) => (
-                          <div key={task.id} className="flex items-center justify-between p-2 bg-slate-900 rounded-lg border border-slate-700">
+                          <div key={task.id} className="flex items-center justify-between p-3 bg-slate-900 rounded-lg border border-slate-700 hover:bg-slate-800 transition-colors">
                             <div className="flex items-center space-x-2">
                               <CheckCircle className="w-4 h-4 text-green-400" />
                               <span className="text-sm text-slate-200">{task.title}</span>
@@ -361,7 +361,7 @@ export default function ProjectForm({
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center text-slate-400 py-4 border border-slate-700 rounded-lg bg-slate-900/30">
+                      <div className="text-center text-slate-400 py-6 border border-slate-700 rounded-lg bg-slate-900/30">
                         <p className="text-sm">No progress tasks yet</p>
                       </div>
                     )}
