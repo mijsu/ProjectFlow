@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/hooks/useAuth";
 import { useCollection, addDocument } from "@/hooks/useFirestore";
 import { where } from "firebase/firestore";
@@ -23,6 +24,7 @@ export default function Calendar() {
   const [eventType, setEventType] = useState("meeting");
   const [eventStartTime, setEventStartTime] = useState("");
   const [eventEndTime, setEventEndTime] = useState("");
+  const [eventDate, setEventDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(false);
   
   const { user } = useAuth();
@@ -51,8 +53,8 @@ export default function Calendar() {
 
     setLoading(true);
     try {
-      const startDateTime = new Date(`${format(selectedDate, "yyyy-MM-dd")}T${eventStartTime}`);
-      const endDateTime = new Date(`${format(selectedDate, "yyyy-MM-dd")}T${eventEndTime}`);
+      const startDateTime = new Date(`${format(eventDate, "yyyy-MM-dd")}T${eventStartTime}`);
+      const endDateTime = new Date(`${format(eventDate, "yyyy-MM-dd")}T${eventEndTime}`);
 
       if (endDateTime <= startDateTime) {
         throw new Error("End time must be after start time");
@@ -80,6 +82,7 @@ export default function Calendar() {
       setEventType("meeting");
       setEventStartTime("");
       setEventEndTime("");
+      setEventDate(selectedDate);
       setIsEventFormOpen(false);
     } catch (error: any) {
       toast({
@@ -227,7 +230,6 @@ export default function Calendar() {
           <DialogContent className="max-w-md bg-slate-950 border-slate-800 text-slate-100">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold">Create New Event</DialogTitle>
-              <p className="text-slate-400">For {format(selectedDate, "EEEE, MMMM d, yyyy")}</p>
             </DialogHeader>
 
             <form onSubmit={handleCreateEvent} className="space-y-4">
@@ -254,6 +256,30 @@ export default function Calendar() {
                   placeholder="Enter event description"
                   rows={2}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-slate-200">Event Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal bg-slate-800 border-slate-700 hover:bg-slate-700"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {format(eventDate, "PPP")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-slate-900 border-slate-700" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={eventDate}
+                      onSelect={(date) => date && setEventDate(date)}
+                      initialFocus
+                      className="bg-slate-900"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <div className="space-y-2">
