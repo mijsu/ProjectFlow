@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,13 +7,9 @@ import { useCollection } from "@/hooks/useFirestore";
 import { where, orderBy, limit } from "firebase/firestore";
 import { format } from "date-fns";
 import { Link } from "wouter";
-import { Edit3 } from "lucide-react";
-import ProjectForm from "@/components/forms/ProjectForm";
 
 export default function ActiveProjects() {
   const { user } = useAuth();
-  const [editingProject, setEditingProject] = useState(null);
-  const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
   
   const { data: projects, loading } = useCollection("projects", [
     where("ownerId", "==", user?.uid || ""),
@@ -104,22 +99,9 @@ export default function ActiveProjects() {
                       {project.name}
                     </h4>
                   </Link>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        setEditingProject(project);
-                        setIsProjectFormOpen(true);
-                      }}
-                      className="h-6 w-6 p-0 text-slate-400 hover:text-slate-200"
-                    >
-                      <Edit3 className="w-3 h-3" />
-                    </Button>
-                    <Badge className={getStatusColor(project.status)}>
-                      {project.status.replace("-", " ")}
-                    </Badge>
-                  </div>
+                  <Badge className={getStatusColor(project.status)}>
+                    {project.status.replace("-", " ")}
+                  </Badge>
                 </div>
                 
                 <p className="text-sm text-slate-400 mb-3 line-clamp-2">
@@ -154,15 +136,6 @@ export default function ActiveProjects() {
           )}
         </div>
       </CardContent>
-
-      <ProjectForm
-        isOpen={isProjectFormOpen}
-        onClose={() => {
-          setIsProjectFormOpen(false);
-          setEditingProject(null);
-        }}
-        project={editingProject}
-      />
     </Card>
   );
 }
