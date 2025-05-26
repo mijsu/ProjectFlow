@@ -55,24 +55,39 @@ export function useCollection(collectionName: string, constraints: QueryConstrai
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const q = constraints.length > 0 
-      ? query(collection(db, collectionName), ...constraints)
-      : collection(db, collectionName);
+    let unsubscribe: (() => void) | null = null;
     
-    const unsubscribe = onSnapshot(q,
-      (snapshot) => {
-        const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setData(docs);
-        setLoading(false);
-      },
-      (err) => {
-        setError(err.message);
-        setLoading(false);
-      }
-    );
+    const setupListener = () => {
+      const q = constraints.length > 0 
+        ? query(collection(db, collectionName), ...constraints)
+        : collection(db, collectionName);
+      
+      unsubscribe = onSnapshot(q,
+        (snapshot) => {
+          const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setData(docs);
+          setLoading(false);
+          setError(null);
+        },
+        (err) => {
+          console.warn(`Firestore error for ${collectionName}:`, err);
+          setError(err.message);
+          setLoading(false);
+          
+          // Retry connection after 5 seconds
+          setTimeout(setupListener, 5000);
+        }
+      );
+    };
 
-    return unsubscribe;
-  }, [collectionName, constraints]);
+    setupListener();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [collectionName, JSON.stringify(constraints)]);
 
   return { data, loading, error };
 }

@@ -48,17 +48,64 @@ export default function Calendar() {
 
   const allEvents = [...filteredEvents, ...localEvents];
 
+  // Debug logging
+  useEffect(() => {
+    console.log("Events from Firestore:", events?.length || 0);
+    console.log("Filtered events:", filteredEvents.length);
+    console.log("Local events:", localEvents.length);
+    console.log("All events:", allEvents.length);
+  }, [events, filteredEvents, localEvents, allEvents]);
+
   // Handle Firestore connection errors with better UX
   useEffect(() => {
     if (error) {
       console.warn("Firestore connection error:", error);
       toast({
-        title: "Offline Mode",
-        description: "Working offline. Events will sync when connection is restored.",
-        variant: "default",
+        title: "Connection Issue",
+        description: "Some events may not be visible. Trying to reconnect...",
+        variant: "destructive",
       });
     }
   }, [error, toast]);
+
+  // Sync local events to Firestore when connection is restored
+  useEffect(() => {
+    if (events && localEvents.length > 0 && !error) {
+      // Try to sync local events to Firestore
+      const syncLocalEvents = async () => {
+        for (const localEvent of localEvents) {
+          if (localEvent.isLocal) {
+            try {
+              await addDocument("events", {
+                title: localEvent.title,
+                description: localEvent.description,
+                type: localEvent.type,
+                startTime: localEvent.startTime.toDate(),
+                endTime: localEvent.endTime.toDate(),
+                userId: user?.uid,
+                createdAt: new Date(),
+              });
+              
+              // Remove from local storage after successful sync
+              const updatedLocalEvents = localEvents.filter(e => e.id !== localEvent.id);
+              setLocalEvents(updatedLocalEvents);
+              localStorage.setItem('calendar-local-events', JSON.stringify(
+                updatedLocalEvents.map(event => ({
+                  ...event,
+                  startTime: event.startTime.toDate().toISOString(),
+                  endTime: event.endTime.toDate().toISOString()
+                }))
+              ));
+            } catch (syncError) {
+              console.warn("Failed to sync local event:", syncError);
+            }
+          }
+        }
+      };
+      
+      syncLocalEvents();
+    }
+  }, [events, localEvents, error, user?.uid]);
 
   // Persist local events to localStorage
   useEffect(() => {
@@ -80,6 +127,11 @@ export default function Calendar() {
   const eventsForSelectedDate = allEvents.filter(event => 
     event.startTime && isSameDay(event.startTime.toDate(), selectedDate)
   );
+
+  // Debug selected date events
+  useEffect(() => {
+    console.log(`Events for ${format(selectedDate, "yyyy-MM-dd")}:`, eventsForSelectedDate.length);
+  }, [selectedDate, eventsForSelectedDate]);
 
   // Get events for a specific date
   const getEventsForDate = (date: Date) => {
@@ -355,8 +407,9 @@ export default function Calendar() {
             <CardContent>
               <div className="space-y-3">
                 {eventsLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mb-3"></div>
+                    <p className="text-slate-400 text-sm">Loading events...</p>
                   </div>
                 ) : eventsForSelectedDate.length === 0 ? (
                   <div className="text-center py-8">

@@ -4,6 +4,7 @@ import RecentActivity from "@/components/dashboard/RecentActivity";
 import QuickActions from "@/components/dashboard/QuickActions";
 import ActiveProjects from "@/components/dashboard/ActiveProjects";
 import RecentDocuments from "@/components/dashboard/RecentDocuments";
+import TodayEvents from "@/components/dashboard/TodayEvents";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Dashboard() {
@@ -22,6 +23,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <RecentActivity />
           <QuickActions />
+          <TodayEvents />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
