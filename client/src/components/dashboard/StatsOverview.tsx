@@ -31,40 +31,64 @@ export default function StatsOverview() {
   const totalHours = Math.round((timeEntries?.reduce((sum, entry) => sum + (entry.duration || 0), 0) || 0) / 60);
   const completedTasks = tasks?.filter(t => t.status === "completed")?.length || 0;
 
-  // Calculate percentage changes based on actual data
-  const calculateChange = (current: number, previous: number) => {
-    if (previous === 0) return current > 0 ? "+100%" : "0%";
-    const change = ((current - previous) / previous) * 100;
-    return change >= 0 ? `+${change.toFixed(1)}%` : `${change.toFixed(1)}%`;
+  // Calculate real percentage changes based on actual month-over-month data
+  const currentMonth = new Date();
+  const lastMonth = subMonths(currentMonth, 1);
+  
+  // Get last month's data for comparison
+  const lastMonthStart = startOfMonth(lastMonth);
+  const lastMonthEnd = endOfMonth(lastMonth);
+  
+  const { data: lastMonthProjects } = useCollection("projects", [
+    where("ownerId", "==", user?.uid || ""),
+    where("createdAt", ">=", lastMonthStart),
+    where("createdAt", "<=", lastMonthEnd)
+  ]);
+  
+  const { data: lastMonthDocuments } = useCollection("documents", [
+    where("ownerId", "==", user?.uid || ""),
+    where("createdAt", ">=", lastMonthStart),
+    where("createdAt", "<=", lastMonthEnd)
+  ]);
+  
+  const { data: lastMonthTimeEntries } = useCollection("timeEntries", [
+    where("userId", "==", user?.uid || ""),
+    where("startTime", ">=", lastMonthStart),
+    where("startTime", "<=", lastMonthEnd)
+  ]);
+  
+  const { data: lastMonthTasks } = useCollection("tasks", [
+    where("assigneeId", "==", user?.uid || ""),
+    where("completedAt", ">=", lastMonthStart),
+    where("completedAt", "<=", lastMonthEnd)
+  ]);
+
+  // Calculate real growth percentages
+  const calculateGrowth = (current: number, previous: number) => {
+    if (previous === 0 && current === 0) return "0%";
+    if (previous === 0 && current > 0) return "+100%";
+    if (current === 0) return "-100%";
+    
+    const growth = ((current - previous) / previous) * 100;
+    const sign = growth >= 0 ? "+" : "";
+    return `${sign}${growth.toFixed(1)}%`;
   };
 
-  // For demo purposes, using simple growth calculation based on current data
-  // In a real app, you'd compare with last month's stored data
-  const getProjectChange = () => {
-    const growth = activeProjects > 0 ? Math.min(activeProjects * 2.5, 25) : 0;
-    return `+${growth.toFixed(1)}%`;
-  };
+  const lastMonthActiveProjects = lastMonthProjects?.filter(p => p.status === "in-progress")?.length || 0;
+  const lastMonthDocumentCount = lastMonthDocuments?.length || 0;
+  const lastMonthHours = Math.round((lastMonthTimeEntries?.reduce((sum, entry) => sum + (entry.duration || 0), 0) || 0) / 60);
+  const lastMonthCompletedTasks = lastMonthTasks?.length || 0;
 
-  const getDocumentChange = () => {
-    const growth = totalDocuments > 0 ? Math.min(totalDocuments * 1.8, 20) : 0;
-    return `+${growth.toFixed(1)}%`;
-  };
-
-  const getHoursChange = () => {
-    const growth = totalHours > 0 ? Math.min(totalHours * 0.5, 15) : 0;
-    return `+${growth.toFixed(1)}%`;
-  };
-
-  const getTasksChange = () => {
-    const growth = completedTasks > 0 ? Math.min(completedTasks * 3, 30) : 0;
-    return `+${growth.toFixed(1)}%`;
-  };
+  const projectsChange = calculateGrowth(activeProjects, lastMonthActiveProjects);
+  const documentsChange = calculateGrowth(totalDocuments, lastMonthDocumentCount);
+  const hoursChange = calculateGrowth(totalHours, lastMonthHours);
+  const tasksChange = calculateGrowth(completedTasks, lastMonthCompletedTasks);
 
   const stats = [
     {
       title: "Active Projects",
       value: activeProjects,
-      change: getProjectChange(),
+      change: projectsChange,
       icon: FolderOpen,
       color: "text-emerald-400",
       bgColor: "bg-emerald-600/10",
@@ -72,7 +96,7 @@ export default function StatsOverview() {
     {
       title: "Documents Created",
       value: totalDocuments,
-      change: getDocumentChange(),
+      change: documentsChange,
       icon: FileText,
       color: "text-blue-400",
       bgColor: "bg-blue-600/10",
@@ -80,7 +104,7 @@ export default function StatsOverview() {
     {
       title: "Hours Tracked",
       value: totalHours,
-      change: getHoursChange(),
+      change: hoursChange,
       icon: Clock,
       color: "text-yellow-400",
       bgColor: "bg-yellow-500/10",
@@ -88,7 +112,7 @@ export default function StatsOverview() {
     {
       title: "Tasks Completed",
       value: completedTasks,
-      change: getTasksChange(),
+      change: tasksChange,
       icon: CheckCircle,
       color: "text-purple-400",
       bgColor: "bg-purple-500/10",
