@@ -233,15 +233,21 @@ export default function ProjectForm({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-slate-950 border-slate-800 text-slate-100">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">
+      <DialogContent className="max-w-5xl max-h-[90vh] bg-slate-950 border-slate-800 text-slate-100">
+        <DialogHeader className="pb-4 border-b border-slate-700">
+          <DialogTitle className="text-xl font-semibold">
             {project ? "Edit Project" : "Create New Project"}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Project name input */}
+        <div className="max-h-[70vh] overflow-y-auto">
+          <form onSubmit={handleSubmit} className="space-y-6 p-1">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Left Column - Project Details */}
+              <div className="space-y-4">
+                <h3 className="text-base font-medium text-emerald-400 border-b border-slate-700 pb-2">Project Details</h3>
+                
+                {/* Project name input */}
           <div className="space-y-2">
             <Label htmlFor="name" className="text-slate-200">
               Project Name
@@ -324,85 +330,69 @@ export default function ProjectForm({
             </Popover>
           </div>
 
-          {/* Task-based Progress Tracking */}
-          {project && (
-            <div className="space-y-4 border-t border-slate-700 pt-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-slate-200 font-medium">Progress Tasks</Label>
-                <span className="text-sm text-slate-400">
-                  Total: {progress}%
-                </span>
               </div>
 
-              {/* Existing Tasks */}
-              {projectTasks && projectTasks.length > 0 && (
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {projectTasks.map((task) => (
-                    <div key={task.id} className="flex items-center justify-between p-2 bg-slate-900 rounded-lg border border-slate-700">
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle className="w-4 h-4 text-green-400" />
-                        <span className="text-sm text-slate-200">{task.title}</span>
-                      </div>
-                      <span className="text-sm font-medium text-emerald-400">
-                        +{task.progressContribution || 0}%
+              {/* Right Column - Task Progress Tracking */}
+              <div className="space-y-4">
+                <h3 className="text-base font-medium text-emerald-400 border-b border-slate-700 pb-2">Progress Tracking</h3>
+                
+                {project ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-slate-200 font-medium">Progress Tasks</Label>
+                      <span className="text-sm text-slate-400">
+                        Total: {progress}%
                       </span>
                     </div>
-                  ))}
-                </div>
-              )}
 
-              {/* Add New Task */}
-              <div className="space-y-3 p-3 bg-slate-900 rounded-lg border border-slate-700">
-                <Label className="text-slate-200 text-sm">Add Progress Task</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    placeholder="Task description (e.g., Project meeting)"
-                    value={newTaskTitle}
-                    onChange={(e) => setNewTaskTitle(e.target.value)}
-                    className="flex-1 bg-slate-800 border-slate-600 text-slate-100"
-                  />
-                  <Input
-                    type="number"
-                    placeholder="10"
-                    min="1"
-                    max="100"
-                    value={newTaskProgress}
-                    onChange={(e) => setNewTaskProgress(e.target.value)}
-                    className="w-20 bg-slate-800 border-slate-600 text-slate-100"
-                  />
-                  <span className="flex items-center text-slate-400 text-sm">%</span>
-                </div>
-                <Button
-                  type="button"
-                  onClick={handleAddTask}
-                  size="sm"
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Task Progress
-                </Button>
+                    {/* Existing Tasks - More Scrollable */}
+                    {projectTasks && projectTasks.length > 0 ? (
+                      <div className="space-y-2 max-h-64 overflow-y-auto border border-slate-700 rounded-lg p-2 bg-slate-900/50">
+                        {projectTasks.map((task) => (
+                          <div key={task.id} className="flex items-center justify-between p-2 bg-slate-900 rounded-lg border border-slate-700">
+                            <div className="flex items-center space-x-2">
+                              <CheckCircle className="w-4 h-4 text-green-400" />
+                              <span className="text-sm text-slate-200">{task.title}</span>
+                            </div>
+                            <span className="text-sm font-medium text-emerald-400">
+                              +{task.progressContribution || 0}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center text-slate-400 py-4 border border-slate-700 rounded-lg bg-slate-900/30">
+                        <p className="text-sm">No progress tasks yet</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center text-slate-400 py-8">
+                    <p>Task progress tracking will be available after creating the project.</p>
+                  </div>
+                )}
               </div>
             </div>
-          )}
 
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
-            >
-              {project ? "Update Project" : "Create Project"}
-            </Button>
-          </div>
-        </form>
+            <div className="flex gap-3 pt-6 border-t border-slate-700">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+              >
+                {project ? "Update Project" : "Create Project"}
+              </Button>
+            </div>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   );
