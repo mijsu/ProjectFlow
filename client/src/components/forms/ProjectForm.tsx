@@ -347,7 +347,7 @@ export default function ProjectForm({
 
                     {/* Existing Tasks - More Scrollable */}
                     {projectTasks && projectTasks.length > 0 ? (
-                      <div className="space-y-2 max-h-96 overflow-y-auto border border-slate-700 rounded-lg p-3 bg-slate-900/50">
+                      <div className="space-y-2 max-h-[28rem] overflow-y-auto border border-slate-700 rounded-lg p-3 bg-slate-900/50">
                         {projectTasks.map((task) => (
                           <div key={task.id} className="flex items-center justify-between p-3 bg-slate-900 rounded-lg border border-slate-700 hover:bg-slate-800 transition-colors">
                             <div className="flex items-center space-x-2">
