@@ -25,7 +25,7 @@ const navigation = [
 export default function Sidebar() {
   const [location] = useLocation();
   const { user } = useAuth();
-
+  
   const { data: recentProjects } = useCollection("projects", [
     where("ownerId", "==", user?.uid || ""),
     orderBy("updatedAt", "desc"),
@@ -65,7 +65,7 @@ export default function Sidebar() {
           </div>
           <h1 className="text-lg font-semibold text-slate-100">ProjectFlow</h1>
         </div>
-
+        
         {user && (
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
@@ -97,18 +97,21 @@ export default function Sidebar() {
           {navigation.map((item) => {
             const isActive = location === item.href;
             const Icon = item.icon;
-
+            
             return (
               <li key={item.name}>
-                <div className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+                <Link href={item.href}>
+                  <div
+                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
                       isActive
                         ? "bg-emerald-600/10 text-emerald-400 border border-emerald-600/20"
                         : "text-slate-300 hover:bg-slate-800/50"
                     }`}
-                  onClick={() => window.location.href = item.href}>
+                  >
                     <Icon className="w-4 h-4" />
                     <span>{item.name}</span>
                   </div>
+                </Link>
               </li>
             );
           })}

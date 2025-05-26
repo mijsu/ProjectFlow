@@ -74,10 +74,8 @@ export function useCollection(collectionName: string, constraints: QueryConstrai
           setError(err.message);
           setLoading(false);
 
-          // Only retry for certain error types
-          if (err.code === 'failed-precondition' || err.code === 'unavailable') {
-            setTimeout(setupListener, 10000); // Increase retry delay
-          }
+          // Retry connection after 5 seconds
+          setTimeout(setupListener, 5000);
         }
       );
     };
@@ -107,26 +105,16 @@ export async function addDocument(collectionName: string, data: any) {
   }
 }
 
-export async function updateDocument(collectionName: string, docId: string, data: any) {
+// Update document function
+export const updateDocument = async (collection: string, docId: string, data: any) => {
   try {
-    const docRef = doc(db, collectionName, docId);
-    await updateDoc(docRef, {
-      ...data,
-      updatedAt: new Date(),
-    });
+    const docRef = doc(db, collection, docId);
+    await updateDoc(docRef, data);
     return docRef;
   } catch (error) {
-    console.error(`Error updating document in ${collectionName}:`, error);
+    console.error(`Error updating document in ${collection}:`, error);
     throw error;
   }
-}
+};
 
-export async function deleteDocument(collectionName: string, docId: string) {
-  try {
-    const docRef = doc(db, collectionName, docId);
-    await deleteDoc(docRef);
-  } catch (error) {
-    console.error(`Error deleting document in ${collectionName}:`, error);
-    throw error;
-  }
-}
+export { addDocument, updateDocument };

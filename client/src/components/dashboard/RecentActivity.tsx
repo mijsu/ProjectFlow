@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useCollection } from "@/hooks/useFirestore";
-import { where, orderBy, limit } from "firebase/firestore";
+import { orderBy, limit } from "firebase/firestore";
 import { FileText, FolderOpen, Clock, CheckCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
