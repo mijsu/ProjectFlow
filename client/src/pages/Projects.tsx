@@ -16,10 +16,10 @@ export default function Projects() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
   const { user } = useAuth();
-  
+
   const { data: projects, loading } = useCollection("projects", [
     where("ownerId", "==", user?.uid || ""),
-    orderBy("updatedAt", "desc")
+    orderBy("updatedAt", "desc"),
   ]);
 
   const getStatusColor = (status: string) => {
@@ -37,10 +37,15 @@ export default function Projects() {
     }
   };
 
-  const filteredProjects = projects?.filter(project =>
-    project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (project.description && project.description.toLowerCase().includes(searchQuery.toLowerCase()))
-  ) || [];
+  const filteredProjects =
+    projects?.filter(
+      (project) =>
+        project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (project.description &&
+          project.description
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())),
+    ) || [];
 
   if (loading) {
     return (
@@ -49,7 +54,10 @@ export default function Projects() {
         <div className="flex-1 overflow-y-auto p-6 bg-slate-900">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <Card key={i} className="bg-slate-950 border-slate-800 animate-pulse">
+              <Card
+                key={i}
+                className="bg-slate-950 border-slate-800 animate-pulse"
+              >
                 <CardContent className="p-6">
                   <div className="h-6 bg-slate-700 rounded mb-4"></div>
                   <div className="h-4 bg-slate-700 rounded mb-2"></div>
@@ -67,9 +75,8 @@ export default function Projects() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       <TopBar title="Projects" />
-      
+
       <div className="flex-1 overflow-y-auto p-6 bg-slate-900">
-        {/* Header Actions */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
             <div className="relative">
@@ -83,8 +90,8 @@ export default function Projects() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
             </div>
           </div>
-          
-          <Button 
+
+          <Button
             onClick={() => setIsProjectFormOpen(true)}
             className="bg-emerald-600 hover:bg-emerald-700"
           >
@@ -93,7 +100,6 @@ export default function Projects() {
           </Button>
         </div>
 
-        {/* Projects Grid */}
         {filteredProjects.length === 0 ? (
           <div className="text-center py-16">
             <FolderOpen className="w-16 h-16 text-slate-400 mx-auto mb-4" />
@@ -101,13 +107,12 @@ export default function Projects() {
               {searchQuery ? "No projects found" : "No projects yet"}
             </h3>
             <p className="text-slate-400 mb-6">
-              {searchQuery 
-                ? "Try adjusting your search terms" 
-                : "Create your first project to get started"
-              }
+              {searchQuery
+                ? "Try adjusting your search terms"
+                : "Create your first project to get started"}
             </p>
             {!searchQuery && (
-              <Button 
+              <Button
                 onClick={() => setIsProjectFormOpen(true)}
                 className="bg-emerald-600 hover:bg-emerald-700"
               >
@@ -119,8 +124,8 @@ export default function Projects() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map((project) => (
-              <Card 
-                key={project.id} 
+              <Card
+                key={project.id}
                 className="bg-slate-950 border-slate-800 hover:border-slate-700 transition-colors cursor-pointer group"
               >
                 <CardHeader className="pb-3">
@@ -132,37 +137,39 @@ export default function Projects() {
                       {project.status.replace("-", " ")}
                     </Badge>
                   </div>
-                  
+
                   <p className="text-sm text-slate-400 line-clamp-2">
                     {project.description || "No description"}
                   </p>
                 </CardHeader>
-                
+
                 <CardContent>
                   <div className="space-y-4">
-                    {/* Project Meta */}
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center space-x-1 text-slate-400">
                         <Users className="w-4 h-4" />
                         <span>{project.teamMembers?.length || 0} members</span>
                       </div>
-                      
+
                       {project.deadline && (
                         <div className="flex items-center space-x-1 text-slate-400">
                           <Calendar className="w-4 h-4" />
-                          <span>{format(project.deadline.toDate(), "MMM d")}</span>
+                          <span>
+                            {format(project.deadline.toDate(), "MMM d")}
+                          </span>
                         </div>
                       )}
                     </div>
-                    
-                    {/* Progress */}
+
                     <div>
                       <div className="flex items-center justify-between text-sm mb-2">
                         <span className="text-slate-400">Progress</span>
-                        <span className="text-slate-300">{project.progress || 0}%</span>
+                        <span className="text-slate-300">
+                          {project.progress || 0}%
+                        </span>
                       </div>
-                      <Progress 
-                        value={project.progress || 0} 
+                      <Progress
+                        value={project.progress || 0}
                         className="h-2 bg-slate-800"
                       />
                     </div>

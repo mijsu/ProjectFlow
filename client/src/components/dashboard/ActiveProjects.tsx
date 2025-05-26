@@ -7,14 +7,16 @@ import { useCollection } from "@/hooks/useFirestore";
 import { where, orderBy, limit } from "firebase/firestore";
 import { format } from "date-fns";
 import { Link } from "wouter";
+import { useState } from "react";
+import ProjectForm from "@/components/forms/ProjectForm"; // Add this import at the top
 
 export default function ActiveProjects() {
   const { user } = useAuth();
-  
+
   const { data: projects, loading } = useCollection("projects", [
     where("ownerId", "==", user?.uid || ""),
     orderBy("updatedAt", "desc"),
-    limit(5)
+    limit(5),
   ]);
 
   const getStatusColor = (status: string) => {
@@ -45,6 +47,14 @@ export default function ActiveProjects() {
     }
   };
 
+  const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null); // Add this state
+
+  const handleEditProject = (project) => {
+    setSelectedProject(project);
+    setIsProjectFormOpen(true);
+  };
+
   if (loading) {
     return (
       <Card className="bg-slate-950 border-slate-800">
@@ -54,7 +64,10 @@ export default function ActiveProjects() {
         <CardContent>
           <div className="space-y-4">
             {[...Array(2)].map((_, i) => (
-              <div key={i} className="p-4 bg-slate-900 rounded-lg border border-slate-800 animate-pulse">
+              <div
+                key={i}
+                className="p-4 bg-slate-900 rounded-lg border border-slate-800 animate-pulse"
+              >
                 <div className="h-5 bg-slate-700 rounded w-3/4 mb-2"></div>
                 <div className="h-4 bg-slate-700 rounded w-full mb-3"></div>
                 <div className="h-3 bg-slate-700 rounded w-1/2"></div>
@@ -71,7 +84,11 @@ export default function ActiveProjects() {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-slate-100">Active Projects</CardTitle>
         <Link href="/projects">
-          <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-blue-400 hover:text-blue-300"
+          >
             View All
           </Button>
         </Link>
@@ -91,7 +108,8 @@ export default function ActiveProjects() {
             projects?.map((project) => (
               <div
                 key={project.id}
-                className="p-4 bg-slate-900 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors"
+                onClick={() => handleEditProject(project)} // Update this part
+                className="p-4 bg-slate-900 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors cursor-pointer"
               >
                 <div className="flex items-center justify-between mb-2">
                   <Link href={`/projects/${project.id}`}>
@@ -103,11 +121,11 @@ export default function ActiveProjects() {
                     {project.status.replace("-", " ")}
                   </Badge>
                 </div>
-                
+
                 <p className="text-sm text-slate-400 mb-3 line-clamp-2">
                   {project.description || "No description"}
                 </p>
-                
+
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
                     <span className="text-xs text-slate-400">
@@ -120,14 +138,16 @@ export default function ActiveProjects() {
                     </span>
                   )}
                 </div>
-                
+
                 <div>
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="text-slate-400">Progress</span>
-                    <span className="text-slate-300">{project.progress || 0}%</span>
+                    <span className="text-slate-300">
+                      {project.progress || 0}%
+                    </span>
                   </div>
-                  <Progress 
-                    value={project.progress || 0} 
+                  <Progress
+                    value={project.progress || 0}
                     className="h-2 bg-slate-800"
                   />
                 </div>
@@ -136,6 +156,18 @@ export default function ActiveProjects() {
           )}
         </div>
       </CardContent>
+      <ProjectForm
+        isOpen={isProjectFormOpen}
+        onClose={() => {
+          setSelectedProject(null);
+          setIsProjectFormOpen(false);
+        }}
+        onSuccess={() => {
+          setSelectedProject(null);
+          setIsProjectFormOpen(false);
+        }}
+        project={selectedProject} // Pass the selected project to the form
+      />
     </Card>
   );
 }
