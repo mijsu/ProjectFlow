@@ -80,7 +80,7 @@ export default function ActiveProjects() {
   }
 
   return (
-    <Card className="bg-slate-950 border-slate-800 h-[400px] flex flex-col">
+    <Card className="bg-slate-950 border-slate-800 h-[500px] flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between flex-shrink-0">
         <CardTitle className="text-slate-100">Active Projects</CardTitle>
         <Link href="/projects">
