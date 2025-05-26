@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -25,6 +25,29 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const { user } = useAuth();
   const [, navigate] = useLocation();
+
+  // Load viewed notifications from localStorage on mount
+  useEffect(() => {
+    if (user?.uid) {
+      const storageKey = `viewedNotifications_${user.uid}`;
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        try {
+          setViewedNotifications(JSON.parse(saved));
+        } catch (error) {
+          console.error("Error loading viewed notifications:", error);
+        }
+      }
+    }
+  }, [user?.uid]);
+
+  // Save viewed notifications to localStorage whenever it changes
+  useEffect(() => {
+    if (user?.uid && viewedNotifications.length > 0) {
+      const storageKey = `viewedNotifications_${user.uid}`;
+      localStorage.setItem(storageKey, JSON.stringify(viewedNotifications));
+    }
+  }, [viewedNotifications, user?.uid]);
 
   // Fetch data for notifications
   const { data: tasks } = useCollection("tasks", user?.uid ? [
