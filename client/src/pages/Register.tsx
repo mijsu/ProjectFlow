@@ -1,51 +1,62 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
-import { signInWithGoogle, signInWithEmail } from "@/lib/auth";
+import { signUpWithEmail, signInWithGoogle } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { LayoutDashboard, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-export default function Login() {
+export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const [, navigate] = useLocation();
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [user, navigate]);
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-500"></div>
-      </div>
-    );
+  if (user) {
+    navigate("/");
+    return null;
   }
 
-  const handleEmailSignIn = async (e: React.FormEvent) => {
+  const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (password.length < 6) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      await signInWithEmail(email, password);
+      await signUpWithEmail(email, password, displayName);
       toast({
         title: "Success",
-        description: "Signed in successfully!",
+        description: "Account created successfully!",
       });
       navigate("/");
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to sign in",
+        description: error.message || "Failed to create account",
         variant: "destructive",
       });
     } finally {
@@ -74,9 +85,9 @@ export default function Login() {
               <LayoutDashboard className="w-8 h-8 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-slate-100">Welcome Back</CardTitle>
+          <CardTitle className="text-2xl font-bold text-slate-100">Create Account</CardTitle>
           <p className="text-slate-400">
-            Sign in to your ProjectFlow account
+            Join ProjectFlow to manage your documents, projects, and time
           </p>
         </CardHeader>
         
@@ -116,8 +127,21 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Email Sign In Form */}
-          <form onSubmit={handleEmailSignIn} className="space-y-4">
+          {/* Email Sign Up Form */}
+          <form onSubmit={handleEmailSignUp} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="displayName" className="text-slate-200">Full Name</Label>
+              <Input
+                id="displayName"
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                required
+                className="bg-slate-800 border-slate-700 text-slate-100 placeholder-slate-400"
+                placeholder="Enter your full name"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="email" className="text-slate-200">Email</Label>
               <Input
@@ -155,30 +179,43 @@ export default function Login() {
               </div>
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-slate-200">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="bg-slate-800 border-slate-700 text-slate-100 placeholder-slate-400"
+                placeholder="Confirm your password"
+              />
+            </div>
+
             <Button
               type="submit"
               disabled={loading}
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
             >
-              {loading ? "Signing In..." : "Sign In"}
+              {loading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
 
           <div className="text-center">
             <p className="text-sm text-slate-400">
-              Don't have an account?{" "}
+              Already have an account?{" "}
               <button
-                onClick={() => navigate("/register")}
+                onClick={() => navigate("/login")}
                 className="text-emerald-400 hover:text-emerald-300 font-medium"
               >
-                Sign up
+                Sign in
               </button>
             </p>
           </div>
 
           <div className="text-center">
             <p className="text-xs text-slate-500">
-              By signing in, you agree to our Terms of Service and Privacy Policy
+              By creating an account, you agree to our Terms of Service and Privacy Policy
             </p>
           </div>
         </CardContent>

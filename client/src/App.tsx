@@ -11,6 +11,7 @@ import Projects from "@/pages/Projects";
 import Calendar from "@/pages/Calendar";
 import TimeTracking from "@/pages/TimeTracking";
 import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 import NotFound from "@/pages/not-found";
 
 function AppContent() {
@@ -25,7 +26,12 @@ function AppContent() {
   }
 
   if (!user) {
-    return <Login />;
+    return (
+      <Switch>
+        <Route path="/register" component={Register} />
+        <Route component={Login} />
+      </Switch>
+    );
   }
 
   return (
