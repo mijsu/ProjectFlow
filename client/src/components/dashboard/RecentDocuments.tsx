@@ -66,8 +66,8 @@ export default function RecentDocuments() {
   }
 
   return (
-    <Card className="bg-slate-950 border-slate-800">
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card className="bg-slate-950 border-slate-800 h-[500px] flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between flex-shrink-0">
         <CardTitle className="text-slate-100">Recent Documents</CardTitle>
         <Link href="/documents">
           <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300">
@@ -75,8 +75,8 @@ export default function RecentDocuments() {
           </Button>
         </Link>
       </CardHeader>
-      <CardContent>
-        <div className={`space-y-3 ${documents?.length > 5 ? 'max-h-80 overflow-y-auto pr-2' : ''}`}>
+      <CardContent className="flex-1 overflow-hidden">
+        <div className={`space-y-3 h-full ${documents?.length > 5 ? 'overflow-y-auto pr-2' : ''}`}>
           {documents?.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-slate-400 mb-4">No documents yet</p>
