@@ -13,7 +13,7 @@ export default function RecentDocuments() {
   const { data: documents, loading } = useCollection("documents", [
     where("ownerId", "==", user?.uid || ""),
     orderBy("updatedAt", "desc"),
-    limit(5)
+    limit(10)
   ]);
 
   const getDocumentIcon = (type: string) => {
