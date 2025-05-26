@@ -111,12 +111,75 @@ export default function Calendar() {
               </Button>
             </CardHeader>
             <CardContent>
-              <CalendarComponent
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => date && setSelectedDate(date)}
-                className="rounded-md border border-slate-700 bg-slate-900 w-full"
-              />
+              <div className="space-y-4">
+                {/* Month Navigation */}
+                <div className="flex items-center justify-between">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1, 1))}
+                    className="border-slate-700 text-slate-300 hover:bg-slate-800"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <h2 className="text-lg font-semibold text-slate-100">
+                    {format(selectedDate, "MMMM yyyy")}
+                  </h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1))}
+                    className="border-slate-700 text-slate-300 hover:bg-slate-800"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {/* Advanced Calendar Grid */}
+                <div className="bg-slate-900 rounded-lg border border-slate-700 p-4">
+                  {/* Days of week header */}
+                  <div className="grid grid-cols-7 gap-1 mb-2">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                      <div key={day} className="p-2 text-center text-xs font-medium text-slate-400">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Calendar days grid */}
+                  <div className="grid grid-cols-7 gap-1">
+                    {Array.from({ length: 42 }, (_, i) => {
+                      const date = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), i - 6);
+                      const isCurrentMonth = date.getMonth() === selectedDate.getMonth();
+                      const isSelected = isSameDay(date, selectedDate);
+                      const isToday = isSameDay(date, new Date());
+                      const hasEvents = events?.some(event => 
+                        event.startTime && isSameDay(event.startTime.toDate(), date)
+                      );
+
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => setSelectedDate(date)}
+                          className={`
+                            relative p-2 h-12 text-sm rounded transition-colors
+                            ${isCurrentMonth ? 'text-slate-200' : 'text-slate-500'}
+                            ${isSelected ? 'bg-emerald-600 text-white' : 'hover:bg-slate-800'}
+                            ${isToday && !isSelected ? 'bg-blue-600/20 text-blue-400' : ''}
+                          `}
+                        >
+                          {date.getDate()}
+                          {hasEvents && (
+                            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
+                              <div className="w-1 h-1 bg-emerald-400 rounded-full"></div>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
