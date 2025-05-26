@@ -90,7 +90,7 @@ export default function ProjectForm({
         status,
         progress: numericProgress,
         ownerId: user.uid,
-        teamMembers: project?.teamMembers || [], // Check this line
+        teamMembers: Array.isArray(project?.teamMembers) ? project.teamMembers : [],
         deadline: deadline || null,
       };
 
@@ -98,7 +98,7 @@ export default function ProjectForm({
 
       if (project) {
         // Update existing project
-        await updateDocument(`projects/${project.id}`, projectData);
+        await updateDocument("projects", project.id, projectData);
         toast({
           title: "Success",
           description: "Project updated successfully!",

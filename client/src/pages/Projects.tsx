@@ -9,12 +9,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCollection } from "@/hooks/useFirestore";
 import { where, orderBy } from "firebase/firestore";
 import { format } from "date-fns";
-import { Plus, Search, FolderOpen, Calendar, Users } from "lucide-react";
+import { Plus, Search, FolderOpen, Calendar, Users, Edit } from "lucide-react";
 import ProjectForm from "@/components/forms/ProjectForm";
 
 export default function Projects() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
   const { user } = useAuth();
 
   const { data: projects, loading } = useCollection("projects", [
