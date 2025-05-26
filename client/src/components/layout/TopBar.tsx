@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Search, Settings, User, LogOut, Clock, AlertTriangle, Calendar, CheckCircle } from "lucide-react";
+import { Bell, Search, Settings, User, LogOut, Clock, AlertTriangle, Calendar, CheckCircle, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { signOutUser } from "@/lib/auth";
 import { useLocation } from "wouter";
@@ -20,6 +20,7 @@ interface TopBarProps {
 export default function TopBar({ title, subtitle }: TopBarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [dismissedNotifications, setDismissedNotifications] = useState<string[]>([]);
   const { user } = useAuth();
   const [, navigate] = useLocation();
 
@@ -143,10 +144,18 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
       });
     }
 
-    return notifications.slice(0, 5); // Limit to 5 notifications
+    return notifications.filter(notification => 
+      !dismissedNotifications.includes(notification.id)
+    );
   };
 
   const notifications = generateNotifications();
+
+  const dismissNotification = (notificationId: string, event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDismissedNotifications(prev => [...prev, notificationId]);
+  };
 
   const handleSignOut = async () => {
     try {
@@ -217,7 +226,7 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             align="end" 
-            className="w-80 bg-slate-900 border-slate-700 max-h-96 overflow-y-auto"
+            className="w-80 bg-slate-900 border-slate-700"
           >
             {notifications.length === 0 ? (
               <div className="p-4 text-center text-slate-400">
@@ -231,33 +240,43 @@ export default function TopBar({ title, subtitle }: TopBarProps) {
                   <h4 className="font-semibold text-slate-100">Notifications</h4>
                   <p className="text-xs text-slate-400">{notifications.length} new alert{notifications.length !== 1 ? 's' : ''}</p>
                 </div>
-                {notifications.map((notification) => {
-                  const IconComponent = notification.icon;
-                  return (
-                    <DropdownMenuItem
-                      key={notification.id}
-                      onClick={notification.action}
-                      className="p-3 cursor-pointer hover:bg-slate-800 focus:bg-slate-800"
-                    >
-                      <div className="flex items-start space-x-3 w-full">
-                        <IconComponent 
-                          className={`w-4 h-4 mt-0.5 flex-shrink-0 ${getNotificationColor(notification.type)}`} 
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-200 truncate">
-                            {notification.title}
-                          </p>
-                          <p className="text-xs text-slate-400 truncate">
-                            {notification.description}
-                          </p>
-                          <p className="text-xs text-slate-500 mt-1">
-                            {notification.time}
-                          </p>
+                <div className={`${notifications.length > 5 ? 'max-h-80 overflow-y-auto' : ''}`}>
+                  {notifications.map((notification) => {
+                    const IconComponent = notification.icon;
+                    return (
+                      <DropdownMenuItem
+                        key={notification.id}
+                        onClick={notification.action}
+                        className="p-3 cursor-pointer hover:bg-slate-800 focus:bg-slate-800 relative"
+                      >
+                        <div className="flex items-start space-x-3 w-full pr-8">
+                          <IconComponent 
+                            className={`w-4 h-4 mt-0.5 flex-shrink-0 ${getNotificationColor(notification.type)}`} 
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-200 truncate">
+                              {notification.title}
+                            </p>
+                            <p className="text-xs text-slate-400 truncate">
+                              {notification.description}
+                            </p>
+                            <p className="text-xs text-slate-500 mt-1">
+                              {notification.time}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </DropdownMenuItem>
-                  );
-                })}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => dismissNotification(notification.id, e)}
+                          className="absolute top-2 right-2 h-6 w-6 p-0 text-slate-400 hover:text-slate-200 hover:bg-slate-700"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </div>
               </>
             )}
           </DropdownMenuContent>
