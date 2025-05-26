@@ -77,6 +77,63 @@ export default function ProjectForm({
     }
   }, [project]);
 
+  // Calculate progress based on tasks
+  useEffect(() => {
+    if (projectTasks && projectTasks.length > 0) {
+      const totalProgress = projectTasks.reduce((sum, task) => sum + (task.progressContribution || 0), 0);
+      setProgress(Math.min(totalProgress, 100));
+    }
+  }, [projectTasks]);
+
+  // Add new task to project with progress contribution
+  const handleAddTask = async () => {
+    if (!newTaskTitle.trim() || !newTaskProgress.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter task title and progress percentage",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const progressValue = parseInt(newTaskProgress);
+    if (isNaN(progressValue) || progressValue < 1 || progressValue > 100) {
+      toast({
+        title: "Error",
+        description: "Progress must be between 1 and 100",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await addDocument("tasks", {
+        title: newTaskTitle.trim(),
+        description: `Added from project: ${name}`,
+        progressContribution: progressValue,
+        projectId: project?.id || `temp-${Date.now()}`,
+        assigneeId: user?.uid,
+        status: "completed",
+        createdAt: new Date(),
+        dueDate: new Date(),
+      });
+
+      setNewTaskTitle("");
+      setNewTaskProgress("");
+      
+      toast({
+        title: "Success",
+        description: `Task added with ${progressValue}% progress contribution`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add task",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -266,6 +323,67 @@ export default function ProjectForm({
               </PopoverContent>
             </Popover>
           </div>
+
+          {/* Task-based Progress Tracking */}
+          {project && (
+            <div className="space-y-4 border-t border-slate-700 pt-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-slate-200 font-medium">Progress Tasks</Label>
+                <span className="text-sm text-slate-400">
+                  Total: {progress}%
+                </span>
+              </div>
+
+              {/* Existing Tasks */}
+              {projectTasks && projectTasks.length > 0 && (
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {projectTasks.map((task) => (
+                    <div key={task.id} className="flex items-center justify-between p-2 bg-slate-900 rounded-lg border border-slate-700">
+                      <div className="flex items-center space-x-2">
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        <span className="text-sm text-slate-200">{task.title}</span>
+                      </div>
+                      <span className="text-sm font-medium text-emerald-400">
+                        +{task.progressContribution || 0}%
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add New Task */}
+              <div className="space-y-3 p-3 bg-slate-900 rounded-lg border border-slate-700">
+                <Label className="text-slate-200 text-sm">Add Progress Task</Label>
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="Task description (e.g., Project meeting)"
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    className="flex-1 bg-slate-800 border-slate-600 text-slate-100"
+                  />
+                  <Input
+                    type="number"
+                    placeholder="10"
+                    min="1"
+                    max="100"
+                    value={newTaskProgress}
+                    onChange={(e) => setNewTaskProgress(e.target.value)}
+                    className="w-20 bg-slate-800 border-slate-600 text-slate-100"
+                  />
+                  <span className="flex items-center text-slate-400 text-sm">%</span>
+                </div>
+                <Button
+                  type="button"
+                  onClick={handleAddTask}
+                  size="sm"
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Task Progress
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-3 pt-4">
             <Button
