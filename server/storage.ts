@@ -259,6 +259,11 @@ export class MemStorage implements IStorage {
     const timeEntry: TimeEntry = { 
       ...insertTimeEntry, 
       id,
+      description: insertTimeEntry.description || null,
+      projectId: insertTimeEntry.projectId || null,
+      taskId: insertTimeEntry.taskId || null,
+      documentId: insertTimeEntry.documentId || null,
+      endTime: insertTimeEntry.endTime || null,
       createdAt: new Date()
     };
     this.timeEntries.set(id, timeEntry);
@@ -290,6 +295,9 @@ export class MemStorage implements IStorage {
     const activity: Activity = { 
       ...insertActivity, 
       id,
+      entityType: insertActivity.entityType || null,
+      entityId: insertActivity.entityId || null,
+      metadata: insertActivity.metadata || {},
       createdAt: new Date()
     };
     this.activities.set(id, activity);
@@ -310,6 +318,9 @@ export class MemStorage implements IStorage {
     const event: Event = { 
       ...insertEvent, 
       id,
+      type: insertEvent.type || "meeting",
+      description: insertEvent.description || null,
+      projectId: insertEvent.projectId || null,
       createdAt: new Date()
     };
     this.events.set(id, event);
