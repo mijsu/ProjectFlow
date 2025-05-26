@@ -134,9 +134,23 @@ export default function Projects() {
                     <CardTitle className="text-slate-100 group-hover:text-emerald-400 transition-colors">
                       {project.name}
                     </CardTitle>
-                    <Badge className={getStatusColor(project.status)}>
-                      {project.status.replace("-", " ")}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingProject(project);
+                          setIsProjectFormOpen(true);
+                        }}
+                        className="text-slate-400 hover:text-emerald-400 hover:bg-slate-800"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Badge className={getStatusColor(project.status)}>
+                        {project.status.replace("-", " ")}
+                      </Badge>
+                    </div>
                   </div>
 
                   <p className="text-sm text-slate-400 line-clamp-2">
@@ -184,11 +198,15 @@ export default function Projects() {
 
       <ProjectForm
         isOpen={isProjectFormOpen}
-        onClose={() => setIsProjectFormOpen(false)}
-        onSuccess={() => {
-          // The useCollection hook will automatically refresh the data
+        onClose={() => {
           setIsProjectFormOpen(false);
+          setEditingProject(null);
         }}
+        onSuccess={() => {
+          setIsProjectFormOpen(false);
+          setEditingProject(null);
+        }}
+        project={editingProject}
       />
     </div>
   );

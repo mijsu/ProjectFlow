@@ -41,16 +41,32 @@ export default function ProjectForm({
   onSuccess,
   project,
 }: ProjectFormProps) {
-  const [name, setName] = useState(project?.name || "");
-  const [description, setDescription] = useState(project?.description || "");
-  const [status, setStatus] = useState(project?.status || "planning");
-  const [progress, setProgress] = useState(project?.progress || 0);
-  const [deadline, setDeadline] = useState<Date | undefined>(
-    project?.deadline?.toDate() || undefined,
-  );
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState("planning");
+  const [progress, setProgress] = useState(0);
+  const [deadline, setDeadline] = useState<Date | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  // Update form when project changes
+  useEffect(() => {
+    if (project) {
+      setName(project.name || "");
+      setDescription(project.description || "");
+      setStatus(project.status || "planning");
+      setProgress(project.progress || 0);
+      setDeadline(project.deadline?.toDate() || undefined);
+    } else {
+      // Reset form for new project
+      setName("");
+      setDescription("");
+      setStatus("planning");
+      setProgress(0);
+      setDeadline(undefined);
+    }
+  }, [project]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
