@@ -25,8 +25,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Plus, Trash2, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
+import { useCollection } from "@/hooks/useFirestore";
+import { where } from "firebase/firestore";
 
 interface ProjectFormProps {
   isOpen: boolean;
@@ -47,8 +49,15 @@ export default function ProjectForm({
   const [progress, setProgress] = useState(0);
   const [deadline, setDeadline] = useState<Date | undefined>(undefined);
   const [loading, setLoading] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskProgress, setNewTaskProgress] = useState("");
   const { user } = useAuth();
   const { toast } = useToast();
+
+  // Fetch existing tasks for this project
+  const { data: projectTasks } = useCollection("tasks", project?.id ? [
+    where("projectId", "==", project.id)
+  ] : []);
 
   // Update form when project changes
   useEffect(() => {
