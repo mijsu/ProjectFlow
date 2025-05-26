@@ -10,9 +10,11 @@ import { useCollection } from "@/hooks/useFirestore";
 import { where, orderBy } from "firebase/firestore";
 import { format } from "date-fns";
 import { Plus, Search, FolderOpen, Calendar, Users } from "lucide-react";
+import ProjectForm from "@/components/forms/ProjectForm";
 
 export default function Projects() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
   const { user } = useAuth();
   
   const { data: projects, loading } = useCollection("projects", [
@@ -82,7 +84,10 @@ export default function Projects() {
             </div>
           </div>
           
-          <Button className="bg-emerald-600 hover:bg-emerald-700">
+          <Button 
+            onClick={() => setIsProjectFormOpen(true)}
+            className="bg-emerald-600 hover:bg-emerald-700"
+          >
             <Plus className="w-4 h-4 mr-2" />
             New Project
           </Button>
@@ -102,7 +107,10 @@ export default function Projects() {
               }
             </p>
             {!searchQuery && (
-              <Button className="bg-emerald-600 hover:bg-emerald-700">
+              <Button 
+                onClick={() => setIsProjectFormOpen(true)}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Project
               </Button>
@@ -165,6 +173,15 @@ export default function Projects() {
           </div>
         )}
       </div>
+
+      <ProjectForm
+        isOpen={isProjectFormOpen}
+        onClose={() => setIsProjectFormOpen(false)}
+        onSuccess={() => {
+          // The useCollection hook will automatically refresh the data
+          setIsProjectFormOpen(false);
+        }}
+      />
     </div>
   );
 }

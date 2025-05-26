@@ -81,7 +81,7 @@ export default function ActiveProjects() {
           {projects?.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-slate-400 mb-4">No projects yet</p>
-              <Link href="/projects/new">
+              <Link href="/projects">
                 <Button className="bg-emerald-600 hover:bg-emerald-700">
                   Create Your First Project
                 </Button>

@@ -142,7 +142,7 @@ export default function Sidebar() {
 
       {/* Footer Actions */}
       <div className="p-4 border-t border-slate-800">
-        <Link href="/projects/new">
+        <Link href="/projects">
           <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
             <Plus className="w-4 h-4 mr-2" />
             New Project
