@@ -270,7 +270,7 @@ export default function TimeTracking() {
     setLoading(true);
     try {
       // Create a progress task in the tasks collection (matching project system)
-      await addDocument("tasks", {
+      const taskData = {
         title: entryDescription.trim(),
         description: entryDescription.trim(),
         progressContribution: progressPercentage,
@@ -281,14 +281,12 @@ export default function TimeTracking() {
         completedAt: new Date(),
         ownerId: user.uid,
         assigneeId: user.uid
-      });
+      };
 
-      // Update the project's total progress by adding this task's contribution
-      // Get all completed progress tasks for this project to calculate total progress
-      const projectDoc = await updateDocument("projects", entryProject, {
-        updatedAt: new Date()
-      });
-      
+      console.log("Creating task with data:", taskData);
+      const taskDoc = await addDocument("tasks", taskData);
+      console.log("Task created successfully:", taskDoc);
+
       toast({
         title: "Success",
         description: `Progress task added: ${entryDescription.trim()} (${progressPercentage}% contribution)`,
@@ -300,9 +298,10 @@ export default function TimeTracking() {
       setEntryProject("");
       setIsManualEntryOpen(false);
     } catch (error: any) {
+      console.error("Error creating progress task:", error);
       toast({
         title: "Error",
-        description: "Failed to add progress task",
+        description: `Failed to add progress task: ${error.message || "Unknown error"}`,
         variant: "destructive",
       });
     } finally {
