@@ -59,6 +59,9 @@ export default function ProjectForm({
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const [isDeletingTask, setIsDeletingTask] = useState(false);
+  const [showDocumentDeleteConfirmation, setShowDocumentDeleteConfirmation] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<any>(null);
+  const [isDeletingDocument, setIsDeletingDocument] = useState(false);
   
   // Ongoing tasks state
   const [newOngoingTaskTitle, setNewOngoingTaskTitle] = useState("");
@@ -220,21 +223,7 @@ export default function ProjectForm({
       .replace(/\n/g, '<br>');
   };
 
-  const handleDeleteDocument = async (document: any) => {
-    try {
-      await deleteDocument("documents", document.id);
-      toast({
-        title: "Document Deleted",
-        description: `"${document.title}" has been removed from the project`,
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete document",
-        variant: "destructive",
-      });
-    }
-  };
+
 
   // Ongoing tasks functions
   const handleAddOngoingTask = async () => {
@@ -396,6 +385,31 @@ export default function ProjectForm({
       });
     } finally {
       setIsDeletingTask(false);
+    }
+  };
+
+  const handleDeleteDocument = async (document: any) => {
+    setIsDeletingDocument(true);
+    
+    try {
+      // Delete the document from Firebase
+      await deleteDocument("documents", document.id);
+      
+      // Add 2-second delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "Document Deleted",
+        description: `${document.title} has been removed from the project`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete document",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeletingDocument(false);
     }
   };
 
@@ -924,7 +938,12 @@ export default function ProjectForm({
                               type="button"
                               size="sm"
                               variant="ghost"
-                              onClick={() => handleDeleteDocument(document)}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setDocumentToDelete(document);
+                                setShowDocumentDeleteConfirmation(true);
+                              }}
                               className="h-8 w-8 p-0 text-slate-400 hover:text-red-400 hover:bg-slate-800"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -1140,6 +1159,72 @@ export default function ProjectForm({
               </div>
             ) : (
               "Delete Task"
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* Document Delete Confirmation Modal */}
+    <Dialog open={showDocumentDeleteConfirmation} onOpenChange={setShowDocumentDeleteConfirmation}>
+      <DialogContent className="max-w-md bg-slate-950 border-slate-800 text-slate-100">
+        <DialogHeader>
+          <DialogTitle className="text-slate-100 flex items-center space-x-2">
+            <Trash2 className="w-5 h-5 text-red-400" />
+            <span>Delete Document</span>
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <p className="text-slate-300">
+            Are you sure you want to delete this document? This action cannot be undone.
+          </p>
+          
+          {documentToDelete && (
+            <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-700">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <div className="font-medium text-slate-200">{documentToDelete.title}</div>
+                  <div className="text-xs text-slate-400 capitalize">{documentToDelete.type}</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <div className="flex space-x-2 pt-2">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => {
+              setShowDocumentDeleteConfirmation(false);
+              setDocumentToDelete(null);
+            }}
+            className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800"
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={async () => {
+              if (documentToDelete && !isDeletingDocument) {
+                await handleDeleteDocument(documentToDelete);
+                setShowDocumentDeleteConfirmation(false);
+                setDocumentToDelete(null);
+              }
+            }}
+            disabled={isDeletingDocument}
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isDeletingDocument ? (
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Deleting...</span>
+              </div>
+            ) : (
+              "Delete Document"
             )}
           </Button>
         </div>
