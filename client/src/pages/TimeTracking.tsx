@@ -96,10 +96,19 @@ export default function TimeTracking() {
   }, [isTimerRunning, startTime, pausedTime]);
 
   const handleStartTimer = () => {
-    if (!currentTask.trim()) {
+    if (!entryProject) {
+      toast({
+        title: "Error", 
+        description: "Please select a project first",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!currentTask || currentTask === "no-tasks") {
       toast({
         title: "Error",
-        description: "Please enter a task description",
+        description: "Please select an ongoing task to track time for",
         variant: "destructive",
       });
       return;
@@ -269,31 +278,17 @@ export default function TimeTracking() {
                 </div>
               </div>
 
-              {/* Task Input */}
+              {/* Project Selection - Required */}
               <div className="space-y-2">
-                <Label htmlFor="currentTask" className="text-slate-200">
-                  What are you working on?
-                </Label>
-                <Input
-                  id="currentTask"
-                  type="text"
-                  value={currentTask}
-                  onChange={(e) => setCurrentTask(e.target.value)}
-                  placeholder="Enter task description..."
-                  className="bg-slate-800 border-slate-700 text-slate-100"
-                  disabled={isTimerRunning}
-                />
-              </div>
-
-              {/* Project Selection */}
-              <div className="space-y-2">
-                <Label className="text-slate-200">Project (Optional)</Label>
-                <Select value={entryProject} onValueChange={setEntryProject} disabled={isTimerRunning}>
+                <Label className="text-slate-200">Select Project</Label>
+                <Select value={entryProject} onValueChange={(value) => {
+                  setEntryProject(value);
+                  setCurrentTask(""); // Reset task when project changes
+                }} disabled={isTimerRunning}>
                   <SelectTrigger className="bg-slate-800 border-slate-700">
-                    <SelectValue placeholder="Select a project" />
+                    <SelectValue placeholder="Choose a project to track time for" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-700">
-                    <SelectItem value="none">No project</SelectItem>
                     {projects?.map((project) => (
                       <SelectItem key={project.id} value={project.id}>
                         {project.name}
@@ -302,6 +297,43 @@ export default function TimeTracking() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Task Selection - Shows after project selection */}
+              {entryProject && entryProject !== "none" && (
+                <div className="space-y-2">
+                  <Label className="text-slate-200">Select Ongoing Task</Label>
+                  <Select value={currentTask} onValueChange={setCurrentTask} disabled={isTimerRunning}>
+                    <SelectTrigger className="bg-slate-800 border-slate-700">
+                      <SelectValue placeholder="Choose which ongoing task to track time for" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900 border-slate-700">
+                      {projectTasks && projectTasks.length > 0 ? (
+                        projectTasks.map((task) => (
+                          <SelectItem key={task.id} value={task.id}>
+                            <div className="flex items-center space-x-2">
+                              <div className={`w-2 h-2 rounded-full ${
+                                task.priority === 'high' ? 'bg-red-400' :
+                                task.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
+                              }`} />
+                              <span>{task.title}</span>
+                              <span className="text-xs text-slate-400">({task.priority})</span>
+                            </div>
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-tasks" disabled>
+                          No ongoing tasks - Add tasks in project settings
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  {projectTasks && projectTasks.length === 0 && (
+                    <p className="text-xs text-slate-400 mt-1">
+                      Add ongoing tasks to your project to enable task-specific time tracking
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* Timer Controls */}
               <div className="flex justify-center space-x-4">
