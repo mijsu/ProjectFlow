@@ -87,14 +87,108 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
     
     setTimeout(() => {
       textarea.focus();
-      textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+      if (selectedText) {
+        // Keep the formatted text selected
+        textarea.setSelectionRange(start + before.length, end + before.length);
+      } else {
+        // Place cursor between the markers
+        textarea.setSelectionRange(start + before.length, start + before.length);
+      }
     }, 0);
   };
 
-  const formatBold = () => insertTextAtCursor("**", "**");
-  const formatItalic = () => insertTextAtCursor("*", "*");
-  const formatUnderline = () => insertTextAtCursor("<u>", "</u>");
-  const formatCode = () => insertTextAtCursor("`", "`");
+  const formatBold = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    
+    if (selectedText) {
+      // Only format the selected text
+      const newText = content.substring(0, start) + `**${selectedText}**` + content.substring(end);
+      setContent(newText);
+      
+      setTimeout(() => {
+        textarea.focus();
+        // Select the newly formatted text
+        textarea.setSelectionRange(start, end + 4);
+      }, 0);
+    } else {
+      insertTextAtCursor("**", "**");
+    }
+  };
+
+  const formatItalic = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    
+    if (selectedText) {
+      // Only format the selected text
+      const newText = content.substring(0, start) + `*${selectedText}*` + content.substring(end);
+      setContent(newText);
+      
+      setTimeout(() => {
+        textarea.focus();
+        // Select the newly formatted text
+        textarea.setSelectionRange(start, end + 2);
+      }, 0);
+    } else {
+      insertTextAtCursor("*", "*");
+    }
+  };
+
+  const formatUnderline = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    
+    if (selectedText) {
+      // Only format the selected text
+      const newText = content.substring(0, start) + `<u>${selectedText}</u>` + content.substring(end);
+      setContent(newText);
+      
+      setTimeout(() => {
+        textarea.focus();
+        // Select the newly formatted text
+        textarea.setSelectionRange(start, end + 7);
+      }, 0);
+    } else {
+      insertTextAtCursor("<u>", "</u>");
+    }
+  };
+
+  const formatCode = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    
+    if (selectedText) {
+      // Only format the selected text
+      const newText = content.substring(0, start) + `\`${selectedText}\`` + content.substring(end);
+      setContent(newText);
+      
+      setTimeout(() => {
+        textarea.focus();
+        // Select the newly formatted text
+        textarea.setSelectionRange(start, end + 2);
+      }, 0);
+    } else {
+      insertTextAtCursor("`", "`");
+    }
+  };
+
   const formatQuote = () => insertTextAtCursor("> ");
   
   const insertHeading = (level: number) => {
