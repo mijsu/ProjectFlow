@@ -500,7 +500,12 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl h-[85vh] bg-slate-950 border-slate-800 text-slate-100 p-0 overflow-hidden flex flex-col">
+      <DialogContent 
+        className="max-w-5xl h-[85vh] bg-slate-950 border-slate-800 text-slate-100 p-0 overflow-hidden flex flex-col [&>button]:hidden"
+      >
+        <DialogHeader className="sr-only">
+          <DialogTitle>Document Editor</DialogTitle>
+        </DialogHeader>
         {/* Compact Header */}
         <div className="flex items-center justify-between p-3 border-b border-slate-800 bg-slate-900/50">
           <Input
