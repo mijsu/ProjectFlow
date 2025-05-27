@@ -123,6 +123,140 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
     }
   };
 
+  // Professional diagram templates
+  const getTemplateContent = (docType: string) => {
+    switch (docType) {
+      case "flowchart":
+        return `# Flowchart Template
+
+## Process Flow
+\`\`\`
+┌─────────────┐
+│    Start    │
+└─────┬───────┘
+      │
+      v
+┌─────────────┐
+│  Input Data │
+└─────┬───────┘
+      │
+      v
+┌─────────────┐     No
+│  Validation │────────┐
+│   Process   │        │
+└─────┬───────┘        │
+      │ Yes            │
+      v                │
+┌─────────────┐        │
+│   Process   │        │
+│    Data     │        │
+└─────┬───────┘        │
+      │                │
+      v                │
+┌─────────────┐        │
+│   Output    │        │
+│   Results   │        │
+└─────┬───────┘        │
+      │                │
+      v                │
+┌─────────────┐        │
+│     End     │←───────┘
+└─────────────┘
+\`\`\`
+
+## Key Steps:
+1. **Start Process** - Initialize workflow
+2. **Input Data** - Collect required information
+3. **Validation** - Check data integrity
+4. **Process Data** - Execute main logic
+5. **Output Results** - Display final outcome
+6. **End Process** - Complete workflow
+
+## Decision Points:
+- **Validation Check**: Determines if data meets criteria
+- **Error Handling**: Routes to appropriate error resolution
+
+## Notes:
+- Replace text above with your specific process steps
+- Use ASCII art for visual flow representation
+- Add decision diamonds where needed`;
+
+      case "dfd":
+        return `# Data Flow Diagram Template
+
+## Level 0: Context Diagram
+\`\`\`
+External Entity 1    ┌─────────────────┐    External Entity 2
+     │               │                 │               │
+     │    Data A     │   System Name   │    Data C     │
+     └──────────────→│                 │←──────────────┘
+                     │   (Process 0)   │
+     ┌──────────────→│                 │←──────────────┐
+     │    Data B     │                 │    Data D     │
+     │               └─────────────────┘               │
+External Entity 3                              External Entity 4
+\`\`\`
+
+## Level 1: Decomposition
+\`\`\`
+External A
+     │
+     │ Data Input
+     v
+┌─────────────┐    Process Data    ┌─────────────┐
+│  Process 1  │──────────────────→│  Process 2  │
+│   Validate  │                   │   Transform │
+└─────┬───────┘                   └─────┬───────┘
+      │                                 │
+      │ Validated Data                  │ Processed Data
+      v                                 v
+┌─────────────┐                   ┌─────────────┐
+│   Data      │                   │  Process 3  │
+│   Store 1   │                   │   Output    │
+└─────────────┘                   └─────┬───────┘
+                                        │
+                                        │ Results
+                                        v
+                                  External B
+\`\`\`
+
+## Data Stores:
+- **D1: Data Store 1** - Validated input data
+- **D2: Data Store 2** - Processed results
+- **D3: Data Store 3** - Configuration data
+
+## External Entities:
+- **User Interface** - System user interaction
+- **Database** - Persistent data storage
+- **External API** - Third-party services
+- **Reports** - Generated output
+
+## Data Flows:
+1. **Input Validation** - Raw data → Validated data
+2. **Data Processing** - Validated data → Processed data
+3. **Output Generation** - Processed data → Final results
+
+## Notes:
+- Customize processes for your specific system
+- Add/remove data stores as needed
+- Include all external data sources`;
+
+      default:
+        return "";
+    }
+  };
+
+  // Load template when type changes to diagram types
+  const handleTypeChange = (newType: string) => {
+    setType(newType);
+    
+    // If switching to a diagram type and content is empty, load template
+    if ((newType === "flowchart" || newType === "dfd") && !content.trim()) {
+      const template = getTemplateContent(newType);
+      setContent(template);
+    }
+  };
+
   const handleSave = async () => {
     if (!user) return;
     
@@ -206,7 +340,7 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[95vh] bg-slate-950 border-slate-800 text-slate-100 p-0 overflow-hidden">
+      <DialogContent className="max-w-7xl max-h-[95vh] bg-slate-950 border-slate-800 text-slate-100 p-0 overflow-hidden flex flex-col">
         {/* Enhanced Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/50">
           <div className="flex items-center space-x-3">
@@ -254,7 +388,7 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
         <div className="bg-slate-900/30 border-b border-slate-800">
           <div className="flex items-center justify-between p-3">
             <div className="flex items-center space-x-4">
-              <Select value={type} onValueChange={setType}>
+              <Select value={type} onValueChange={handleTypeChange}>
                 <SelectTrigger className="w-52 bg-slate-900 border-slate-700">
                   <div className="flex items-center space-x-2">
                     {getTypeIcon(type)}
@@ -433,24 +567,63 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
           )}
         </div>
 
-        {/* Enhanced Content Area */}
-        <div className="flex-1 overflow-hidden">
+        {/* Enhanced Scrollable Content Area */}
+        <div className="flex-1 overflow-hidden min-h-0">
           {isPreviewMode ? (
             <div className="h-full overflow-y-auto p-6 bg-gradient-to-br from-slate-900 to-slate-950">
-              <div className="max-w-4xl mx-auto">
+              <div className="max-w-5xl mx-auto">
                 <div 
                   className="prose prose-invert prose-lg max-w-none text-slate-200 leading-relaxed"
+                  style={{ 
+                    whiteSpace: 'pre-wrap',
+                    fontFamily: type === 'flowchart' || type === 'dfd' ? 'monospace' : 'inherit' 
+                  }}
                   dangerouslySetInnerHTML={{ __html: renderPreview() }}
                 />
               </div>
             </div>
           ) : (
-            <div className="h-full p-6">
-              <Textarea
-                ref={textareaRef}
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Start writing your document...
+            <div className="h-full overflow-hidden flex flex-col">
+              {/* Template Load Button for Diagram Types */}
+              {(type === 'flowchart' || type === 'dfd') && (
+                <div className="p-3 bg-slate-800/30 border-b border-slate-700">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-slate-400">
+                      🎨 Professional {type === 'flowchart' ? 'Flowchart' : 'Data Flow Diagram'} Template
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const template = getTemplateContent(type);
+                        setContent(template);
+                      }}
+                      className="text-emerald-400 hover:text-emerald-300 hover:bg-slate-700"
+                    >
+                      <Palette className="w-4 h-4 mr-2" />
+                      Load Template
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex-1 p-6 overflow-hidden">
+                <Textarea
+                  ref={textareaRef}
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder={type === 'flowchart' || type === 'dfd' 
+                    ? `Create your ${type === 'flowchart' ? 'flowchart' : 'data flow diagram'}...
+
+🔥 Diagram Tips:
+• Use the "Load Template" button above for professional templates
+• Edit the template directly - all text is customizable
+• Use ASCII art for visual flow representation
+• ┌─┐ │ └─┘ for boxes, ── for lines, ↓→← for arrows
+• Replace template text with your specific process steps
+
+Start with a template or create from scratch! 🚀`
+                    : `Start writing your document...
 
 ✨ Pro Tips:
 • **Bold text** for emphasis
@@ -459,13 +632,14 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
 • - Bullet lists
 • 1. Numbered lists
 • > Block quotes
-• `inline code`
+• \`inline code\`
 • [link text](url)
 • ![image description](image-url)
 
-Happy writing! 🚀"
-                className="w-full h-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-4 rounded-lg"
-              />
+Happy writing! 🚀`}
+                  className="w-full h-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-4 rounded-lg overflow-y-auto"
+                />
+              </div>
             </div>
           )}
         </div>
