@@ -25,6 +25,28 @@ export default function ActiveProjects() {
     where("userId", "==", user?.uid || "")
   ]);
 
+  // Get all tasks to calculate real-time progress
+  const { data: allTasks } = useCollection("tasks", [
+    where("ownerId", "==", user?.uid || "")
+  ]);
+
+  // Calculate real-time progress for a project
+  const calculateProjectProgress = (projectId: string) => {
+    if (!allTasks) return 0;
+    
+    const progressTasks = allTasks.filter(task => 
+      task.projectId === projectId && 
+      task.type === "progress" && 
+      task.status === "completed"
+    );
+    
+    const totalProgress = progressTasks.reduce((sum, task) => 
+      sum + (task.progressContribution || 0), 0
+    );
+    
+    return Math.min(totalProgress, 100); // Cap at 100%
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "in-progress":
@@ -170,11 +192,11 @@ export default function ActiveProjects() {
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="text-slate-400">Progress</span>
                     <span className="text-slate-300">
-                      {project.progress || 0}%
+                      {calculateProjectProgress(project.id)}%
                     </span>
                   </div>
                   <Progress
-                    value={project.progress || 0}
+                    value={calculateProjectProgress(project.id)}
                     className="h-2 bg-slate-800"
                   />
                 </div>
