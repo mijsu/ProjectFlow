@@ -101,99 +101,45 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
     const editor = editorRef.current;
     editor.focus();
 
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
-
-    const range = selection.getRangeAt(0);
-    
+    // Use the modern approach with execCommand fallback
     try {
+      let success = false;
+      
       switch (command) {
         case "bold":
-          if (selection.toString()) {
-            const span = document.createElement('strong');
-            try {
-              range.surroundContents(span);
-            } catch {
-              span.innerHTML = range.extractContents().textContent || '';
-              range.insertNode(span);
-            }
-          }
+          success = document.execCommand('bold', false, null);
           break;
         case "italic":
-          if (selection.toString()) {
-            const span = document.createElement('em');
-            try {
-              range.surroundContents(span);
-            } catch {
-              span.innerHTML = range.extractContents().textContent || '';
-              range.insertNode(span);
-            }
-          }
+          success = document.execCommand('italic', false, null);
           break;
         case "underline":
-          if (selection.toString()) {
-            const span = document.createElement('u');
-            try {
-              range.surroundContents(span);
-            } catch {
-              span.innerHTML = range.extractContents().textContent || '';
-              range.insertNode(span);
-            }
-          }
+          success = document.execCommand('underline', false, null);
           break;
         case "list":
-          const ul = document.createElement('ul');
-          const li = document.createElement('li');
-          if (selection.toString()) {
-            li.textContent = selection.toString();
-            range.deleteContents();
-          } else {
-            li.textContent = 'List item';
-          }
-          ul.appendChild(li);
-          range.insertNode(ul);
+          success = document.execCommand('insertUnorderedList', false, null);
           break;
         case "listOrdered":
-          const ol = document.createElement('ol');
-          const liOrdered = document.createElement('li');
-          if (selection.toString()) {
-            liOrdered.textContent = selection.toString();
-            range.deleteContents();
-          } else {
-            liOrdered.textContent = 'List item';
-          }
-          ol.appendChild(liOrdered);
-          range.insertNode(ol);
+          success = document.execCommand('insertOrderedList', false, null);
           break;
         case "link":
           const url = prompt("Enter URL:");
-          if (url && selection.toString()) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.textContent = selection.toString();
-            link.style.color = '#60a5fa';
-            link.style.textDecoration = 'underline';
-            range.deleteContents();
-            range.insertNode(link);
+          if (url) {
+            success = document.execCommand('createLink', false, url);
           }
           break;
         case "image":
           const imageUrl = prompt("Enter image URL:");
           if (imageUrl) {
-            const img = document.createElement('img');
-            img.src = imageUrl;
-            img.style.maxWidth = '100%';
-            img.style.height = 'auto';
-            range.insertNode(img);
+            success = document.execCommand('insertImage', false, imageUrl);
           }
           break;
       }
       
-      // Update content state
-      setContent(editor.innerHTML);
+      // Update content after any changes
+      setTimeout(() => {
+        setContent(editor.innerHTML);
+      }, 10);
       
-      // Clear selection
-      selection.removeAllRanges();
     } catch (error) {
       console.warn("Rich text formatting failed:", error);
     }
