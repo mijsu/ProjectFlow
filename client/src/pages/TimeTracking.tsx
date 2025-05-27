@@ -28,6 +28,7 @@ export default function TimeTracking() {
   const [entryDuration, setEntryDuration] = useState("");
   const [entryProject, setEntryProject] = useState("");
   const [selectedTask, setSelectedTask] = useState("");
+  const [newTaskProgress, setNewTaskProgress] = useState("");
   const [loading, setLoading] = useState(false);
   const [showTaskCompletionModal, setShowTaskCompletionModal] = useState(false);
   const [pendingTimeEntry, setPendingTimeEntry] = useState<any>(null);
@@ -247,7 +248,7 @@ export default function TimeTracking() {
     e.preventDefault();
     if (!user) return;
 
-    if (!entryDescription.trim() || !entryDuration) {
+    if (!entryDescription.trim() || !entryProject || !newTaskProgress) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -256,11 +257,11 @@ export default function TimeTracking() {
       return;
     }
 
-    const durationMinutes = parseInt(entryDuration);
-    if (isNaN(durationMinutes) || durationMinutes <= 0) {
+    const progressPercentage = parseInt(newTaskProgress);
+    if (isNaN(progressPercentage) || progressPercentage <= 0 || progressPercentage > 100) {
       toast({
         title: "Error",
-        description: "Please enter a valid duration in minutes",
+        description: "Please enter a valid progress percentage (1-100)",
         variant: "destructive",
       });
       return;
@@ -268,21 +269,22 @@ export default function TimeTracking() {
 
     setLoading(true);
     try {
-      const entryStartTime = new Date(`${entryDate}T12:00:00`);
-      const entryEndTime = new Date(entryStartTime.getTime() + durationMinutes * 60 * 1000);
-
-      await addDocument("timeEntries", {
-        description: entryDescription.trim(),
-        duration: durationMinutes,
-        startTime: entryStartTime,
-        endTime: entryEndTime,
-        userId: user.uid,
-        projectId: entryProject || null,
+      // Create a new progress task
+      await addDocument("tasks", {
+        title: entryDescription.trim(),
+        description: `Progress task: ${progressPercentage}% contribution`,
+        status: "pending",
+        priority: "medium",
+        progress: progressPercentage,
+        projectId: entryProject,
+        assigneeId: user.uid,
+        createdAt: new Date(),
+        dueDate: null,
       });
 
       toast({
         title: "Success",
-        description: `Manual time entry added: ${Math.floor(durationMinutes / 60)}h ${durationMinutes % 60}m`,
+        description: `Progress task added: ${entryDescription.trim()} (${progressPercentage}% contribution)`,
       });
 
       // Reset form
@@ -438,10 +440,10 @@ export default function TimeTracking() {
               </CardContent>
             </Card>
 
-            {/* Manual Entry */}
+            {/* Add Progress Task */}
             <Card className="bg-slate-950 border-slate-800">
               <CardHeader>
-                <CardTitle className="text-slate-100">Quick Actions</CardTitle>
+                <CardTitle className="text-slate-100">Add Progress Task</CardTitle>
               </CardHeader>
               <CardContent>
                 <Button
@@ -449,7 +451,7 @@ export default function TimeTracking() {
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Manual Entry
+                  Add Task Progress
                 </Button>
               </CardContent>
             </Card>
@@ -491,121 +493,87 @@ export default function TimeTracking() {
           </CardContent>
         </Card>
 
-        {/* Manual Entry Dialog */}
+        {/* Add Progress Task Dialog */}
         <Dialog open={isManualEntryOpen} onOpenChange={setIsManualEntryOpen}>
           <DialogContent className="max-w-md bg-slate-950 border-slate-800 text-slate-100">
             <DialogHeader>
-              <DialogTitle className="text-lg font-semibold">Add Manual Time Entry</DialogTitle>
+              <DialogTitle className="text-lg font-semibold">Add Progress Task</DialogTitle>
             </DialogHeader>
 
             <form onSubmit={handleManualEntry} className="space-y-4">
-              {!entryProject || entryProject === "none" ? (
-                <div className="space-y-2">
-                  <Label htmlFor="description" className="text-slate-200">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={entryDescription}
-                    onChange={(e) => setEntryDescription(e.target.value)}
-                    required
-                    className="bg-slate-800 border-slate-700 text-slate-100 resize-none"
-                    placeholder="What did you work on?"
-                    rows={2}
-                  />
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Label className="text-slate-200">Select Ongoing Task</Label>
-                  <Select value={selectedTask} onValueChange={setSelectedTask} required>
-                    <SelectTrigger className="bg-slate-800 border-slate-700">
-                      <SelectValue placeholder="Choose an ongoing task to track time for" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-700">
-                      {projectTasks && projectTasks.length > 0 ? (
-                        projectTasks.map((task) => (
-                          <SelectItem key={task.id} value={task.id}>
-                            <div className="flex items-center space-x-2">
-                              <div className={`w-2 h-2 rounded-full ${
-                                task.priority === 'high' ? 'bg-red-400' :
-                                task.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
-                              }`} />
-                              <span>{task.title}</span>
-                              <span className="text-xs text-slate-400">({task.priority} priority)</span>
-                            </div>
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="no-tasks" disabled>
-                          No ongoing tasks available - Add tasks in project settings
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  {projectTasks && projectTasks.length === 0 && (
-                    <p className="text-xs text-slate-400 mt-1">
-                      Add ongoing tasks to your project to enable task-specific time tracking
-                    </p>
-                  )}
-                </div>
-              )}
-
               <div className="space-y-2">
-                <Label htmlFor="date" className="text-slate-200">Date</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={entryDate}
-                  onChange={(e) => setEntryDate(e.target.value)}
-                  required
-                  className="bg-slate-800 border-slate-700 text-slate-100"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="duration" className="text-slate-200">Duration (minutes)</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  value={entryDuration}
-                  onChange={(e) => setEntryDuration(e.target.value)}
-                  required
-                  min="1"
-                  className="bg-slate-800 border-slate-700 text-slate-100"
-                  placeholder="e.g., 60"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-slate-200">Project (Optional)</Label>
-                <Select value={entryProject} onValueChange={setEntryProject}>
+                <Label className="text-slate-200">Select Project</Label>
+                <Select value={entryProject} onValueChange={setEntryProject} required>
                   <SelectTrigger className="bg-slate-800 border-slate-700">
-                    <SelectValue placeholder="Select a project" />
+                    <SelectValue placeholder="Choose a project" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-700">
-                    <SelectItem value="none">No project</SelectItem>
-                    {projects?.map((project) => (
-                      <SelectItem key={project.id} value={project.id}>
-                        {project.name}
+                    {projects && projects.length > 0 ? (
+                      projects.map((project) => (
+                        <SelectItem key={project.id} value={project.id}>
+                          <div className="flex items-center justify-between w-full">
+                            <span>{project.name}</span>
+                            <span className="text-xs text-slate-400 ml-2">{project.progress}%</span>
+                          </div>
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-projects" disabled>
+                        No projects available
                       </SelectItem>
-                    ))}
+                    )}
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
+              <div className="space-y-2">
+                <Label htmlFor="taskDescription" className="text-slate-200">Task Description</Label>
+                <Input
+                  id="taskDescription"
+                  value={entryDescription}
+                  onChange={(e) => setEntryDescription(e.target.value)}
+                  required
+                  className="bg-slate-800 border-slate-700 text-slate-100"
+                  placeholder="Task description (e.g., Project meeting)"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="progressPercentage" className="text-slate-200">Progress Percentage</Label>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    id="progressPercentage"
+                    type="number"
+                    value={newTaskProgress}
+                    onChange={(e) => setNewTaskProgress(e.target.value)}
+                    required
+                    min="1"
+                    max="100"
+                    className="bg-slate-800 border-slate-700 text-slate-100 flex-1"
+                    placeholder="10"
+                  />
+                  <span className="text-slate-400">%</span>
+                </div>
+                <p className="text-xs text-slate-500">
+                  This percentage will be added to the project progress when the task is completed
+                </p>
+              </div>
+
+              <div className="flex space-x-2 pt-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
                   onClick={() => setIsManualEntryOpen(false)}
-                  className="flex-1 border-slate-700 text-slate-300 hover:bg-slate-800"
+                  className="flex-1 border-slate-700 text-slate-400 hover:text-slate-200"
                 >
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
+                <Button 
+                  type="submit" 
                   disabled={loading}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  {loading ? "Adding..." : "Add Entry"}
+                  {loading ? "Adding..." : "Add Task Progress"}
                 </Button>
               </div>
             </form>
