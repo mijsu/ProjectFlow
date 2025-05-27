@@ -455,7 +455,7 @@ External A
               </div>
             </div>
           ) : (
-            <div className="flex-1 p-4 overflow-hidden flex flex-col">
+            <div className="flex-1 p-2 overflow-hidden flex flex-col">
               <Textarea
                 ref={textareaRef}
                 value={content}
@@ -485,7 +485,8 @@ Start with a template or create from scratch! 🚀`
 • ![image description](image-url)
 
 Happy writing! 🚀`}
-                className="flex-1 w-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-4 rounded-lg"
+                className="w-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-3 rounded-lg"
+                style={{ height: '550px' }}
               />
             </div>
           )}
