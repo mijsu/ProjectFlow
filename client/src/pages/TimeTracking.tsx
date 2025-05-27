@@ -291,7 +291,7 @@ export default function TimeTracking() {
       // Reset form
       setEntryDescription("");
       setNewTaskProgress("");
-      setEntryProject("");
+      setProgressTaskProject("");
       setIsManualEntryOpen(false);
     } catch (error: any) {
       toast({
