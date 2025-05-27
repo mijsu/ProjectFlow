@@ -944,41 +944,7 @@ export default function ProjectForm({
               </div>
             )}
 
-            {/* Add New Task Section - Closer to buttons */}
-            {project && (
-              <div className="border-t border-slate-700 pt-4">
-                <div className="space-y-3 p-3 bg-slate-900 rounded-lg border border-slate-700">
-                  <Label className="text-slate-200 text-sm font-medium">Add Progress Task</Label>
-                  <div className="flex space-x-2">
-                    <Input
-                      placeholder="Task description (e.g., Project meeting)"
-                      value={newTaskTitle}
-                      onChange={(e) => setNewTaskTitle(e.target.value)}
-                      className="flex-1 bg-slate-800 border-slate-600 text-slate-100"
-                    />
-                    <Input
-                      type="number"
-                      placeholder="10"
-                      min="1"
-                      max="100"
-                      value={newTaskProgress}
-                      onChange={(e) => setNewTaskProgress(e.target.value)}
-                      className="w-20 bg-slate-800 border-slate-600 text-slate-100"
-                    />
-                    <span className="flex items-center text-slate-400 text-sm">%</span>
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={handleAddTask}
-                    size="sm"
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Task Progress
-                  </Button>
-                </div>
-              </div>
-            )}
+
 
             <div className="flex gap-3 pt-4 border-t border-slate-700">
               <Button
