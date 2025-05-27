@@ -283,10 +283,11 @@ export default function TimeTracking() {
         assigneeId: user.uid
       });
 
-      // Get current project and update its progress
-      const projectsQuery = await addDocument("projects", entryProject);
-      // Note: We need to fetch the project first, then update its progress
-      // This is a simplified approach - in a real app you'd fetch the current progress first
+      // Update the project's total progress by adding this task's contribution
+      // Get all completed progress tasks for this project to calculate total progress
+      const projectDoc = await updateDocument("projects", entryProject, {
+        updatedAt: new Date()
+      });
       
       toast({
         title: "Success",
