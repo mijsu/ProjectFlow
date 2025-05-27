@@ -307,6 +307,7 @@ export default function ProjectForm({
       
       await updateDocument("tasks", taskId, {
         status: "completed",
+        completedAt: new Date(),
         updatedAt: new Date()
       });
       
@@ -324,7 +325,7 @@ export default function ProjectForm({
       
       toast({
         title: "Task Completed",
-        description: `Task completed! Project progress updated to ${newProgress}%`,
+        description: `Task completed! Project progress updated by +${taskProgress}% to ${newProgress}%`,
       });
     } catch (error) {
       toast({

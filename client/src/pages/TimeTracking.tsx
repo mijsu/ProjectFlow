@@ -188,9 +188,29 @@ export default function TimeTracking() {
       // Save the time entry
       await addDocument("timeEntries", pendingTimeEntry);
 
+      // Get the current task details to preserve progress percentage
+      const selectedTask = projectTasks?.find(task => task.id === currentTask);
+      const taskProgress = selectedTask?.progressPercentage || 0;
+
       // Mark the task as completed
       if (currentTask) {
-        await updateDocument("tasks", currentTask, { status: "completed" });
+        await updateDocument("tasks", currentTask, { 
+          status: "completed",
+          completedAt: new Date(),
+          updatedAt: new Date()
+        });
+      }
+
+      // Update project progress if task has progress percentage
+      if (taskProgress > 0 && entryProject) {
+        const selectedProject = projects?.find(p => p.id === entryProject);
+        if (selectedProject) {
+          const newProgress = Math.min(100, (selectedProject.progress || 0) + taskProgress);
+          await updateDocument("projects", entryProject, {
+            progress: newProgress,
+            updatedAt: new Date()
+          });
+        }
       }
 
       // Add 2-second delay for user feedback
@@ -198,7 +218,9 @@ export default function TimeTracking() {
 
       toast({
         title: "Success",
-        description: `Task completed! Time saved: ${Math.floor(pendingTimeEntry.duration / 60)}h ${pendingTimeEntry.duration % 60}m`,
+        description: taskProgress > 0 
+          ? `Task completed! Time saved: ${Math.floor(pendingTimeEntry.duration / 60)}h ${pendingTimeEntry.duration % 60}m. Project progress updated by +${taskProgress}%`
+          : `Task completed! Time saved: ${Math.floor(pendingTimeEntry.duration / 60)}h ${pendingTimeEntry.duration % 60}m`,
       });
 
       // Reset everything
