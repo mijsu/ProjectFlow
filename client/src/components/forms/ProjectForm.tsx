@@ -591,7 +591,7 @@ export default function ProjectForm({
               id="progress"
               type="number"
               value={progress}
-              onChange={(e) => setProgress(e.target.value)}
+              onChange={(e) => setProgress(parseInt(e.target.value) || 0)}
               min="0"
               max="100"
             />
