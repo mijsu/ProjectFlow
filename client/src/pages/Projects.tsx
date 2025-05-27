@@ -166,11 +166,11 @@ export default function Projects() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
             {filteredProjects.map((project) => (
               <Card
                 key={project.id}
-                className="bg-slate-950 border-slate-800 hover:border-slate-700 transition-colors cursor-pointer group"
+                className="bg-slate-950 border-slate-800 hover:border-slate-700 transition-colors cursor-pointer group flex flex-col h-fit"
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between mb-2">
