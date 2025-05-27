@@ -576,7 +576,7 @@ export default function Projects() {
                   {(() => {
                     const analytics = getProjectAnalytics(viewingProject.id);
                     return (
-                      <div className="space-y-4">
+                      <div className={`space-y-4 ${analytics.combinedTimeline.length > 4 ? 'max-h-80 overflow-y-auto pr-2' : ''}`}>
                         {analytics.combinedTimeline.length === 0 ? (
                           <div className="text-center py-8 text-slate-400">
                             <Activity className="w-12 h-12 mx-auto mb-3 opacity-50" />
