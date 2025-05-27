@@ -42,7 +42,7 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
   const [content, setContent] = useState("");
   const [type, setType] = useState("document");
   const [saving, setSaving] = useState(false);
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isRealTimeView, setIsRealTimeView] = useState(true);
   const [wordCount, setWordCount] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
@@ -678,11 +678,11 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsPreviewMode(!isPreviewMode)}
-              className={`${isPreviewMode ? 'bg-slate-700 text-emerald-400' : 'text-slate-300'} hover:bg-slate-700`}
+              onClick={() => setIsRealTimeView(!isRealTimeView)}
+              className={`${isRealTimeView ? 'bg-slate-700 text-emerald-400' : 'text-slate-300'} hover:bg-slate-700`}
             >
               <Eye className="w-4 h-4 mr-2" />
-              {isPreviewMode ? "Edit" : "Preview"}
+              {isRealTimeView ? "Live View ON" : "Raw Text"}
             </Button>
             <Button
               onClick={handleSave}
@@ -831,7 +831,7 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
             </div>
           </div>
 
-          {!isPreviewMode && (
+          {true && (
             <div className="flex items-center space-x-2 px-3 pb-3">
               {/* Text Formatting Group */}
               <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
@@ -969,24 +969,68 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
           )}
         </div>
 
-        {/* Enhanced Content Area */}
+        {/* Real-Time Split Editor */}
         <div className="flex-1 overflow-hidden">
-          {isPreviewMode ? (
-            <div className="h-full overflow-y-auto p-6 bg-gradient-to-br from-slate-900 to-slate-950">
-              <div className="max-w-4xl mx-auto">
-                <div 
-                  className="prose prose-invert prose-lg max-w-none text-slate-200 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: renderPreview() }}
-                />
+          {isRealTimeView ? (
+            // Split-screen real-time editor
+            <div className="h-full flex">
+              {/* Left side - Editor */}
+              <div className="w-1/2 border-r border-slate-700">
+                <div className="h-full p-4">
+                  <div className="text-xs text-slate-400 mb-2 flex items-center">
+                    <Edit3 className="w-3 h-3 mr-1" />
+                    Editor (type here)
+                  </div>
+                  <Textarea
+                    ref={textareaRef}
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Start typing your document or diagram...
+
+📝 **Quick Start:**
+• **Bold text** for emphasis
+• *Italic text* for style  
+• # Heading 1, ## Heading 2
+• - Bullet lists
+• > Block quotes
+• `inline code`
+• [link text](url)
+
+🎨 **Insert Diagram:**
+Use the dropdown above to insert professional diagram templates!"
+                    className="w-full h-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-4 rounded-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Right side - Live Preview */}
+              <div className="w-1/2">
+                <div className="h-full p-4 bg-gradient-to-br from-slate-900 to-slate-950">
+                  <div className="text-xs text-slate-400 mb-2 flex items-center">
+                    <Eye className="w-3 h-3 mr-1" />
+                    Live Preview
+                  </div>
+                  <div className="h-full overflow-y-auto bg-slate-900/50 rounded-lg p-4">
+                    <div 
+                      className="prose prose-invert prose-lg max-w-none text-slate-200 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: renderPreview() }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
+            // Full-screen raw editor
             <div className="h-full p-6">
+              <div className="text-xs text-slate-400 mb-2 flex items-center">
+                <Type className="w-3 h-3 mr-1" />
+                Raw Text Editor
+              </div>
               <Textarea
                 ref={textareaRef}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Start writing your document...
+                placeholder="Raw text editing mode - type markdown directly...
 
 ✨ Pro Tips:
 • **Bold text** for emphasis
