@@ -40,7 +40,7 @@ export default function ActiveProjects() {
     const progressTasks = allTasks.filter(task => 
       task.projectId === projectId && 
       task.status === "completed" &&
-      (task.type === "progress" || task.progressPercentage > 0)
+      (task.type === "progress" || (task.progressPercentage !== undefined && task.progressPercentage !== null))
     );
     
     const totalProgress = progressTasks.reduce((sum, task) => {
