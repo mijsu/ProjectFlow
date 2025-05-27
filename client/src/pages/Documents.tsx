@@ -1,6 +1,7 @@
 import { useState } from "react";
 import TopBar from "@/components/layout/TopBar";
 import AdvancedDocumentEditor from "@/components/editor/AdvancedDocumentEditor";
+import VisualDiagramEditor from "@/components/editor/VisualDiagramEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -332,12 +333,23 @@ export default function Documents() {
         )}
       </div>
 
-      <AdvancedDocumentEditor
-        isOpen={isEditorOpen}
-        onClose={() => setIsEditorOpen(false)}
-        document={selectedDocument}
-        projectId={newDocumentProject}
-      />
+      {selectedDocument?.type === 'flowchart' || selectedDocument?.type === 'dfd' || 
+       (isCreateDialogOpen && newDocument?.type === 'flowchart') || 
+       (isCreateDialogOpen && newDocument?.type === 'dfd') ? (
+        <VisualDiagramEditor
+          isOpen={isEditorOpen}
+          onClose={() => setIsEditorOpen(false)}
+          document={selectedDocument}
+          projectId={newDocumentProject}
+        />
+      ) : (
+        <AdvancedDocumentEditor
+          isOpen={isEditorOpen}
+          onClose={() => setIsEditorOpen(false)}
+          document={selectedDocument}
+          projectId={newDocumentProject}
+        />
+      )}
 
       {/* Enhanced Document Creation Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
