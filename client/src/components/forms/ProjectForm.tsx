@@ -57,6 +57,7 @@ export default function ProjectForm({
   const [isDocumentViewerOpen, setIsDocumentViewerOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<any>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   
   // Ongoing tasks state
   const [newOngoingTaskTitle, setNewOngoingTaskTitle] = useState("");
@@ -421,6 +422,7 @@ export default function ProjectForm({
     }
 
     setLoading(true);
+    setIsFormSubmitting(true);
     try {
       const projectData = {
         name: name.trim(),
@@ -462,7 +464,10 @@ export default function ProjectForm({
         description: project ? "Project updated successfully!" : "Project created successfully!",
       });
 
-      onSuccess?.();
+      // Only call onSuccess after successful form submission
+      if (isFormSubmitting) {
+        onSuccess?.();
+      }
       onClose();
     } catch (error: any) {
       toast({
@@ -472,6 +477,7 @@ export default function ProjectForm({
       });
     } finally {
       setLoading(false);
+      setIsFormSubmitting(false);
     }
   };
 
