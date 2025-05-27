@@ -34,6 +34,9 @@ export default function TimeTracking() {
   const [pendingTimeEntry, setPendingTimeEntry] = useState<any>(null);
   const [isCompletingTask, setIsCompletingTask] = useState(false);
   
+  // Separate state for Add Progress Task modal
+  const [progressTaskProject, setProgressTaskProject] = useState("");
+  
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -248,7 +251,7 @@ export default function TimeTracking() {
     e.preventDefault();
     if (!user) return;
 
-    if (!entryDescription.trim() || !entryProject || !newTaskProgress) {
+    if (!entryDescription.trim() || !progressTaskProject || !newTaskProgress) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -273,7 +276,7 @@ export default function TimeTracking() {
       await addDocument("progressEntries", {
         description: entryDescription.trim(),
         percentage: progressPercentage,
-        projectId: entryProject,
+        projectId: progressTaskProject,
         userId: user.uid,
         createdAt: new Date(),
         date: new Date(),
@@ -501,7 +504,7 @@ export default function TimeTracking() {
             <form onSubmit={handleManualEntry} className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-slate-200">Select Project</Label>
-                <Select value={entryProject} onValueChange={setEntryProject} required>
+                <Select value={progressTaskProject} onValueChange={setProgressTaskProject} required>
                   <SelectTrigger className="bg-slate-800 border-slate-700">
                     <SelectValue placeholder="Choose a project" />
                   </SelectTrigger>
