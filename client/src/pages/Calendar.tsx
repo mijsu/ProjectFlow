@@ -73,7 +73,7 @@ export default function Calendar() {
       
       toast({
         title: "Success",
-        description: "Event created successfully!",
+        description: "Schedule created successfully!",
       });
       
       // Reset form
@@ -87,7 +87,7 @@ export default function Calendar() {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to create event",
+        description: error.message || "Failed to create schedule",
         variant: "destructive",
       });
     } finally {
