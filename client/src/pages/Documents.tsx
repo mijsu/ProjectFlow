@@ -14,6 +14,7 @@ import { where, orderBy } from "firebase/firestore";
 import { formatDistanceToNow } from "date-fns";
 import { Plus, Search, FileText, Workflow, FileCode, MoreHorizontal, FolderOpen, Layers, Trash2, Edit } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { deleteDocument } from "@/hooks/useFirestore";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,6 +26,8 @@ export default function Documents() {
   const [newDocumentType, setNewDocumentType] = useState("document");
   const [newDocumentProject, setNewDocumentProject] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [documentToDelete, setDocumentToDelete] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -183,13 +186,22 @@ export default function Documents() {
     setIsEditorOpen(true);
   };
 
-  const handleDeleteDocument = async (document: any) => {
+  const handleDeleteClick = (document: any) => {
+    setDocumentToDelete(document);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!documentToDelete) return;
+    
     try {
-      await deleteDocument("documents", document.id);
+      await deleteDocument("documents", documentToDelete.id);
       toast({
         title: "Success",
         description: "Document deleted successfully",
       });
+      setIsDeleteDialogOpen(false);
+      setDocumentToDelete(null);
     } catch (error) {
       toast({
         title: "Error", 
@@ -337,7 +349,7 @@ export default function Documents() {
                           <DropdownMenuItem 
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDeleteDocument(document);
+                              handleDeleteClick(document);
                             }}
                             className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
                           >
@@ -465,6 +477,36 @@ export default function Documents() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="bg-slate-950 border-slate-800 text-slate-100">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-slate-100">Delete Document</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-400">
+              Are you sure you want to delete "{documentToDelete?.title}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              onClick={() => {
+                setIsDeleteDialogOpen(false);
+                setDocumentToDelete(null);
+              }}
+              className="bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
