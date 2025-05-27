@@ -41,12 +41,22 @@ export default function RecentActivity() {
       description: `Modified document "${d.title}"`,
       createdAt: d.updatedAt,
     })) || []),
-    ...(timeEntries?.map((t) => ({
-      id: `time-${t.id}`,
-      type: "time_logged",
-      description: `Logged ${Math.floor((t.duration || 0) / 60)}h ${(t.duration || 0) % 60}m for "${t.description}"`,
-      createdAt: t.startTime,
-    })) || []),
+    ...(timeEntries?.map((t) => {
+      const hours = Math.floor((t.duration || 0) / 60);
+      const minutes = (t.duration || 0) % 60;
+      const timeStr = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+      
+      // Find the project name for this time entry
+      const entryProject = projects?.find(p => p.id === t.projectId);
+      const projectName = entryProject?.name || "Unknown Project";
+      
+      return {
+        id: `time-${t.id}`,
+        type: "time_logged",
+        description: `Spent ${timeStr} completing ${t.description} Task in (${projectName})`,
+        createdAt: t.startTime,
+      };
+    }) || []),
   ]
     .sort((a, b) => {
       const aTime = a.createdAt?.toDate?.() || a.createdAt || new Date(0);
