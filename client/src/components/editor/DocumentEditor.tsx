@@ -98,45 +98,104 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
   const formatText = (command: string) => {
     if (!editorRef.current) return;
 
-    // Focus the editor first
-    editorRef.current.focus();
+    const editor = editorRef.current;
+    editor.focus();
+
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
     
-    // Use browser's built-in rich text commands
     try {
       switch (command) {
         case "bold":
-          document.execCommand("bold", false);
+          if (selection.toString()) {
+            const span = document.createElement('strong');
+            try {
+              range.surroundContents(span);
+            } catch {
+              span.innerHTML = range.extractContents().textContent || '';
+              range.insertNode(span);
+            }
+          }
           break;
         case "italic":
-          document.execCommand("italic", false);
+          if (selection.toString()) {
+            const span = document.createElement('em');
+            try {
+              range.surroundContents(span);
+            } catch {
+              span.innerHTML = range.extractContents().textContent || '';
+              range.insertNode(span);
+            }
+          }
           break;
         case "underline":
-          document.execCommand("underline", false);
+          if (selection.toString()) {
+            const span = document.createElement('u');
+            try {
+              range.surroundContents(span);
+            } catch {
+              span.innerHTML = range.extractContents().textContent || '';
+              range.insertNode(span);
+            }
+          }
           break;
         case "list":
-          document.execCommand("insertUnorderedList", false);
+          const ul = document.createElement('ul');
+          const li = document.createElement('li');
+          if (selection.toString()) {
+            li.textContent = selection.toString();
+            range.deleteContents();
+          } else {
+            li.textContent = 'List item';
+          }
+          ul.appendChild(li);
+          range.insertNode(ul);
           break;
         case "listOrdered":
-          document.execCommand("insertOrderedList", false);
+          const ol = document.createElement('ol');
+          const liOrdered = document.createElement('li');
+          if (selection.toString()) {
+            liOrdered.textContent = selection.toString();
+            range.deleteContents();
+          } else {
+            liOrdered.textContent = 'List item';
+          }
+          ol.appendChild(liOrdered);
+          range.insertNode(ol);
           break;
         case "link":
           const url = prompt("Enter URL:");
-          if (url) {
-            document.execCommand("createLink", false, url);
+          if (url && selection.toString()) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.textContent = selection.toString();
+            link.style.color = '#60a5fa';
+            link.style.textDecoration = 'underline';
+            range.deleteContents();
+            range.insertNode(link);
           }
           break;
         case "image":
           const imageUrl = prompt("Enter image URL:");
           if (imageUrl) {
-            document.execCommand("insertImage", false, imageUrl);
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            range.insertNode(img);
           }
           break;
       }
       
-      // Update content state with the rich text HTML
-      setContent(editorRef.current.innerHTML);
+      // Update content state
+      setContent(editor.innerHTML);
+      
+      // Clear selection
+      selection.removeAllRanges();
     } catch (error) {
-      console.warn("Rich text command failed:", error);
+      console.warn("Rich text formatting failed:", error);
     }
   };
 
@@ -247,7 +306,7 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
           </div>
         </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden relative">
           <div
             ref={editorRef}
             contentEditable
@@ -260,12 +319,11 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
               lineHeight: '1.6',
               fontSize: '14px'
             }}
-            placeholder="Start writing your document here..."
           />
           {!content && (
             <div 
               className="absolute top-4 left-4 text-slate-400 pointer-events-none"
-              style={{ marginTop: '4px' }}
+              style={{ marginTop: '20px' }}
             >
               Start writing your document here...
             </div>
