@@ -62,7 +62,11 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
       setContent("");
       setType("document");
     }
-  }, [document]);
+    // Reset diagram mode when type changes to non-diagram types
+    if (type !== 'flowchart' && type !== 'dfd') {
+      setIsDiagramMode(false);
+    }
+  }, [document, type]);
 
   useEffect(() => {
     const words = content.trim().split(/\s+/).filter(word => word.length > 0);
@@ -679,15 +683,17 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
             <div className="text-xs text-slate-400 bg-slate-800 px-3 py-1 rounded">
               {wordCount} words
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsDiagramMode(!isDiagramMode)}
-              className={`${isDiagramMode ? 'bg-emerald-700 text-white' : 'text-slate-300'} hover:bg-slate-700`}
-            >
-              <Shapes className="w-4 h-4 mr-2" />
-              {isDiagramMode ? "Visual Builder" : "Text Mode"}
-            </Button>
+            {(type === 'flowchart' || type === 'dfd') && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsDiagramMode(!isDiagramMode)}
+                className={`${isDiagramMode ? 'bg-emerald-700 text-white' : 'text-slate-300'} hover:bg-slate-700`}
+              >
+                <Shapes className="w-4 h-4 mr-2" />
+                {isDiagramMode ? "Visual Builder" : "Text Mode"}
+              </Button>
+            )}
             {!isDiagramMode && (
               <Button
                 variant="ghost"
@@ -740,12 +746,14 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                     <div className="flex items-center space-x-2">
                       <Workflow className="w-4 h-4" />
                       <span>Flowchart</span>
+                      <span className="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded">Visual Builder</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="dfd">
                     <div className="flex items-center space-x-2">
                       <Workflow className="w-4 h-4" />
                       <span>Data Flow Diagram</span>
+                      <span className="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded">Visual Builder</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="code">
