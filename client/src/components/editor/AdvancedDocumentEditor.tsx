@@ -107,6 +107,459 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
     insertTextAtCursor(tableTemplate);
   };
 
+  // Advanced Diagram Templates
+  const insertFlowchartTemplate = () => {
+    const flowchartTemplate = `
+# Flowchart Diagram
+
+## Process Flow
+\`\`\`
+START
+  ↓
+[Decision Point]
+  ↓ YES        ↓ NO
+[Process A]   [Process B]
+  ↓             ↓
+[Result A]    [Result B]
+  ↓             ↓
+END           END
+\`\`\`
+
+## Flowchart Elements:
+- **Oval**: Start/End points
+- **Rectangle**: Process steps
+- **Diamond**: Decision points
+- **Arrows**: Flow direction
+
+### Key Components:
+1. **Input**: Data or trigger
+2. **Process**: Action or operation
+3. **Decision**: Yes/No branch
+4. **Output**: Final result
+`;
+    setContent(flowchartTemplate);
+  };
+
+  const insertDFDTemplate = () => {
+    const dfdTemplate = `
+# Data Flow Diagram (DFD)
+
+## Level 0 - Context Diagram
+\`\`\`
+External Entity 1 ──→ [System Name] ──→ External Entity 2
+                       ↓
+                   Data Store
+\`\`\`
+
+## Level 1 - Detailed Processes
+\`\`\`
+[Process 1] ──→ D1: Database
+     ↓
+[Process 2] ──→ [Process 3]
+     ↓              ↓
+External User ←── Output
+\`\`\`
+
+## DFD Components:
+- **Circles**: Processes (numbered)
+- **Squares**: External entities
+- **Open rectangles**: Data stores (D1, D2...)
+- **Arrows**: Data flows (labeled)
+
+### Data Flows:
+1. **Input flows**: Data entering system
+2. **Output flows**: Data leaving system
+3. **Internal flows**: Data between processes
+4. **Storage flows**: Data to/from storage
+`;
+    setContent(dfdTemplate);
+  };
+
+  const insertERDTemplate = () => {
+    const erdTemplate = `
+# Entity Relationship Diagram (ERD)
+
+## Database Schema Design
+
+### Entities and Relationships:
+\`\`\`
+[Customer] ──(1:M)── [Order] ──(M:1)── [Product]
+    |                   |
+    |                   |
+[Address]           [OrderItem]
+    |                   |
+ (1:1)               (M:M)
+\`\`\`
+
+## Entity Details:
+
+### Customer Entity
+- **Primary Key**: CustomerID
+- **Attributes**: Name, Email, Phone
+- **Relationships**: 
+  - Has many Orders (1:M)
+  - Has one Address (1:1)
+
+### Order Entity
+- **Primary Key**: OrderID
+- **Foreign Keys**: CustomerID
+- **Attributes**: OrderDate, TotalAmount
+- **Relationships**:
+  - Belongs to Customer (M:1)
+  - Contains many OrderItems (1:M)
+
+### Product Entity
+- **Primary Key**: ProductID
+- **Attributes**: Name, Price, Description
+- **Relationships**:
+  - Appears in many Orders (M:M via OrderItem)
+`;
+    setContent(erdTemplate);
+  };
+
+  const insertUMLTemplate = () => {
+    const umlTemplate = `
+# UML Class Diagram
+
+## System Architecture
+
+### Class Structure:
+\`\`\`
+┌─────────────────┐
+│    BaseClass    │
+├─────────────────┤
+│ - attribute1    │
+│ - attribute2    │
+├─────────────────┤
+│ + method1()     │
+│ + method2()     │
+└─────────────────┘
+         ↑
+         │ (inheritance)
+         │
+┌─────────────────┐
+│  DerivedClass   │
+├─────────────────┤
+│ - newAttribute  │
+├─────────────────┤
+│ + newMethod()   │
+└─────────────────┘
+\`\`\`
+
+## Class Relationships:
+- **Inheritance**: ──▷ (is-a relationship)
+- **Association**: ──── (uses relationship)
+- **Aggregation**: ──◇ (has-a relationship)
+- **Composition**: ──◆ (part-of relationship)
+
+### Access Modifiers:
+- **+** Public
+- **-** Private
+- **#** Protected
+- **~** Package
+`;
+    setContent(umlTemplate);
+  };
+
+  const insertNetworkDiagramTemplate = () => {
+    const networkTemplate = `
+# Network Architecture Diagram
+
+## Network Topology
+
+### Infrastructure Layout:
+\`\`\`
+Internet ──→ Router ──→ Firewall ──→ Switch
+                                      │
+                    ┌─────────────────┼─────────────────┐
+                    │                 │                 │
+              Web Server         Database Server    File Server
+               (Apache)           (MySQL)          (Storage)
+                    │                 │                 │
+              Load Balancer     Backup Server    Print Server
+\`\`\`
+
+## Network Components:
+
+### Core Infrastructure:
+1. **Router**: Traffic routing and internet gateway
+2. **Firewall**: Security and access control
+3. **Switch**: Local network connectivity
+4. **Load Balancer**: Traffic distribution
+
+### Servers:
+1. **Web Server**: Application hosting
+2. **Database Server**: Data storage and management
+3. **File Server**: Document and file storage
+4. **Backup Server**: Data redundancy
+
+### Security Zones:
+- **DMZ**: Public-facing services
+- **Internal Network**: Private resources
+- **Management Network**: Administrative access
+`;
+    setContent(networkTemplate);
+  };
+
+  const insertProcessFlowTemplate = () => {
+    const processTemplate = `
+# Business Process Flow
+
+## Workflow Diagram
+
+### Process Steps:
+\`\`\`
+Request Received
+       ↓
+[Validation Check] ──→ [Rejected] → End
+       ↓ (Valid)
+[Assignment] ──→ [Team A] / [Team B]
+       ↓
+[Processing]
+       ↓
+[Quality Check] ──→ [Rework] ──┐
+       ↓ (Approved)              │
+[Final Review] ←─────────────────┘
+       ↓
+[Delivery/Output]
+       ↓
+Process Complete
+\`\`\`
+
+## Process Elements:
+
+### Decision Points:
+- **Validation**: Check requirements
+- **Assignment**: Route to appropriate team
+- **Quality Check**: Verify standards
+- **Final Review**: Management approval
+
+### Parallel Processes:
+1. **Team A**: Technical processing
+2. **Team B**: Administrative processing
+
+### Loop-backs:
+- **Rework**: Return to processing if quality fails
+- **Revision**: Return to review if changes needed
+`;
+    setContent(processTemplate);
+  };
+
+  const insertSystemArchitectureTemplate = () => {
+    const systemTemplate = `
+# System Architecture Diagram
+
+## High-Level Architecture
+
+### System Components:
+\`\`\`
+┌─────────────────────────────────────────────────────────────┐
+│                    Frontend Layer                           │
+├─────────────────────────────────────────────────────────────┤
+│  [Web App]     [Mobile App]     [Admin Dashboard]          │
+│     │              │                    │                  │
+│     └──────────────┼────────────────────┘                  │
+│                    │                                        │
+├─────────────────────────────────────────────────────────────┤
+│                 API Gateway                                 │
+├─────────────────────────────────────────────────────────────┤
+│  [Authentication] [Rate Limiting] [Load Balancer]          │
+│          │              │              │                   │
+├─────────────────────────────────────────────────────────────┤
+│                 Microservices Layer                        │
+├─────────────────────────────────────────────────────────────┤
+│ [User Service] [Order Service] [Payment Service] [Notify]  │
+│       │            │              │              │         │
+├─────────────────────────────────────────────────────────────┤
+│                   Data Layer                               │
+├─────────────────────────────────────────────────────────────┤
+│ [User DB]     [Order DB]     [Cache]     [File Storage]    │
+└─────────────────────────────────────────────────────────────┘
+\`\`\`
+
+## Architecture Patterns:
+- **Microservices**: Independent, scalable services
+- **API Gateway**: Single entry point for all requests
+- **Database per Service**: Data isolation and independence
+- **Event-Driven**: Asynchronous communication between services
+
+### Technology Stack:
+- **Frontend**: React, Vue.js, React Native
+- **API Gateway**: Kong, AWS API Gateway, Nginx
+- **Backend**: Node.js, Python, Go, Java
+- **Databases**: PostgreSQL, MongoDB, Redis
+- **Infrastructure**: Docker, Kubernetes, AWS/GCP
+`;
+    setContent(systemTemplate);
+  };
+
+  const insertSequenceDiagramTemplate = () => {
+    const sequenceTemplate = `
+# Sequence Diagram
+
+## User Authentication Flow
+
+### Interaction Timeline:
+\`\`\`
+User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
+ │               │              │              │              │
+ │ Login Request │              │              │              │
+ ├──────────────→│              │              │              │
+ │               │ POST /login  │              │              │
+ │               ├─────────────→│              │              │
+ │               │              │ Validate     │              │
+ │               │              ├─────────────→│              │
+ │               │              │              │ Query User   │
+ │               │              │              ├─────────────→│
+ │               │              │              │ User Data    │
+ │               │              │              │←─────────────┤
+ │               │              │ JWT Token    │              │
+ │               │              │←─────────────┤              │
+ │               │ Success +    │              │              │
+ │               │ Token        │              │              │
+ │               │←─────────────┤              │              │
+ │ Dashboard     │              │              │              │
+ │←──────────────┤              │              │              │
+\`\`\`
+
+## Sequence Elements:
+- **Actors**: User, System components
+- **Messages**: Requests and responses
+- **Lifelines**: Vertical lines showing object existence
+- **Activation**: Boxes showing when object is active
+
+### Alternative Flows:
+1. **Invalid Credentials**: Return error message
+2. **Account Locked**: Display security notice
+3. **Network Error**: Show retry option
+`;
+    setContent(sequenceTemplate);
+  };
+
+  const insertMindMapTemplate = () => {
+    const mindMapTemplate = `
+# Mind Map
+
+## Project Planning Mind Map
+
+### Central Topic: **New Product Launch**
+\`\`\`
+                    📱 New Product Launch
+                           │
+        ┌─────────────────┼─────────────────┐
+        │                 │                 │
+    🎯 Strategy         📊 Research      🛠️ Development
+        │                 │                 │
+    ┌───┼───┐         ┌───┼───┐         ┌───┼───┐
+    │   │   │         │   │   │         │   │   │
+ Goals│Comp│Team   Market│User│Tech   Design│Code│Test
+      │   │         │     │   │         │    │   │
+   Revenue│Brand  Size│ Needs│Trends  UI/UX│API│QA
+   Target │       │     │    │        │    │   │
+          │       │  Surveys│Analysis Mockup│Unit│
+        Share     │         │        │     │   │
+                 Focus    Research  Prototype│Integration
+                Groups             │        │
+                                  MVP     Performance
+\`\`\`
+
+## Mind Map Benefits:
+- **Visual Organization**: See relationships clearly
+- **Brainstorming**: Generate and connect ideas
+- **Planning**: Break down complex projects
+- **Memory Aid**: Visual structure improves recall
+
+### Branch Categories:
+1. **Main Branches**: Primary topics (thick lines)
+2. **Sub-branches**: Supporting ideas (medium lines)
+3. **Details**: Specific items (thin lines)
+4. **Connections**: Relationships between branches
+
+### Customization Tips:
+- Use **colors** for different categories
+- Add **icons** and **emojis** for visual appeal
+- Keep **text short** and meaningful
+- Use **keywords** rather than sentences
+`;
+    setContent(mindMapTemplate);
+  };
+
+  const insertWireframeTemplate = () => {
+    const wireframeTemplate = `
+# UI Wireframe
+
+## Web Application Layout
+
+### Desktop Wireframe:
+\`\`\`
+┌────────────────────────────────────────────────────────────┐
+│  [Logo]           Navigation Menu           [User] [Login] │ Header
+├────────────────────────────────────────────────────────────┤
+│                                                            │
+│  ┌─────────────┐  ┌─────────────────────────────────────┐  │
+│  │             │  │                                     │  │
+│  │  Sidebar    │  │           Main Content              │  │ Main
+│  │             │  │                                     │  │
+│  │ □ Menu 1    │  │  ┌─────────────┐ ┌─────────────┐   │  │
+│  │ □ Menu 2    │  │  │    Card 1   │ │    Card 2   │   │  │
+│  │ □ Menu 3    │  │  │             │ │             │   │  │
+│  │ □ Menu 4    │  │  │  Content    │ │  Content    │   │  │
+│  │             │  │  │             │ │             │   │  │
+│  │             │  │  └─────────────┘ └─────────────┘   │  │
+│  └─────────────┘  │                                     │  │
+│                   │  [Button]    [Button]    [Button]   │  │
+│                   └─────────────────────────────────────┘  │
+├────────────────────────────────────────────────────────────┤
+│         Footer Links    |    Copyright    |    Contact     │ Footer
+└────────────────────────────────────────────────────────────┘
+\`\`\`
+
+### Mobile Wireframe:
+\`\`\`
+┌─────────────────┐
+│ [☰] App [🔍][⚙] │ Header
+├─────────────────┤
+│                 │
+│  ┌─────────────┐│
+│  │   Banner    ││ Main
+│  │   Content   ││
+│  └─────────────┘│
+│                 │
+│  ┌─────────────┐│
+│  │    Card     ││
+│  │             ││
+│  │  Content    ││
+│  │             ││
+│  │  [Action]   ││
+│  └─────────────┘│
+│                 │
+│  ┌─────────────┐│
+│  │    Card     ││
+│  │             ││
+│  │  Content    ││
+│  │             ││
+│  │  [Action]   ││
+│  └─────────────┘│
+├─────────────────┤
+│ [🏠] [📊] [👤] │ Nav
+└─────────────────┘
+\`\`\`
+
+## Wireframe Elements:
+- **Boxes**: Containers and sections
+- **Lines**: Borders and dividers
+- **Text**: Content placeholders
+- **Icons**: Functional elements
+
+### Design Principles:
+1. **Hierarchy**: Important elements are prominent
+2. **Alignment**: Elements line up consistently
+3. **Spacing**: Adequate white space between elements
+4. **Grouping**: Related items are visually connected
+`;
+    setContent(wireframeTemplate);
+  };
+
   const insertLink = () => {
     const url = prompt("Enter URL:");
     if (url) {
@@ -284,6 +737,89 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
                     <div className="flex items-center space-x-2">
                       <FileCode className="w-4 h-4" />
                       <span>Code Documentation</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Advanced Diagram Templates Dropdown */}
+              <Select onValueChange={(value) => {
+                if (value === "flowchart") insertFlowchartTemplate();
+                else if (value === "dfd") insertDFDTemplate();
+                else if (value === "erd") insertERDTemplate();
+                else if (value === "uml") insertUMLTemplate();
+                else if (value === "network") insertNetworkDiagramTemplate();
+                else if (value === "process") insertProcessFlowTemplate();
+                else if (value === "system") insertSystemArchitectureTemplate();
+                else if (value === "sequence") insertSequenceDiagramTemplate();
+                else if (value === "mindmap") insertMindMapTemplate();
+                else if (value === "wireframe") insertWireframeTemplate();
+              }}>
+                <SelectTrigger className="w-60 bg-emerald-900/30 border-emerald-600 text-emerald-200">
+                  <div className="flex items-center space-x-2">
+                    <Workflow className="w-4 h-4" />
+                    <span>📊 Insert Diagram Template</span>
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-slate-700">
+                  <SelectItem value="flowchart">
+                    <div className="flex items-center space-x-2">
+                      <span>🔄</span>
+                      <span>Flowchart - Process Flow</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="dfd">
+                    <div className="flex items-center space-x-2">
+                      <span>📊</span>
+                      <span>Data Flow Diagram (DFD)</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="erd">
+                    <div className="flex items-center space-x-2">
+                      <span>🗄️</span>
+                      <span>Entity Relationship Diagram</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="uml">
+                    <div className="flex items-center space-x-2">
+                      <span>📐</span>
+                      <span>UML Class Diagram</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="network">
+                    <div className="flex items-center space-x-2">
+                      <span>🌐</span>
+                      <span>Network Architecture</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="process">
+                    <div className="flex items-center space-x-2">
+                      <span>⚙️</span>
+                      <span>Business Process Flow</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="system">
+                    <div className="flex items-center space-x-2">
+                      <span>🏗️</span>
+                      <span>System Architecture</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="sequence">
+                    <div className="flex items-center space-x-2">
+                      <span>🔄</span>
+                      <span>Sequence Diagram</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="mindmap">
+                    <div className="flex items-center space-x-2">
+                      <span>🧠</span>
+                      <span>Mind Map</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="wireframe">
+                    <div className="flex items-center space-x-2">
+                      <span>📱</span>
+                      <span>UI Wireframe</span>
                     </div>
                   </SelectItem>
                 </SelectContent>
