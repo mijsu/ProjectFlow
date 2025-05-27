@@ -667,7 +667,7 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 p-0 overflow-hidden shadow-2xl">
+      <DialogContent className="max-w-[95vw] max-h-[95vh] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 p-0 overflow-hidden shadow-2xl flex flex-col">
         <DialogTitle className="sr-only">Document Editor</DialogTitle>
         {/* Professional Header */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -1040,7 +1040,7 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                       Type using markdown syntax
                     </div>
                   </div>
-                  <div className="flex-1 p-4">
+                  <div className="flex-1 p-4 min-h-0">
                     <Textarea
                       ref={textareaRef}
                       value={content}
@@ -1058,6 +1058,7 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
 
 💡 **Pro Tip:** Use the template dropdown above to insert professional diagram templates!"
                       className="w-full h-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 font-mono text-sm resize-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 leading-relaxed p-4 rounded-lg shadow-sm"
+                      style={{ minHeight: '400px' }}
                     />
                   </div>
                 </div>
@@ -1075,8 +1076,8 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                       See your formatted output
                     </div>
                   </div>
-                  <div className="flex-1 p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
-                    <div className="h-full overflow-y-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                  <div className="flex-1 p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 min-h-0">
+                    <div className="h-full overflow-y-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm" style={{ minHeight: '400px' }}>
                       <div 
                         className="prose prose-gray dark:prose-invert prose-lg max-w-none leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: renderPreview() }}
@@ -1099,7 +1100,7 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                     Raw markdown editing mode
                   </div>
                 </div>
-                <div className="flex-1 p-6">
+                <div className="flex-1 p-6 min-h-0">
                   <Textarea
                     ref={textareaRef}
                     value={content}
@@ -1117,7 +1118,8 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
 • ![alt text](image-url) for images
 
 🚀 **Happy writing!** Your content will be beautifully formatted when saved."
-                    className="w-full h-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 font-mono text-sm resize-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 leading-relaxed p-6 rounded-lg shadow-sm"
+                    className="w-full h-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 font-mono text-sm resize-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 leading-relaxed p-6 rounded-lg shadow-sm overflow-y-auto"
+                    style={{ minHeight: '500px' }}
                   />
                 </div>
               </div>
