@@ -544,17 +544,31 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
         {/* Compact Toolbar */}
         <div className="bg-slate-900/30 border-b border-slate-800">
           <div className="flex items-center justify-between p-2">
-            <Select value={type} onValueChange={handleTypeChange}>
-              <SelectTrigger className="w-44 bg-slate-900 border-slate-700">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700">
-                <SelectItem value="document">📄 Document</SelectItem>
-                <SelectItem value="flowchart">🔄 Flowchart</SelectItem>
-                <SelectItem value="dfd">📊 Data Flow Diagram</SelectItem>
-                <SelectItem value="code">💻 Code Documentation</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Document Type Display (Read-only) */}
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 bg-slate-800 px-3 py-1 rounded">
+                {type === 'flowchart' && <span>🔄 Flowchart</span>}
+                {type === 'dfd' && <span>📊 Data Flow Diagram</span>}
+                {type === 'document' && <span>📄 Document</span>}
+                {type === 'code' && <span>💻 Code Documentation</span>}
+              </div>
+              
+              {/* Template Load Button for Diagrams */}
+              {(type === 'flowchart' || type === 'dfd') && !isPreviewMode && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const template = getTemplateContent(type);
+                    setContent(template);
+                  }}
+                  className="text-emerald-400 hover:text-emerald-300 hover:bg-slate-700 text-xs"
+                >
+                  <Palette className="w-3 h-3 mr-1" />
+                  Load Template
+                </Button>
+              )}
+            </div>
 
             {!isPreviewMode && (
               <div className="flex items-center space-x-1">
@@ -579,24 +593,6 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
               </div>
             )}
           </div>
-
-          {/* Template Load Section for Diagrams */}
-          {(type === 'flowchart' || type === 'dfd') && !isPreviewMode && (
-            <div className="px-3 pb-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  const template = getTemplateContent(type);
-                  setContent(template);
-                }}
-                className="text-emerald-400 hover:text-emerald-300 hover:bg-slate-700 text-xs"
-              >
-                <Palette className="w-3 h-3 mr-1" />
-                Load {type === 'flowchart' ? 'Flowchart' : 'DFD'} Template
-              </Button>
-            </div>
-          )}
         </div>
 
         {/* Enhanced Scrollable Content Area */}
