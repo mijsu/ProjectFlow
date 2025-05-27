@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCollection } from "@/hooks/useFirestore";
 import { where, orderBy } from "firebase/firestore";
 import { format } from "date-fns";
-import { Plus, Search, FolderOpen, Calendar, Users, Edit, Clock, FileText, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Search, FolderOpen, Calendar, Users, Edit, Clock, FileText, ChevronDown, ChevronUp, Eye, X, CheckCircle, AlertCircle, CircleDot } from "lucide-react";
 import ProjectForm from "@/components/forms/ProjectForm";
 
 export default function Projects() {
@@ -17,6 +17,8 @@ export default function Projects() {
   const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [expandedProjects, setExpandedProjects] = useState(new Set());
+  const [viewingProject, setViewingProject] = useState(null);
+  const [isProjectViewOpen, setIsProjectViewOpen] = useState(false);
   const { user } = useAuth();
 
   const { data: projects, loading } = useCollection("projects", [
@@ -64,6 +66,12 @@ export default function Projects() {
       newExpanded.add(projectId);
     }
     setExpandedProjects(newExpanded);
+  };
+
+  // Handle project card click to view details
+  const handleProjectClick = (project: any) => {
+    setViewingProject(project);
+    setIsProjectViewOpen(true);
   };
 
   // Calculate total time spent on each project
@@ -171,6 +179,7 @@ export default function Projects() {
               <Card
                 key={project.id}
                 className="bg-slate-950 border-slate-800 hover:border-slate-700 transition-colors cursor-pointer group flex flex-col h-fit"
+                onClick={() => handleProjectClick(project)}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between mb-2">
@@ -310,6 +319,185 @@ export default function Projects() {
         }}
         project={editingProject}
       />
+
+      {/* Project Details Modal */}
+      <Dialog open={isProjectViewOpen} onOpenChange={setIsProjectViewOpen}>
+        <DialogContent className="max-w-6xl max-h-[90vh] bg-slate-950 border-slate-800 text-slate-100 overflow-hidden flex flex-col">
+          <DialogHeader className="border-b border-slate-800 pb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-blue-600 rounded-lg flex items-center justify-center">
+                  <FolderOpen className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-2xl font-bold text-slate-100">
+                    {viewingProject?.name || "Project Details"}
+                  </DialogTitle>
+                  <p className="text-slate-400 text-sm">
+                    Created {viewingProject?.createdAt ? format(viewingProject.createdAt.toDate(), 'MMM dd, yyyy') : 'Unknown'}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsProjectViewOpen(false)}
+                className="text-slate-400 hover:text-slate-200"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {viewingProject && (
+              <>
+                {/* Project Overview */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Main Details */}
+                  <div className="lg:col-span-2 space-y-6">
+                    {/* Description */}
+                    <div className="bg-slate-900/50 rounded-lg p-6 border border-slate-800">
+                      <h3 className="text-lg font-semibold text-emerald-400 mb-3 flex items-center">
+                        <FileText className="w-5 h-5 mr-2" />
+                        Description
+                      </h3>
+                      <p className="text-slate-300 leading-relaxed">
+                        {viewingProject.description || "No description provided for this project."}
+                      </p>
+                    </div>
+
+                    {/* Attached Documents */}
+                    <div className="bg-slate-900/50 rounded-lg p-6 border border-slate-800">
+                      <h3 className="text-lg font-semibold text-emerald-400 mb-4 flex items-center">
+                        <FileText className="w-5 h-5 mr-2" />
+                        Attached Documents
+                        <span className="ml-2 bg-emerald-600 text-white text-xs px-2 py-1 rounded-full">
+                          {getProjectDocuments(viewingProject.id).length}
+                        </span>
+                      </h3>
+                      
+                      {getProjectDocuments(viewingProject.id).length === 0 ? (
+                        <div className="text-center py-8 text-slate-400">
+                          <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                          <p>No documents attached to this project</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {getProjectDocuments(viewingProject.id).map((document) => (
+                            <div key={document.id} className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                                  <FileText className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                  <h4 className="font-medium text-slate-100">{document.title}</h4>
+                                  <p className="text-sm text-slate-400 capitalize">{document.type}</p>
+                                </div>
+                              </div>
+                              <div className="text-xs text-slate-500">
+                                {format(document.updatedAt?.toDate() || new Date(), 'MMM dd')}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Sidebar Stats */}
+                  <div className="space-y-6">
+                    {/* Quick Stats */}
+                    <div className="bg-slate-900/50 rounded-lg p-6 border border-slate-800">
+                      <h3 className="text-lg font-semibold text-emerald-400 mb-4">Quick Stats</h3>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 text-sm">Documents</span>
+                          <span className="text-slate-100 font-medium">{getProjectDocuments(viewingProject.id).length}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 text-sm">Tasks</span>
+                          <span className="text-slate-100 font-medium">{getProjectTasks(viewingProject.id).length}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 text-sm">Total Time</span>
+                          <span className="text-slate-100 font-medium">{Math.round(getProjectTotalTime(viewingProject.id) / 60)}h</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 text-sm">Status</span>
+                          <span className={`text-sm font-medium ${
+                            viewingProject.status === 'completed' ? 'text-emerald-400' : 
+                            viewingProject.status === 'in-progress' ? 'text-blue-400' : 'text-slate-400'
+                          }`}>
+                            {viewingProject.status?.charAt(0).toUpperCase() + viewingProject.status?.slice(1) || 'Active'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Project Tasks */}
+                    <div className="bg-slate-900/50 rounded-lg p-6 border border-slate-800">
+                      <h3 className="text-lg font-semibold text-emerald-400 mb-4 flex items-center">
+                        <CheckCircle className="w-5 h-5 mr-2" />
+                        Recent Tasks
+                      </h3>
+                      
+                      {getProjectTasks(viewingProject.id).length === 0 ? (
+                        <div className="text-center py-6 text-slate-400">
+                          <CircleDot className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">No tasks created</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {getProjectTasks(viewingProject.id).slice(0, 5).map((task) => (
+                            <div key={task.id} className="flex items-center space-x-3 p-3 bg-slate-800/50 rounded-lg">
+                              <div className={`w-2 h-2 rounded-full ${
+                                task.status === 'completed' ? 'bg-emerald-400' : 
+                                task.status === 'in-progress' ? 'bg-blue-400' : 'bg-slate-500'
+                              }`} />
+                              <div className="flex-1">
+                                <p className="text-sm text-slate-200">{task.title}</p>
+                                <p className="text-xs text-slate-500 capitalize">{task.priority} priority</p>
+                              </div>
+                            </div>
+                          ))}
+                          {getProjectTasks(viewingProject.id).length > 5 && (
+                            <p className="text-xs text-slate-500 text-center pt-2">
+                              +{getProjectTasks(viewingProject.id).length - 5} more tasks
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-4 border-t border-slate-800">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsProjectViewOpen(false)}
+                    className="border-slate-600 text-slate-300 hover:bg-slate-800"
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setEditingProject(viewingProject);
+                      setIsProjectFormOpen(true);
+                      setIsProjectViewOpen(false);
+                    }}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Project
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
