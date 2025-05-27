@@ -16,7 +16,16 @@ import {
   Link, 
   Image,
   Save,
-  X
+  X,
+  Type,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Quote,
+  Code,
+  Eye,
+  Edit3,
+  Palette
 } from "lucide-react";
 
 interface DocumentEditorProps {
@@ -31,6 +40,8 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
   const [content, setContent] = useState("");
   const [type, setType] = useState("document");
   const [saving, setSaving] = useState(false);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -46,6 +57,57 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
       setType("document");
     }
   }, [document]);
+
+  // Enhanced formatting functions
+  const insertTextAtCursor = (before: string, after: string = "") => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    
+    const newText = content.substring(0, start) + before + selectedText + after + content.substring(end);
+    setContent(newText);
+    
+    // Reset cursor position
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+    }, 0);
+  };
+
+  const formatBold = () => insertTextAtCursor("**", "**");
+  const formatItalic = () => insertTextAtCursor("*", "*");
+  const formatUnderline = () => insertTextAtCursor("<u>", "</u>");
+  const formatCode = () => insertTextAtCursor("`", "`");
+  const formatQuote = () => insertTextAtCursor("> ");
+  
+  const insertHeading = (level: number) => {
+    const prefix = "#".repeat(level) + " ";
+    insertTextAtCursor(prefix);
+  };
+  
+  const insertList = () => insertTextAtCursor("- ");
+  const insertOrderedList = () => insertTextAtCursor("1. ");
+  
+  const insertTable = () => {
+    const tableTemplate = `
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+|          |          |          |
+|          |          |          |
+`;
+    insertTextAtCursor(tableTemplate);
+  };
+
+  const insertLink = () => {
+    const url = prompt("Enter URL:");
+    if (url) {
+      const linkText = selectedText || "Link Text";
+      insertTextAtCursor(`[${linkText}](${url})`);
+    }
+  };
 
   const handleSave = async () => {
     if (!user) return;
