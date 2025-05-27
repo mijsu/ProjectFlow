@@ -34,20 +34,31 @@ export default function ActiveProjects() {
   const calculateProjectProgress = (projectId: string) => {
     if (!allTasks) return 0;
     
+    // Include both types of progress tasks:
+    // 1. Tasks with type="progress" from Time Tracking (use progressContribution)
+    // 2. Regular completed tasks from Project system (use progressPercentage)
     const progressTasks = allTasks.filter(task => 
       task.projectId === projectId && 
-      task.type === "progress" && 
-      task.status === "completed"
+      task.status === "completed" &&
+      (task.type === "progress" || task.progressPercentage > 0)
     );
     
-    const totalProgress = progressTasks.reduce((sum, task) => 
-      sum + (task.progressContribution || 0), 0
-    );
+    const totalProgress = progressTasks.reduce((sum, task) => {
+      // Use progressContribution for Time Tracking tasks, progressPercentage for Project tasks
+      const contribution = task.progressContribution || task.progressPercentage || 0;
+      return sum + contribution;
+    }, 0);
     
     // Debug logging to help identify the issue
     console.log(`Project ${projectId} progress calculation:`, {
       totalTasks: progressTasks.length,
-      tasks: progressTasks.map(t => ({ title: t.title, contribution: t.progressContribution })),
+      tasks: progressTasks.map(t => ({ 
+        title: t.title, 
+        type: t.type,
+        progressContribution: t.progressContribution,
+        progressPercentage: t.progressPercentage,
+        contribution: t.progressContribution || t.progressPercentage || 0
+      })),
       totalProgress
     });
     
