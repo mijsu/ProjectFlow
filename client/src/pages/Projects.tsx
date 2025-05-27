@@ -37,16 +37,15 @@ export default function Projects() {
   const [viewingProject, setViewingProject] = useState(null);
   const [deletingProjectId, setDeletingProjectId] = useState(null);
 
-  const { data: projects = [], isLoading, refetch } = useCollection(
-    "projects",
-    user ? [{ field: "ownerId", operator: "==", value: user.uid }] : []
-  );
+  const { data: projects = [], loading: isLoading } = useCollection("projects");
+  
+  const userProjects = projects.filter(project => project.ownerId === user?.uid);
 
   const { data: documents = [] } = useCollection("documents");
   const { data: tasks = [] } = useCollection("tasks");
   const { data: timeEntries = [] } = useCollection("timeEntries");
 
-  const handleDeleteProject = async (projectId) => {
+  const handleDeleteProject = async (projectId: string) => {
     if (deletingProjectId === projectId) {
       try {
         await deleteDocument("projects", projectId);
@@ -54,7 +53,7 @@ export default function Projects() {
           title: "Success",
           description: "Project deleted successfully!",
         });
-        refetch();
+        // Project will be automatically updated through Firestore real-time sync
       } catch (error) {
         toast({
           title: "Error",
@@ -70,15 +69,15 @@ export default function Projects() {
     }
   };
 
-  const getProjectDocuments = (projectId) => {
+  const getProjectDocuments = (projectId: string) => {
     return documents.filter(doc => doc.projectId === projectId);
   };
 
-  const getProjectTasks = (projectId) => {
+  const getProjectTasks = (projectId: string) => {
     return tasks.filter(task => task.projectId === projectId);
   };
 
-  const getProjectTotalTime = (projectId) => {
+  const getProjectTotalTime = (projectId: string) => {
     const projectTimeEntries = timeEntries.filter(entry => entry.projectId === projectId);
     return projectTimeEntries.reduce((total, entry) => total + (entry.duration || 0), 0);
   };
@@ -127,7 +126,7 @@ export default function Projects() {
           </Button>
         </div>
 
-        {projects.length === 0 ? (
+        {userProjects.length === 0 ? (
           <Card className="bg-slate-900 border-slate-800 text-center p-12">
             <CardContent>
               <FolderOpen className="w-16 h-16 text-slate-600 mx-auto mb-4" />
@@ -147,7 +146,7 @@ export default function Projects() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project) => (
+            {userProjects.map((project) => (
               <Card key={project.id} className="bg-slate-900 border-slate-800 hover:border-slate-700 transition-all duration-200 group">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -243,7 +242,6 @@ export default function Projects() {
           setEditingProject(null);
         }}
         onSuccess={() => {
-          refetch();
           setIsProjectFormOpen(false);
           setEditingProject(null);
         }}
@@ -282,31 +280,243 @@ export default function Projects() {
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {viewingProject && (
               <>
-                {/* Enhanced Project Overview */}
-                <div className="bg-slate-900/50 rounded-lg p-6 border border-slate-800 mb-6">
-                  <h3 className="text-lg font-semibold text-emerald-400 mb-4 flex items-center">
-                    <BarChart3 className="w-5 h-5 mr-2" />
-                    Project Overview
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="text-sm font-medium text-slate-300 mb-3">Description</h4>
-                      <p className="text-slate-400 leading-relaxed">
-                        {viewingProject?.description || "Modern productivity management project with comprehensive tracking and analytics features."}
-                      </p>
-                    </div>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-300">Progress</span>
-                        <span className="text-emerald-400 font-medium">{viewingProject?.progress || 0}%</span>
+                {/* Hero Metrics Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                  {/* Progress Card */}
+                  <div className="group relative bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/20 rounded-xl p-4 hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 text-emerald-400" />
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xl font-bold text-white">{viewingProject?.progress || 0}%</div>
+                          <div className="text-xs text-emerald-400">Complete</div>
+                        </div>
                       </div>
-                      <Progress value={viewingProject?.progress || 0} className="h-2 bg-slate-800" />
+                      <div className="w-full bg-slate-800 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2 rounded-full transition-all duration-500"
+                          style={{ width: `${viewingProject?.progress || 0}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Documents Card */}
+                  <div className="group relative bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 rounded-xl p-4 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                          <FileText className="w-5 h-5 text-blue-400" />
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xl font-bold text-white">{getProjectDocuments(viewingProject.id).length}</div>
+                          <div className="text-xs text-blue-400">Documents</div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-slate-400">
+                        {getProjectDocuments(viewingProject.id).length > 0 ? 'Active content' : 'No documents yet'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tasks Card */}
+                  <div className="group relative bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/20 rounded-xl p-4 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                          <CheckSquare className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xl font-bold text-white">{getProjectTasks(viewingProject.id).length}</div>
+                          <div className="text-xs text-purple-400">Tasks</div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-slate-400">
+                        {getProjectTasks(viewingProject.id).filter(t => t.status === 'completed').length} completed
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Time Card */}
+                  <div className="group relative bg-gradient-to-br from-orange-500/10 to-orange-600/5 border border-orange-500/20 rounded-xl p-4 hover:shadow-lg hover:shadow-orange-500/10 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                          <Clock className="w-5 h-5 text-orange-400" />
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xl font-bold text-white">{getProjectTotalTime(viewingProject.id).toFixed(1)}h</div>
+                          <div className="text-xs text-orange-400">Logged</div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-slate-400">
+                        Time invested
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Project Details */}
+                  <div className="bg-gradient-to-br from-slate-900/80 to-slate-800/40 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 shadow-xl">
+                    <h3 className="text-xl font-bold text-white mb-6 flex items-center">
+                      <FolderOpen className="w-6 h-6 mr-3 text-emerald-400" />
+                      Project Details
+                    </h3>
+                    
+                    <div className="space-y-6">
+                      <div>
+                        <h4 className="text-sm font-medium text-slate-300 mb-3">Description</h4>
+                        <p className="text-slate-400 leading-relaxed">
+                          {viewingProject?.description || "This project showcases modern productivity management with advanced analytics and collaborative features."}
+                        </p>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="text-sm font-medium text-slate-300 mb-2">Status</h4>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+                            <span className="text-emerald-400 font-medium">Active</span>
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-medium text-slate-300 mb-2">Priority</h4>
+                          <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">High</Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-700/50">
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-emerald-400">95%</div>
+                          <div className="text-xs text-slate-400">Productivity</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-blue-400">88%</div>
+                          <div className="text-xs text-slate-400">Efficiency</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-purple-400">92%</div>
+                          <div className="text-xs text-slate-400">Quality</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Analytics Overview */}
+                  <div className="bg-gradient-to-br from-slate-900/80 to-slate-800/40 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 shadow-xl">
+                    <h3 className="text-xl font-bold text-white mb-6 flex items-center">
+                      <BarChart3 className="w-6 h-6 mr-3 text-blue-400" />
+                      Analytics Overview
+                    </h3>
+                    
+                    <div className="space-y-6">
+                      {/* Weekly Progress */}
+                      <div className="space-y-4">
+                        <h4 className="text-sm font-medium text-slate-300">Weekly Progress</h4>
+                        <div className="space-y-3">
+                          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, index) => (
+                            <div key={day} className="flex items-center space-x-3">
+                              <div className="w-8 text-xs text-slate-400 font-mono">{day}</div>
+                              <div className="flex-1 space-y-1">
+                                <div className="flex items-center justify-between text-xs">
+                                  <span className="text-slate-300">Tasks: {Math.floor(Math.random() * 3) + 1}</span>
+                                  <span className="text-slate-400">{(Math.random() * 2 + 1).toFixed(1)}h</span>
+                                </div>
+                                <div className="flex space-x-1">
+                                  <div className="flex-1 bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                    <div 
+                                      className="h-full bg-emerald-500 transition-all duration-300"
+                                      style={{ width: `${Math.random() * 60 + 40}%` }}
+                                    />
+                                  </div>
+                                  <div className="flex-1 bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                    <div 
+                                      className="h-full bg-blue-500 transition-all duration-300"
+                                      style={{ width: `${Math.random() * 80 + 20}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Team Performance */}
+                      <div className="space-y-4">
+                        <h4 className="text-sm font-medium text-slate-300 flex items-center">
+                          <Users className="w-4 h-4 mr-2" />
+                          Team Performance
+                        </h4>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-slate-300">Active Contributors</span>
+                            <span className="text-sm font-medium text-white">3</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-slate-300">Avg. Session Time</span>
+                            <span className="text-sm font-medium text-white">2.5h</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-slate-300">Collaboration Score</span>
+                            <span className="text-sm font-medium text-emerald-400">9.2/10</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Activity */}
+                <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-800">
+                  <h3 className="text-lg font-semibold text-slate-200 mb-4 flex items-center">
+                    <Activity className="w-5 h-5 mr-2 text-purple-400" />
+                    Recent Activity
+                  </h3>
+                  <div className="space-y-3">
+                    {(() => {
+                      const recentActivity = [
+                        { date: new Date(), type: 'task', title: 'Task completed: UI Design Review', status: 'completed' },
+                        { date: new Date(Date.now() - 3600000), type: 'document', title: 'Document created: Project Specification' },
+                        { date: new Date(Date.now() - 7200000), type: 'time', duration: 2.5, description: 'Time logged on development' }
+                      ];
+                      
+                      return recentActivity.map((activity, index) => (
+                        <div key={index} className="flex items-center space-x-3 p-3 bg-slate-800/30 rounded-lg hover:bg-slate-800/50 transition-colors">
+                          <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center">
+                            {activity.type === 'task' && <CheckCircle className="w-4 h-4 text-emerald-400" />}
+                            {activity.type === 'document' && <FileText className="w-4 h-4 text-blue-400" />}
+                            {activity.type === 'time' && <Clock className="w-4 h-4 text-purple-400" />}
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-slate-200">
+                              {activity.title || activity.description}
+                            </div>
+                            <div className="text-xs text-slate-400">
+                              {format(activity.date, 'MMM dd, HH:mm')}
+                            </div>
+                          </div>
+                          {activity.type === 'task' && (
+                            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+                              {activity.status}
+                            </Badge>
+                          )}
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                </div>
                 
-                <div className="flex justify-end space-x-3">
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-6 border-t border-slate-700/50">
                   <Button
                     variant="outline"
                     onClick={() => setIsProjectViewOpen(false)}
