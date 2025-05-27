@@ -269,22 +269,20 @@ export default function TimeTracking() {
 
     setLoading(true);
     try {
-      // Create a new progress task
-      await addDocument("tasks", {
-        title: entryDescription.trim(),
-        description: `Progress task: ${progressPercentage}% contribution`,
-        status: "pending",
-        priority: "medium",
-        progress: progressPercentage,
+      // Create a progress entry directly in the progress tracking system
+      await addDocument("progressEntries", {
+        description: entryDescription.trim(),
+        percentage: progressPercentage,
         projectId: entryProject,
-        assigneeId: user.uid,
+        userId: user.uid,
         createdAt: new Date(),
-        dueDate: null,
+        date: new Date(),
+        type: "manual_entry"
       });
 
       toast({
         title: "Success",
-        description: `Progress task added: ${entryDescription.trim()} (${progressPercentage}% contribution)`,
+        description: `Progress added: ${entryDescription.trim()} (${progressPercentage}% contribution)`,
       });
 
       // Reset form
