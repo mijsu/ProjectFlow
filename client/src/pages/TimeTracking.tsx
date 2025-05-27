@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { useCollection, addDocument } from "@/hooks/useFirestore";
+import { useCollection, addDocument, updateDocument } from "@/hooks/useFirestore";
 import { where, orderBy, limit } from "firebase/firestore";
 import { format, formatDuration, intervalToDuration } from "date-fns";
 import { Play, Pause, Square, Plus, Clock, Calendar } from "lucide-react";
@@ -29,6 +29,8 @@ export default function TimeTracking() {
   const [entryProject, setEntryProject] = useState("");
   const [selectedTask, setSelectedTask] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [completionData, setCompletionData] = useState<any>(null);
   
   const { user } = useAuth();
   const { toast } = useToast();
@@ -78,17 +80,8 @@ export default function TimeTracking() {
     where("projectId", "==", entryProject)
   ] : []);
   
-  // Filter to only show in-progress tasks and debug logging
-  const projectTasks = allTasks?.filter(task => {
-    console.log("Task debug:", { 
-      taskId: task.id, 
-      taskProjectId: task.projectId, 
-      selectedProject: entryProject, 
-      status: task.status,
-      title: task.title 
-    });
-    return task.status === "in-progress" && task.projectId === entryProject;
-  }) || [];
+  // Filter to only show in-progress tasks
+  const projectTasks = allTasks?.filter(task => task.status === "in-progress") || [];
 
   // Timer effect
   useEffect(() => {
@@ -160,19 +153,54 @@ export default function TimeTracking() {
       return;
     }
 
+    setIsTimerRunning(false);
+    
+    // Get the selected task details
+    const selectedTaskData = projectTasks?.find(task => task.id === currentTask);
+    
+    // Store completion data and show modal
+    setCompletionData({
+      description: selectedTaskData ? selectedTaskData.title : currentTask,
+      duration: duration,
+      startTime: startTime,
+      endTime: endTime,
+      userId: user.uid,
+      projectId: entryProject || null,
+      taskId: currentTask || null,
+      taskData: selectedTaskData
+    });
+    
+    setShowCompletionModal(true);
+  };
+
+  const handleTaskCompletion = async (markAsComplete: boolean) => {
+    if (!completionData) return;
+
     try {
+      // Save the time entry
       await addDocument("timeEntries", {
-        description: currentTask,
-        duration: duration,
-        startTime: startTime,
-        endTime: endTime,
-        userId: user.uid,
-        projectId: entryProject || null,
+        description: completionData.description,
+        duration: completionData.duration,
+        startTime: completionData.startTime,
+        endTime: completionData.endTime,
+        userId: completionData.userId,
+        projectId: completionData.projectId,
+        taskId: completionData.taskId,
       });
+
+      // If user marked task as complete, update task status
+      if (markAsComplete && completionData.taskId && completionData.taskData) {
+        await updateDocument("tasks", completionData.taskId, {
+          status: "completed",
+          updatedAt: new Date()
+        });
+      }
 
       toast({
         title: "Success",
-        description: `Time entry saved: ${Math.floor(duration / 60)}h ${duration % 60}m`,
+        description: markAsComplete 
+          ? `Task completed! Time saved: ${Math.floor(completionData.duration / 60)}h ${completionData.duration % 60}m`
+          : `Time entry saved: ${Math.floor(completionData.duration / 60)}h ${completionData.duration % 60}m`,
       });
 
       // Reset timer
@@ -181,7 +209,9 @@ export default function TimeTracking() {
       setElapsedTime(0);
       setPausedTime(0);
       setCurrentTask("");
-      localStorage.removeItem('timer-state');
+      setEntryProject("");
+      setShowCompletionModal(false);
+      setCompletionData(null);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -567,6 +597,47 @@ export default function TimeTracking() {
                 </Button>
               </div>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Task Completion Modal */}
+        <Dialog open={showCompletionModal} onOpenChange={setShowCompletionModal}>
+          <DialogContent className="max-w-md bg-slate-950 border-slate-800 text-slate-100">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-semibold">Task Complete?</DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-emerald-400 mb-2">
+                  {completionData && `${Math.floor(completionData.duration / 60)}h ${completionData.duration % 60}m`}
+                </div>
+                <p className="text-slate-300 mb-4">
+                  You worked on: <span className="font-medium text-slate-100">{completionData?.description}</span>
+                </p>
+                <p className="text-slate-400 text-sm">
+                  Did you complete this task, or would you like to take a break and continue later?
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => handleTaskCompletion(false)}
+                  variant="outline"
+                  className="flex-1 border-slate-700 text-slate-300 hover:bg-slate-800"
+                >
+                  <Pause className="w-4 h-4 mr-2" />
+                  Take a Break
+                </Button>
+                <Button
+                  onClick={() => handleTaskCompletion(true)}
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  <Square className="w-4 h-4 mr-2" />
+                  Task Complete!
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
