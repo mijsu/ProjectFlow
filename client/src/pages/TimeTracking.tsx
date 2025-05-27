@@ -401,23 +401,13 @@ export default function TimeTracking() {
                     {pausedTime > 0 ? "Resume" : "Start"}
                   </Button>
                 ) : (
-                  <>
-                    <Button
-                      onClick={handlePauseTimer}
-                      variant="outline"
-                      className="border-slate-700 text-slate-300 hover:bg-slate-800 px-8"
-                    >
-                      <Pause className="w-4 h-4 mr-2" />
-                      Pause
-                    </Button>
-                    <Button
-                      onClick={handleStopTimer}
-                      className="bg-red-600 hover:bg-red-700 text-white px-8"
-                    >
-                      <Square className="w-4 h-4 mr-2" />
-                      Stop & Save
-                    </Button>
-                  </>
+                  <Button
+                    onClick={handleStopTimer}
+                    className="bg-red-600 hover:bg-red-700 text-white px-8"
+                  >
+                    <Square className="w-4 h-4 mr-2" />
+                    Stop & Save
+                  </Button>
                 )}
               </div>
             </CardContent>
