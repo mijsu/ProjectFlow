@@ -80,17 +80,10 @@ export default function TimeTracking() {
     where("projectId", "==", entryProject)
   ] : []);
   
-  // Filter to only show in-progress tasks and debug logging
-  const projectTasks = allTasks?.filter(task => {
-    console.log("Task debug:", { 
-      taskId: task.id, 
-      taskProjectId: task.projectId, 
-      selectedProject: entryProject, 
-      status: task.status,
-      title: task.title 
-    });
-    return task.status === "in-progress" && task.projectId === entryProject;
-  }) || [];
+  // Filter to only show in-progress tasks
+  const projectTasks = allTasks?.filter(task => 
+    task.status === "in-progress" && task.projectId === entryProject
+  ) || [];
 
   // Timer effect
   useEffect(() => {
@@ -211,29 +204,25 @@ export default function TimeTracking() {
     }
   };
 
-  const handleTakeBreak = async () => {
+  const handleTakeBreak = () => {
     if (!pendingTimeEntry) return;
 
-    try {
-      // Save the time entry but keep task in progress
-      await addDocument("timeEntries", pendingTimeEntry);
+    // Don't save the time entry yet - just pause the timer
+    setIsTimerRunning(false);
+    
+    // Keep the accumulated time for when they resume
+    const currentElapsed = pendingTimeEntry.duration * 60 * 1000; // Convert back to milliseconds
+    setPausedTime(currentElapsed);
+    setElapsedTime(currentElapsed);
 
-      toast({
-        title: "Success",
-        description: `Break time! Time saved: ${Math.floor(pendingTimeEntry.duration / 60)}h ${pendingTimeEntry.duration % 60}m`,
-      });
+    toast({
+      title: "Break Time!",
+      description: `Timer paused at ${Math.floor(pendingTimeEntry.duration / 60)}h ${pendingTimeEntry.duration % 60}m. Resume when you're ready!`,
+    });
 
-      // Reset timer but keep task selected
-      resetTimer();
-      setShowTaskCompletionModal(false);
-      setPendingTimeEntry(null);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to save time entry",
-        variant: "destructive",
-      });
-    }
+    // Close modal and clear pending entry
+    setShowTaskCompletionModal(false);
+    setPendingTimeEntry(null);
   };
 
   const resetTimer = () => {
