@@ -53,6 +53,8 @@ export default function ProjectForm({
   const [newTaskProgress, setNewTaskProgress] = useState("");
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingTaskTitle, setEditingTaskTitle] = useState("");
+  const [viewingDocument, setViewingDocument] = useState(null);
+  const [isDocumentViewerOpen, setIsDocumentViewerOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -181,8 +183,25 @@ export default function ProjectForm({
 
   // Document management functions
   const handleViewDocument = (document: any) => {
-    // Open document in a new tab or trigger document editor
-    window.open(`/documents?open=${document.id}`, '_blank');
+    setViewingDocument(document);
+    setIsDocumentViewerOpen(true);
+  };
+
+  // Function to format document content for preview
+  const formatDocumentContent = (content: string) => {
+    if (!content) return "";
+    
+    return content
+      .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold text-slate-100 mb-4">$1</h1>')
+      .replace(/^## (.*$)/gim, '<h2 class="text-xl font-semibold text-slate-200 mb-3">$1</h2>')
+      .replace(/^### (.*$)/gim, '<h3 class="text-lg font-medium text-slate-300 mb-2">$1</h3>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-slate-100">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="italic text-slate-200">$1</em>')
+      .replace(/`([^`]+)`/g, '<code class="bg-slate-800 text-emerald-400 px-1 py-0.5 rounded text-sm font-mono">$1</code>')
+      .replace(/^\* (.+$)/gim, '<li class="text-slate-300 mb-1">$1</li>')
+      .replace(/^\d+\. (.+$)/gim, '<li class="text-slate-300 mb-1">$1</li>')
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-lg my-4 border border-slate-700" />')
+      .replace(/\n/g, '<br>');
   };
 
   const handleDeleteDocument = async (document: any) => {
@@ -299,8 +318,9 @@ export default function ProjectForm({
   }, [project]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] bg-slate-950 border-slate-800 text-slate-100">
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-5xl max-h-[90vh] bg-slate-950 border-slate-800 text-slate-100">
         <DialogHeader className="pb-4 border-b border-slate-700">
           <DialogTitle className="text-xl font-semibold">
             {project ? "Edit Project" : "Create New Project"}
@@ -599,5 +619,61 @@ export default function ProjectForm({
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Document Viewer Modal */}
+    <Dialog open={isDocumentViewerOpen} onOpenChange={setIsDocumentViewerOpen}>
+      <DialogContent className="max-w-4xl max-h-[80vh] bg-slate-950 border-slate-800 text-slate-100 overflow-hidden flex flex-col">
+        <DialogHeader>
+          <DialogTitle className="text-slate-100 flex items-center space-x-2">
+            <FileText className="w-5 h-5 text-blue-400" />
+            <span>{viewingDocument?.title || "Document Preview"}</span>
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="flex-1 overflow-y-auto p-6 bg-slate-900/30 rounded-lg border border-slate-700">
+          {viewingDocument ? (
+            <div>
+              <div className="mb-4 pb-3 border-b border-slate-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-100">{viewingDocument.title}</h2>
+                    <p className="text-sm text-slate-400 capitalize">
+                      {viewingDocument.type} • Updated {new Date(viewingDocument.updatedAt?.toDate()).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded">
+                    Read-only Preview
+                  </div>
+                </div>
+              </div>
+              
+              <div className="prose prose-slate max-w-none">
+                <div 
+                  className="text-slate-300 leading-relaxed"
+                  dangerouslySetInnerHTML={{
+                    __html: formatDocumentContent(viewingDocument.content || "No content available")
+                  }}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-32">
+              <p className="text-slate-400">Loading document...</p>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end space-x-2 pt-4 border-t border-slate-700">
+          <Button
+            variant="outline"
+            onClick={() => setIsDocumentViewerOpen(false)}
+            className="bg-slate-800 border-slate-600 text-slate-200 hover:bg-slate-700"
+          >
+            Close
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
