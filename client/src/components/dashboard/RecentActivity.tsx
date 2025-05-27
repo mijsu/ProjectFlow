@@ -38,7 +38,7 @@ export default function RecentActivity() {
     ...(documents?.map((d) => ({
       id: `document-${d.id}`,
       type: "document_updated",
-      description: `Modified document "${d.title}"`,
+      description: `Modified Document "${d.title}"`,
       createdAt: d.updatedAt,
     })) || []),
     ...(timeEntries?.map((t) => {
