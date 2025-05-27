@@ -34,6 +34,19 @@ export default function ActiveProjects() {
   const calculateProjectProgress = (projectId: string) => {
     if (!allTasks) return 0;
     
+    // Debug: Show ALL tasks for this project first
+    const allProjectTasks = allTasks.filter(task => task.projectId === projectId);
+    console.log(`ALL tasks for project ${projectId}:`, allProjectTasks.map(t => ({
+      title: t.title,
+      status: t.status,
+      type: t.type,
+      projectId: t.projectId,
+      progressContribution: t.progressContribution,
+      progressPercentage: t.progressPercentage,
+      progressValue: t.progressValue,
+      progress: t.progress
+    })));
+    
     // Find all completed tasks for this project, regardless of type
     const completedTasks = allTasks.filter(task => 
       task.projectId === projectId && 
@@ -51,7 +64,7 @@ export default function ActiveProjects() {
     }, 0);
     
     // Debug logging to help identify the issue
-    console.log(`Project ${projectId} progress calculation:`, {
+    console.log(`Project ${projectId} COMPLETED tasks:`, {
       totalTasks: completedTasks.length,
       tasks: completedTasks.map(t => ({ 
         title: t.title, 
