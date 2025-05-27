@@ -272,16 +272,27 @@ export default function TimeTracking() {
 
     setLoading(true);
     try {
-      // Create a progress entry directly in the progress tracking system
-      await addDocument("progressEntries", {
-        description: entryDescription.trim(),
-        percentage: progressPercentage,
+      // Create a progress task directly in the tasks collection (same as project tasks)
+      await addDocument("tasks", {
+        title: entryDescription.trim(),
+        progressContribution: progressPercentage,
         projectId: progressTaskProject,
         userId: user.uid,
+        status: "completed", // Mark as completed since it's a manual progress entry
+        priority: "medium",
+        type: "progress",
         createdAt: new Date(),
-        date: new Date(),
-        type: "manual_entry"
+        completedAt: new Date()
       });
+
+      // Update the project's progress by adding this percentage
+      const selectedProject = projects?.find(p => p.id === progressTaskProject);
+      if (selectedProject) {
+        const newProgress = Math.min(100, (selectedProject.progress || 0) + progressPercentage);
+        await updateDocument("projects", progressTaskProject, {
+          progress: newProgress
+        });
+      }
 
       toast({
         title: "Success",
