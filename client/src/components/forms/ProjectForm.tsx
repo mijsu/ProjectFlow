@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { addDocument, updateDocument } from "@/hooks/useFirestore";
+import { addDocument, updateDocument, deleteDocument } from "@/hooks/useFirestore";
 import { useAuth } from "@/hooks/useAuth";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -25,7 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, Plus, Trash2, CheckCircle, Pencil, Check, X } from "lucide-react";
+import { CalendarIcon, Plus, Trash2, CheckCircle, Pencil, Check, X, FileText, Eye, FolderOpen } from "lucide-react";
 import { format } from "date-fns";
 import { useCollection } from "@/hooks/useFirestore";
 import { where } from "firebase/firestore";
@@ -61,6 +61,13 @@ export default function ProjectForm({
     where("projectId", "==", project.id)
   ] : [
     where("projectId", "==", "non-existent-project-id") // This ensures no tasks are returned for new projects
+  ]);
+
+  // Fetch documents attached to this project if editing
+  const { data: projectDocuments } = useCollection("documents", project?.id ? [
+    where("projectId", "==", project.id)
+  ] : [
+    where("projectId", "==", "non-existent-project-id") // No documents for new projects
   ]);
 
   // Update form when project changes
@@ -170,6 +177,28 @@ export default function ProjectForm({
   const handleCancelEdit = () => {
     setEditingTaskId(null);
     setEditingTaskTitle("");
+  };
+
+  // Document management functions
+  const handleViewDocument = (document: any) => {
+    // Open document in a new tab or trigger document editor
+    window.open(`/documents?open=${document.id}`, '_blank');
+  };
+
+  const handleDeleteDocument = async (document: any) => {
+    try {
+      await deleteDocument("documents", document.id);
+      toast({
+        title: "Document Deleted",
+        description: `"${document.title}" has been removed from the project`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete document",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -447,6 +476,71 @@ export default function ProjectForm({
                 )}
               </div>
             </div>
+
+            {/* Attached Documents Section */}
+            {project && (
+              <div className="border-t border-slate-700 pt-4">
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <FolderOpen className="w-5 h-5 text-blue-400" />
+                    <Label className="text-slate-200 font-medium">Attached Documents</Label>
+                    <span className="text-slate-400 text-sm">
+                      ({projectDocuments?.length || 0} documents)
+                    </span>
+                  </div>
+
+                  {projectDocuments && projectDocuments.length > 0 ? (
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {projectDocuments.map((document) => (
+                        <div
+                          key={document.id}
+                          className="flex items-center justify-between p-3 bg-slate-900 rounded-lg border border-slate-700 hover:border-slate-600 transition-colors"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <FileText className="w-4 h-4 text-blue-400" />
+                            <div>
+                              <p className="text-slate-200 font-medium text-sm">
+                                {document.title}
+                              </p>
+                              <p className="text-slate-400 text-xs capitalize">
+                                {document.type} • Updated {new Date(document.updatedAt?.toDate()).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center space-x-1">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleViewDocument(document)}
+                              className="h-8 w-8 p-0 text-slate-400 hover:text-blue-400 hover:bg-slate-800"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDeleteDocument(document)}
+                              className="h-8 w-8 p-0 text-slate-400 hover:text-red-400 hover:bg-slate-800"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center text-slate-400 py-6 border border-slate-700 rounded-lg bg-slate-900/30">
+                      <FolderOpen className="w-12 h-12 text-slate-500 mx-auto mb-2" />
+                      <p className="text-sm">No documents attached to this project</p>
+                      <p className="text-xs mt-1">Create documents and link them to this project to see them here</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Add New Task Section - Closer to buttons */}
             {project && (
