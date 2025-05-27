@@ -110,7 +110,7 @@ export default function Calendar() {
                 className="bg-emerald-600 hover:bg-emerald-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                New Event
+                New Schedule
               </Button>
             </CardHeader>
             <CardContent>
@@ -190,13 +190,13 @@ export default function Calendar() {
           <Card className="bg-slate-950 border-slate-800">
             <CardHeader>
               <CardTitle className="text-slate-100">
-                Events for {format(selectedDate, "MMM d, yyyy")}
+                Schedule for {format(selectedDate, "MMM d, yyyy")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {eventsForSelectedDate.length === 0 ? (
-                  <p className="text-slate-400 text-sm">No events scheduled</p>
+                  <p className="text-slate-400 text-sm">No schedule items</p>
                 ) : (
                   eventsForSelectedDate.map((event) => (
                     <div key={event.id} className="p-3 bg-slate-900 rounded-lg border border-slate-800">
@@ -229,12 +229,12 @@ export default function Calendar() {
         <Dialog open={isEventFormOpen} onOpenChange={setIsEventFormOpen}>
           <DialogContent className="max-w-md bg-slate-950 border-slate-800 text-slate-100">
             <DialogHeader>
-              <DialogTitle className="text-lg font-semibold">Create New Event</DialogTitle>
+              <DialogTitle className="text-lg font-semibold">Create New Schedule</DialogTitle>
             </DialogHeader>
 
             <form onSubmit={handleCreateEvent} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-slate-200">Event Title</Label>
+                <Label htmlFor="title" className="text-slate-200">Schedule Title</Label>
                 <Input
                   id="title"
                   type="text"
@@ -242,7 +242,7 @@ export default function Calendar() {
                   onChange={(e) => setEventTitle(e.target.value)}
                   required
                   className="bg-slate-800 border-slate-700 text-slate-100"
-                  placeholder="Enter event title"
+                  placeholder="Enter schedule title"
                 />
               </div>
 
@@ -253,13 +253,13 @@ export default function Calendar() {
                   value={eventDescription}
                   onChange={(e) => setEventDescription(e.target.value)}
                   className="bg-slate-800 border-slate-700 text-slate-100 resize-none"
-                  placeholder="Enter event description"
+                  placeholder="Enter schedule description"
                   rows={2}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-slate-200">Event Date</Label>
+                <Label className="text-slate-200">Schedule Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -283,7 +283,7 @@ export default function Calendar() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="type" className="text-slate-200">Event Type</Label>
+                <Label htmlFor="type" className="text-slate-200">Schedule Type</Label>
                 <Select value={eventType} onValueChange={setEventType}>
                   <SelectTrigger className="bg-slate-800 border-slate-700">
                     <SelectValue />
@@ -335,7 +335,7 @@ export default function Calendar() {
                   disabled={loading}
                   className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
-                  {loading ? "Creating..." : "Create Event"}
+                  {loading ? "Creating..." : "Create Schedule"}
                 </Button>
               </div>
             </form>
