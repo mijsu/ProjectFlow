@@ -53,7 +53,7 @@ export default function RecentActivity() {
       return {
         id: `time-${t.id}`,
         type: "time_logged",
-        description: `Spent ${timeStr} completing ${t.description} Task in (${projectName})`,
+        description: `Spent ${timeStr} Completing ${t.description} Task in (${projectName})`,
         createdAt: t.startTime,
       };
     }) || []),
