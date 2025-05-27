@@ -667,202 +667,218 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[95vh] bg-slate-950 border-slate-800 text-slate-100 p-0 overflow-hidden">
-        {/* Enhanced Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/50">
-          <div className="flex items-center space-x-3">
-            <Edit3 className="w-5 h-5 text-emerald-400" />
-            <Input
-              placeholder="Enter document title..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="text-lg font-medium bg-transparent border-none text-slate-100 placeholder-slate-400 focus:ring-0 w-96"
-            />
-          </div>
-          <div className="flex items-center space-x-3">
-            <div className="text-xs text-slate-400 bg-slate-800 px-3 py-1 rounded">
-              {wordCount} words
+      <DialogContent className="max-w-[95vw] max-h-[95vh] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 p-0 overflow-hidden shadow-2xl">
+        <DialogTitle className="sr-only">Document Editor</DialogTitle>
+        {/* Professional Header */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between p-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <Edit3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="flex flex-col">
+                <Input
+                  placeholder="Enter document title..."
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="text-xl font-semibold bg-transparent border-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-0 p-0 h-auto w-96"
+                />
+                <div className="flex items-center space-x-3 mt-2">
+                  <Select value={type} onValueChange={setType}>
+                    <SelectTrigger className="w-64 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 shadow-sm">
+                      <div className="flex items-center space-x-2">
+                        {getTypeIcon(type)}
+                        <SelectValue />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                      <SelectItem value="document">
+                        <div className="flex items-center space-x-2">
+                          <FileText className="w-4 h-4" />
+                          <span>Document</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="flowchart">
+                        <div className="flex items-center space-x-2">
+                          <Workflow className="w-4 h-4" />
+                          <span>Flowchart</span>
+                          <span className="text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">Visual Builder</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="dfd">
+                        <div className="flex items-center space-x-2">
+                          <Workflow className="w-4 h-4" />
+                          <span>Data Flow Diagram</span>
+                          <span className="text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">Visual Builder</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="code">
+                        <div className="flex items-center space-x-2">
+                          <FileCode className="w-4 h-4" />
+                          <span>Code Documentation</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+                    {wordCount} words
+                  </div>
+                </div>
+              </div>
             </div>
-            {(type === 'flowchart' || type === 'dfd') && (
+            
+            <div className="flex items-center space-x-3">
+              {(type === 'flowchart' || type === 'dfd') && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsDiagramMode(!isDiagramMode)}
+                  className={`${isDiagramMode 
+                    ? 'bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600' 
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  } shadow-sm`}
+                >
+                  <Shapes className="w-4 h-4 mr-2" />
+                  {isDiagramMode ? "Visual Builder" : "Enable Visual Builder"}
+                </Button>
+              )}
+              {!isDiagramMode && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsRealTimeView(!isRealTimeView)}
+                  className={`${isRealTimeView 
+                    ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600' 
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  } shadow-sm`}
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  {isRealTimeView ? "Live Preview" : "Text Only"}
+                </Button>
+              )}
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md px-6"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {saving ? "Saving..." : "Save Document"}
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsDiagramMode(!isDiagramMode)}
-                className={`${isDiagramMode ? 'bg-emerald-700 text-white' : 'text-slate-300'} hover:bg-slate-700`}
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
-                <Shapes className="w-4 h-4 mr-2" />
-                {isDiagramMode ? "Visual Builder" : "Text Mode"}
+                <X className="w-4 h-4" />
               </Button>
-            )}
-            {!isDiagramMode && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsRealTimeView(!isRealTimeView)}
-                className={`${isRealTimeView ? 'bg-slate-700 text-emerald-400' : 'text-slate-300'} hover:bg-slate-700`}
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                {isRealTimeView ? "Live View ON" : "Raw Text"}
-              </Button>
-            )}
-            <Button
-              onClick={handleSave}
-              disabled={saving}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              {saving ? "Saving..." : "Save"}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="text-slate-400 hover:text-slate-200"
-            >
-              <X className="w-4 h-4" />
-            </Button>
+            </div>
           </div>
         </div>
 
-        {/* Professional Toolbar */}
-        <div className="bg-slate-900/30 border-b border-slate-800">
-          <div className="flex items-center justify-between p-3">
-            <div className="flex items-center space-x-4">
-              <Select value={type} onValueChange={setType}>
-                <SelectTrigger className="w-52 bg-slate-900 border-slate-700">
-                  <div className="flex items-center space-x-2">
-                    {getTypeIcon(type)}
-                    <SelectValue />
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-700">
-                  <SelectItem value="document">
+        {/* Modern Toolbar */}
+        {!isDiagramMode && (
+          <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center space-x-4">
+                {/* Template Insertion */}
+                <Select onValueChange={(value) => {
+                  if (value === "flowchart") insertFlowchartTemplate();
+                  else if (value === "dfd") insertDFDTemplate();
+                  else if (value === "erd") insertERDTemplate();
+                  else if (value === "uml") insertUMLTemplate();
+                  else if (value === "network") insertNetworkDiagramTemplate();
+                  else if (value === "process") insertProcessFlowTemplate();
+                  else if (value === "system") insertSystemArchitectureTemplate();
+                  else if (value === "sequence") insertSequenceDiagramTemplate();
+                  else if (value === "mindmap") insertMindMapTemplate();
+                  else if (value === "wireframe") insertWireframeTemplate();
+                }}>
+                  <SelectTrigger className="w-64 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm">
                     <div className="flex items-center space-x-2">
-                      <FileText className="w-4 h-4" />
-                      <span>Document</span>
+                      <Workflow className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <span>📋 Insert Template</span>
                     </div>
-                  </SelectItem>
-                  <SelectItem value="flowchart">
-                    <div className="flex items-center space-x-2">
-                      <Workflow className="w-4 h-4" />
-                      <span>Flowchart</span>
-                      <span className="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded">Visual Builder</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="dfd">
-                    <div className="flex items-center space-x-2">
-                      <Workflow className="w-4 h-4" />
-                      <span>Data Flow Diagram</span>
-                      <span className="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded">Visual Builder</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="code">
-                    <div className="flex items-center space-x-2">
-                      <FileCode className="w-4 h-4" />
-                      <span>Code Documentation</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                    <SelectItem value="flowchart">
+                      <div className="flex items-center space-x-2">
+                        <span>🔄</span>
+                        <span>Flowchart</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="dfd">
+                      <div className="flex items-center space-x-2">
+                        <span>📊</span>
+                        <span>Data Flow Diagram</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="erd">
+                      <div className="flex items-center space-x-2">
+                        <span>🗄️</span>
+                        <span>Database Schema</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="uml">
+                      <div className="flex items-center space-x-2">
+                        <span>📐</span>
+                        <span>UML Class Diagram</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="network">
+                      <div className="flex items-center space-x-2">
+                        <span>🌐</span>
+                        <span>Network Architecture</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="process">
+                      <div className="flex items-center space-x-2">
+                        <span>⚙️</span>
+                        <span>Business Process</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="system">
+                      <div className="flex items-center space-x-2">
+                        <span>🏗️</span>
+                        <span>System Architecture</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="sequence">
+                      <div className="flex items-center space-x-2">
+                        <span>🔄</span>
+                        <span>Sequence Diagram</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="mindmap">
+                      <div className="flex items-center space-x-2">
+                        <span>🧠</span>
+                        <span>Mind Map</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="wireframe">
+                      <div className="flex items-center space-x-2">
+                        <span>📱</span>
+                        <span>UI Wireframe</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-              {/* Advanced Diagram Templates Dropdown */}
-              <Select onValueChange={(value) => {
-                if (value === "flowchart") insertFlowchartTemplate();
-                else if (value === "dfd") insertDFDTemplate();
-                else if (value === "erd") insertERDTemplate();
-                else if (value === "uml") insertUMLTemplate();
-                else if (value === "network") insertNetworkDiagramTemplate();
-                else if (value === "process") insertProcessFlowTemplate();
-                else if (value === "system") insertSystemArchitectureTemplate();
-                else if (value === "sequence") insertSequenceDiagramTemplate();
-                else if (value === "mindmap") insertMindMapTemplate();
-                else if (value === "wireframe") insertWireframeTemplate();
-              }}>
-                <SelectTrigger className="w-60 bg-emerald-900/30 border-emerald-600 text-emerald-200">
-                  <div className="flex items-center space-x-2">
-                    <Workflow className="w-4 h-4" />
-                    <span>📊 Insert Diagram Template</span>
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-700">
-                  <SelectItem value="flowchart">
-                    <div className="flex items-center space-x-2">
-                      <span>🔄</span>
-                      <span>Flowchart - Process Flow</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="dfd">
-                    <div className="flex items-center space-x-2">
-                      <span>📊</span>
-                      <span>Data Flow Diagram (DFD)</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="erd">
-                    <div className="flex items-center space-x-2">
-                      <span>🗄️</span>
-                      <span>Entity Relationship Diagram</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="uml">
-                    <div className="flex items-center space-x-2">
-                      <span>📐</span>
-                      <span>UML Class Diagram</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="network">
-                    <div className="flex items-center space-x-2">
-                      <span>🌐</span>
-                      <span>Network Architecture</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="process">
-                    <div className="flex items-center space-x-2">
-                      <span>⚙️</span>
-                      <span>Business Process Flow</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="system">
-                    <div className="flex items-center space-x-2">
-                      <span>🏗️</span>
-                      <span>System Architecture</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="sequence">
-                    <div className="flex items-center space-x-2">
-                      <span>🔄</span>
-                      <span>Sequence Diagram</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="mindmap">
-                    <div className="flex items-center space-x-2">
-                      <span>🧠</span>
-                      <span>Mind Map</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="wireframe">
-                    <div className="flex items-center space-x-2">
-                      <span>📱</span>
-                      <span>UI Wireframe</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="text-xs text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800">
+                💡 Use markdown formatting or select templates above
+              </div>
             </div>
 
-            <div className="text-xs text-slate-400 bg-slate-800/50 px-3 py-1 rounded-full">
-              💡 Select text and use formatting buttons, or type markdown directly
-            </div>
-          </div>
-
-          {true && (
-            <div className="flex items-center space-x-2 px-3 pb-3">
-              {/* Text Formatting Group */}
-              <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
+            {/* Formatting Toolbar */}
+            <div className="flex items-center space-x-3 px-4 pb-4">
+              {/* Text Formatting */}
+              <div className="flex items-center bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={formatBold}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none first:rounded-l-lg"
                   title="Bold (Ctrl+B)"
                 >
                   <Bold className="w-4 h-4" />
@@ -871,7 +887,7 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                   variant="ghost"
                   size="sm"
                   onClick={formatItalic}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none"
                   title="Italic (Ctrl+I)"
                 >
                   <Italic className="w-4 h-4" />
@@ -880,7 +896,7 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                   variant="ghost"
                   size="sm"
                   onClick={formatUnderline}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none"
                   title="Underline"
                 >
                   <Underline className="w-4 h-4" />
@@ -889,20 +905,20 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                   variant="ghost"
                   size="sm"
                   onClick={formatCode}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
-                  title="Inline Code"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none last:rounded-r-lg"
+                  title="Code"
                 >
                   <Code className="w-4 h-4" />
                 </Button>
               </div>
 
-              {/* Headings Group */}
-              <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
+              {/* Headings */}
+              <div className="flex items-center bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => insertHeading(1)}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-bold px-3"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 text-xs font-bold px-3 rounded-none first:rounded-l-lg"
                   title="Heading 1"
                 >
                   H1
@@ -911,7 +927,7 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                   variant="ghost"
                   size="sm"
                   onClick={() => insertHeading(2)}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-bold px-3"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 text-xs font-bold px-3 rounded-none"
                   title="Heading 2"
                 >
                   H2
@@ -920,20 +936,20 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                   variant="ghost"
                   size="sm"
                   onClick={() => insertHeading(3)}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-bold px-3"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 text-xs font-bold px-3 rounded-none last:rounded-r-lg"
                   title="Heading 3"
                 >
                   H3
                 </Button>
               </div>
 
-              {/* Lists Group */}
-              <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
+              {/* Lists */}
+              <div className="flex items-center bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={insertList}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none first:rounded-l-lg"
                   title="Bullet List"
                 >
                   <List className="w-4 h-4" />
@@ -942,7 +958,7 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                   variant="ghost"
                   size="sm"
                   onClick={insertOrderedList}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none"
                   title="Numbered List"
                 >
                   <ListOrdered className="w-4 h-4" />
@@ -951,20 +967,20 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                   variant="ghost"
                   size="sm"
                   onClick={formatQuote}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none last:rounded-r-lg"
                   title="Quote Block"
                 >
                   <Quote className="w-4 h-4" />
                 </Button>
               </div>
 
-              {/* Media & Tools Group */}
-              <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
+              {/* Media & Tools */}
+              <div className="flex items-center bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={insertLink}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none first:rounded-l-lg"
                   title="Insert Link"
                 >
                   <Link className="w-4 h-4" />
@@ -973,7 +989,7 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                   variant="ghost"
                   size="sm"
                   onClick={insertImage}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none"
                   title="Insert Image"
                 >
                   <Image className="w-4 h-4" />
@@ -982,15 +998,15 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                   variant="ghost"
                   size="sm"
                   onClick={insertTable}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700 text-xs px-3"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 text-xs px-3 rounded-none last:rounded-r-lg"
                   title="Insert Table"
                 >
                   Table
                 </Button>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Content Area - Visual Builder or Text Editor */}
         <div className="flex-1 overflow-hidden">
@@ -1010,80 +1026,101 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
               initialElements={diagramElements}
             />
           ) : isRealTimeView ? (
-            // Split-screen real-time editor
-            <div className="h-full flex">
+            // Modern Split-screen Editor
+            <div className="h-full flex bg-gray-50 dark:bg-gray-900">
               {/* Left side - Editor */}
-              <div className="w-1/2 border-r border-slate-700">
-                <div className="h-full p-4">
-                  <div className="text-xs text-slate-400 mb-2 flex items-center">
-                    <Edit3 className="w-3 h-3 mr-1" />
-                    Editor (type here)
+              <div className="w-1/2 border-r border-gray-200 dark:border-gray-700">
+                <div className="h-full flex flex-col">
+                  <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center space-x-2">
+                      <Edit3 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Editor</span>
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      Type using markdown syntax
+                    </div>
                   </div>
-                  <Textarea
-                    ref={textareaRef}
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="Start typing your document or diagram...
+                  <div className="flex-1 p-4">
+                    <Textarea
+                      ref={textareaRef}
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      placeholder="Start writing your document...
 
-📝 **Quick Start:**
+✨ **Formatting Guide:**
 • **Bold text** for emphasis
 • *Italic text* for style  
-• # Heading 1, ## Heading 2
-• - Bullet lists
-• > Block quotes
-• `inline code`
-• [link text](url)
+• # Heading 1, ## Heading 2, ### Heading 3
+• - Bullet lists or 1. Numbered lists
+• > Block quotes for important notes
+• `inline code` for technical terms
+• [link text](url) for hyperlinks
 
-🎨 **Insert Diagram:**
-Use the dropdown above to insert professional diagram templates!"
-                    className="w-full h-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-4 rounded-lg"
-                  />
+💡 **Pro Tip:** Use the template dropdown above to insert professional diagram templates!"
+                      className="w-full h-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 font-mono text-sm resize-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 leading-relaxed p-4 rounded-lg shadow-sm"
+                    />
+                  </div>
                 </div>
               </div>
 
               {/* Right side - Live Preview */}
               <div className="w-1/2">
-                <div className="h-full p-4 bg-gradient-to-br from-slate-900 to-slate-950">
-                  <div className="text-xs text-slate-400 mb-2 flex items-center">
-                    <Eye className="w-3 h-3 mr-1" />
-                    Live Preview
+                <div className="h-full flex flex-col">
+                  <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center space-x-2">
+                      <Eye className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Live Preview</span>
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      See your formatted output
+                    </div>
                   </div>
-                  <div className="h-full overflow-y-auto bg-slate-900/50 rounded-lg p-4">
-                    <div 
-                      className="prose prose-invert prose-lg max-w-none text-slate-200 leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: renderPreview() }}
-                    />
+                  <div className="flex-1 p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
+                    <div className="h-full overflow-y-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                      <div 
+                        className="prose prose-gray dark:prose-invert prose-lg max-w-none leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: renderPreview() }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
-            // Full-screen raw editor
-            <div className="h-full p-6">
-              <div className="text-xs text-slate-400 mb-2 flex items-center">
-                <Type className="w-3 h-3 mr-1" />
-                Raw Text Editor
-              </div>
-              <Textarea
-                ref={textareaRef}
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Raw text editing mode - type markdown directly...
+            // Clean Full-screen Editor
+            <div className="h-full bg-gray-50 dark:bg-gray-900">
+              <div className="h-full flex flex-col">
+                <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center space-x-2">
+                    <Type className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Text Editor</span>
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Raw markdown editing mode
+                  </div>
+                </div>
+                <div className="flex-1 p-6">
+                  <Textarea
+                    ref={textareaRef}
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Write your document using markdown syntax...
 
-✨ Pro Tips:
+✨ **Markdown Reference:**
 • **Bold text** for emphasis
 • *Italic text* for style  
 • # Heading 1, ## Heading 2, ### Heading 3
-• - Bullet lists
-• 1. Numbered lists
-• > Block quotes
-• `inline code`
-• [link text](url)
-• ![image description](image-url)
+• - Bullet lists or 1. Numbered lists
+• > Block quotes for important notes
+• `inline code` for technical terms
+• [link text](url) for hyperlinks
+• ![alt text](image-url) for images
 
-Happy writing! 🚀"
-                className="w-full h-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-4 rounded-lg"
-              />
+🚀 **Happy writing!** Your content will be beautifully formatted when saved."
+                    className="w-full h-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 font-mono text-sm resize-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 leading-relaxed p-6 rounded-lg shadow-sm"
+                  />
+                </div>
+              </div>
             </div>
           )}
         </div>
