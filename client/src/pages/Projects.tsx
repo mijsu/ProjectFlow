@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCollection } from "@/hooks/useFirestore";
 import { where, orderBy } from "firebase/firestore";
 import { format } from "date-fns";
-import { Plus, Search, FolderOpen, Calendar, Users, Edit, Clock, FileText, ChevronDown, ChevronUp, Eye, X, CheckCircle, AlertCircle, CircleDot } from "lucide-react";
+import { Plus, Search, FolderOpen, Calendar, Users, Edit, Clock, FileText, ChevronDown, ChevronUp, Eye, X, CheckCircle, AlertCircle, CircleDot, TrendingUp, BarChart3, Activity } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ProjectForm from "@/components/forms/ProjectForm";
 
@@ -92,6 +92,97 @@ export default function Projects() {
   const getProjectTasks = (projectId: string) => {
     if (!tasks) return [];
     return tasks.filter(task => task.projectId === projectId);
+  };
+
+  // Advanced analytics functions
+  const getProjectAnalytics = (projectId: string) => {
+    const projectTasks = getProjectTasks(projectId);
+    const projectDocs = getProjectDocuments(projectId);
+    const projectTimeEntries = timeEntries?.filter(entry => entry.projectId === projectId) || [];
+    
+    // Task completion timeline
+    const taskTimeline = projectTasks
+      .filter(task => task.updatedAt)
+      .map(task => ({
+        date: task.updatedAt?.toDate(),
+        type: 'task',
+        title: task.title,
+        status: task.status,
+        priority: task.priority
+      }))
+      .sort((a, b) => (a.date?.getTime() || 0) - (b.date?.getTime() || 0));
+
+    // Document creation timeline
+    const docTimeline = projectDocs
+      .filter(doc => doc.createdAt)
+      .map(doc => ({
+        date: doc.createdAt?.toDate(),
+        type: 'document',
+        title: doc.title,
+        docType: doc.type
+      }));
+
+    // Time tracking timeline
+    const timeTimeline = projectTimeEntries
+      .filter(entry => entry.createdAt)
+      .map(entry => ({
+        date: entry.createdAt?.toDate(),
+        type: 'time',
+        duration: entry.duration || 0,
+        description: entry.description
+      }));
+
+    // Combined timeline
+    const combinedTimeline = [...taskTimeline, ...docTimeline, ...timeTimeline]
+      .sort((a, b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0))
+      .slice(0, 10); // Last 10 activities
+
+    // Weekly progress data
+    const weeklyData = [];
+    const now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const dayStart = new Date(date.setHours(0, 0, 0, 0));
+      const dayEnd = new Date(date.setHours(23, 59, 59, 999));
+      
+      const tasksCompleted = projectTasks.filter(task => 
+        task.status === 'completed' && 
+        task.updatedAt?.toDate() >= dayStart && 
+        task.updatedAt?.toDate() <= dayEnd
+      ).length;
+      
+      const timeSpent = projectTimeEntries
+        .filter(entry => 
+          entry.createdAt?.toDate() >= dayStart && 
+          entry.createdAt?.toDate() <= dayEnd
+        )
+        .reduce((total, entry) => total + (entry.duration || 0), 0);
+
+      weeklyData.push({
+        date: format(dayStart, 'MMM dd'),
+        tasksCompleted,
+        timeSpent: Math.round(timeSpent / 60), // Convert to hours
+        dayOfWeek: format(dayStart, 'EEE')
+      });
+    }
+
+    // Task status distribution
+    const taskStatusCount = {
+      completed: projectTasks.filter(t => t.status === 'completed').length,
+      'in-progress': projectTasks.filter(t => t.status === 'in-progress').length,
+      pending: projectTasks.filter(t => t.status === 'pending').length,
+    };
+
+    return {
+      combinedTimeline,
+      weeklyData,
+      taskStatusCount,
+      totalTasks: projectTasks.length,
+      totalDocs: projectDocs.length,
+      totalTime: Math.round(getProjectTotalTime(projectId) / 60), // hours
+      completionRate: projectTasks.length > 0 ? Math.round((taskStatusCount.completed / projectTasks.length) * 100) : 0
+    };
   };
 
   const formatDurationMinutes = (minutes: number) => {
@@ -364,6 +455,180 @@ export default function Projects() {
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {viewingProject && (
               <>
+                {/* Advanced Analytics Section */}
+                <div className="bg-slate-900/50 rounded-lg p-6 border border-slate-800 mb-6">
+                  <h3 className="text-lg font-semibold text-emerald-400 mb-4 flex items-center">
+                    <BarChart3 className="w-5 h-5 mr-2" />
+                    Advanced Analytics
+                  </h3>
+                  
+                  {(() => {
+                    const analytics = getProjectAnalytics(viewingProject.id);
+                    return (
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Weekly Activity Chart */}
+                        <div className="space-y-4">
+                          <h4 className="text-sm font-medium text-slate-300 flex items-center">
+                            <TrendingUp className="w-4 h-4 mr-2" />
+                            7-Day Activity Trend
+                          </h4>
+                          <div className="space-y-3">
+                            {analytics.weeklyData.map((day, index) => (
+                              <div key={index} className="flex items-center space-x-3">
+                                <div className="w-12 text-xs text-slate-400 font-mono">
+                                  {day.dayOfWeek}
+                                </div>
+                                <div className="flex-1 space-y-1">
+                                  <div className="flex items-center justify-between text-xs">
+                                    <span className="text-slate-300">Tasks: {day.tasksCompleted}</span>
+                                    <span className="text-slate-400">{day.timeSpent}h</span>
+                                  </div>
+                                  <div className="flex space-x-1">
+                                    <div className="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden">
+                                      <div 
+                                        className="h-full bg-emerald-500 transition-all duration-300"
+                                        style={{ width: `${Math.min((day.tasksCompleted / Math.max(...analytics.weeklyData.map(d => d.tasksCompleted))) * 100, 100)}%` }}
+                                      />
+                                    </div>
+                                    <div className="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden">
+                                      <div 
+                                        className="h-full bg-blue-500 transition-all duration-300"
+                                        style={{ width: `${Math.min((day.timeSpent / Math.max(...analytics.weeklyData.map(d => d.timeSpent))) * 100, 100)}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex items-center space-x-4 text-xs text-slate-400">
+                            <div className="flex items-center space-x-1">
+                              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                              <span>Tasks Completed</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              <span>Hours Worked</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Task Status Distribution */}
+                        <div className="space-y-4">
+                          <h4 className="text-sm font-medium text-slate-300 flex items-center">
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Task Status Overview
+                          </h4>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-300 text-sm">Completed</span>
+                              <span className="text-emerald-400 font-medium">{analytics.taskStatusCount.completed}</span>
+                            </div>
+                            <div className="w-full bg-slate-800 rounded-full h-2">
+                              <div 
+                                className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                                style={{ width: `${analytics.totalTasks > 0 ? (analytics.taskStatusCount.completed / analytics.totalTasks) * 100 : 0}%` }}
+                              />
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-300 text-sm">In Progress</span>
+                              <span className="text-blue-400 font-medium">{analytics.taskStatusCount['in-progress']}</span>
+                            </div>
+                            <div className="w-full bg-slate-800 rounded-full h-2">
+                              <div 
+                                className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                                style={{ width: `${analytics.totalTasks > 0 ? (analytics.taskStatusCount['in-progress'] / analytics.totalTasks) * 100 : 0}%` }}
+                              />
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-300 text-sm">Pending</span>
+                              <span className="text-slate-400 font-medium">{analytics.taskStatusCount.pending}</span>
+                            </div>
+                            <div className="w-full bg-slate-800 rounded-full h-2">
+                              <div 
+                                className="h-full bg-slate-600 rounded-full transition-all duration-500"
+                                style={{ width: `${analytics.totalTasks > 0 ? (analytics.taskStatusCount.pending / analytics.totalTasks) * 100 : 0}%` }}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="mt-4 p-3 bg-slate-800/50 rounded-lg">
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-emerald-400">{analytics.completionRate}%</div>
+                              <div className="text-xs text-slate-400">Overall Completion</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Recent Activity Timeline */}
+                <div className="bg-slate-900/50 rounded-lg p-6 border border-slate-800 mb-6">
+                  <h3 className="text-lg font-semibold text-emerald-400 mb-4 flex items-center">
+                    <Activity className="w-5 h-5 mr-2" />
+                    Recent Activity Timeline
+                  </h3>
+                  
+                  {(() => {
+                    const analytics = getProjectAnalytics(viewingProject.id);
+                    return (
+                      <div className="space-y-4">
+                        {analytics.combinedTimeline.length === 0 ? (
+                          <div className="text-center py-8 text-slate-400">
+                            <Activity className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                            <p>No recent activity recorded</p>
+                          </div>
+                        ) : (
+                          analytics.combinedTimeline.map((activity, index) => (
+                            <div key={index} className="flex items-start space-x-4 p-4 bg-slate-800/30 rounded-lg border border-slate-700">
+                              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                                activity.type === 'task' ? 'bg-emerald-600' :
+                                activity.type === 'document' ? 'bg-blue-600' : 'bg-purple-600'
+                              }`}>
+                                {activity.type === 'task' ? <CheckCircle className="w-5 h-5 text-white" /> :
+                                 activity.type === 'document' ? <FileText className="w-5 h-5 text-white" /> :
+                                 <Clock className="w-5 h-5 text-white" />}
+                              </div>
+                              
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <h5 className="font-medium text-slate-100">
+                                    {activity.type === 'task' ? `Task: ${activity.title}` :
+                                     activity.type === 'document' ? `Document: ${activity.title}` :
+                                     `Time Entry: ${Math.round((activity.duration || 0) / 60)}h logged`}
+                                  </h5>
+                                  <span className="text-xs text-slate-400">
+                                    {activity.date ? format(activity.date, 'MMM dd, HH:mm') : 'Unknown'}
+                                  </span>
+                                </div>
+                                
+                                <div className="flex items-center space-x-3 mt-1">
+                                  <span className={`text-xs px-2 py-1 rounded-full ${
+                                    activity.type === 'task' ? 'bg-emerald-600/20 text-emerald-300' :
+                                    activity.type === 'document' ? 'bg-blue-600/20 text-blue-300' :
+                                    'bg-purple-600/20 text-purple-300'
+                                  }`}>
+                                    {activity.type === 'task' ? 
+                                      `${activity.status} • ${activity.priority} priority` :
+                                     activity.type === 'document' ? 
+                                      `${activity.docType} document` :
+                                      activity.description || 'Time tracking'
+                                    }
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+
                 {/* Project Overview */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Main Details */}
