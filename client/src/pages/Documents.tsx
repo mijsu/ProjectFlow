@@ -1,6 +1,6 @@
 import { useState } from "react";
 import TopBar from "@/components/layout/TopBar";
-import DocumentEditor from "@/components/editor/DocumentEditor";
+import AdvancedDocumentEditor from "@/components/editor/AdvancedDocumentEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -332,7 +332,7 @@ export default function Documents() {
         )}
       </div>
 
-      <DocumentEditor
+      <AdvancedDocumentEditor
         isOpen={isEditorOpen}
         onClose={() => setIsEditorOpen(false)}
         document={selectedDocument}

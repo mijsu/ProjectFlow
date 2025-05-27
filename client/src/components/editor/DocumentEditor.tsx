@@ -16,7 +16,16 @@ import {
   Link, 
   Image,
   Save,
-  X
+  X,
+  Type,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Quote,
+  Code,
+  Eye,
+  Edit3,
+  Palette
 } from "lucide-react";
 
 interface DocumentEditorProps {
@@ -31,7 +40,9 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
   const [content, setContent] = useState("");
   const [type, setType] = useState("document");
   const [saving, setSaving] = useState(false);
-  const editorRef = useRef<HTMLDivElement>(null);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -46,6 +57,57 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
       setType("document");
     }
   }, [document]);
+
+  // Enhanced formatting functions
+  const insertTextAtCursor = (before: string, after: string = "") => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    
+    const newText = content.substring(0, start) + before + selectedText + after + content.substring(end);
+    setContent(newText);
+    
+    // Reset cursor position
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+    }, 0);
+  };
+
+  const formatBold = () => insertTextAtCursor("**", "**");
+  const formatItalic = () => insertTextAtCursor("*", "*");
+  const formatUnderline = () => insertTextAtCursor("<u>", "</u>");
+  const formatCode = () => insertTextAtCursor("`", "`");
+  const formatQuote = () => insertTextAtCursor("> ");
+  
+  const insertHeading = (level: number) => {
+    const prefix = "#".repeat(level) + " ";
+    insertTextAtCursor(prefix);
+  };
+  
+  const insertList = () => insertTextAtCursor("- ");
+  const insertOrderedList = () => insertTextAtCursor("1. ");
+  
+  const insertTable = () => {
+    const tableTemplate = `
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+|          |          |          |
+|          |          |          |
+`;
+    insertTextAtCursor(tableTemplate);
+  };
+
+  const insertLink = () => {
+    const url = prompt("Enter URL:");
+    if (url) {
+      const linkText = selectedText || "Link Text";
+      insertTextAtCursor(`[${linkText}](${url})`);
+    }
+  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -96,53 +158,47 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
   };
 
   const formatText = (command: string) => {
-    if (!editorRef.current) return;
+    if (!textareaRef.current) return;
 
-    const editor = editorRef.current;
-    editor.focus();
-
-    // Use the modern approach with execCommand fallback
-    try {
-      let success = false;
-      
-      switch (command) {
-        case "bold":
-          success = document.execCommand('bold', false, null);
-          break;
-        case "italic":
-          success = document.execCommand('italic', false, null);
-          break;
-        case "underline":
-          success = document.execCommand('underline', false, null);
-          break;
-        case "list":
-          success = document.execCommand('insertUnorderedList', false, null);
-          break;
-        case "listOrdered":
-          success = document.execCommand('insertOrderedList', false, null);
-          break;
-        case "link":
-          const url = prompt("Enter URL:");
-          if (url) {
-            success = document.execCommand('createLink', false, url);
-          }
-          break;
-        case "image":
-          const imageUrl = prompt("Enter image URL:");
-          if (imageUrl) {
-            success = document.execCommand('insertImage', false, imageUrl);
-          }
-          break;
-      }
-      
-      // Update content after any changes
-      setTimeout(() => {
-        setContent(editor.innerHTML);
-      }, 10);
-      
-    } catch (error) {
-      console.warn("Rich text formatting failed:", error);
+    const textarea = textareaRef.current;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    
+    let formattedText = "";
+    switch (command) {
+      case "bold":
+        formattedText = selectedText ? `**${selectedText}**` : "**text**";
+        break;
+      case "italic":
+        formattedText = selectedText ? `*${selectedText}*` : "*text*";
+        break;
+      case "underline":
+        formattedText = selectedText ? `<u>${selectedText}</u>` : "<u>text</u>";
+        break;
+      case "list":
+        formattedText = selectedText ? `\n- ${selectedText}` : "\n- ";
+        break;
+      case "listOrdered":
+        formattedText = selectedText ? `\n1. ${selectedText}` : "\n1. ";
+        break;
+      case "link":
+        formattedText = selectedText ? `[${selectedText}](url)` : "[text](url)";
+        break;
+      case "image":
+        formattedText = "![image description](image-url)";
+        break;
     }
+
+    const newContent = content.substring(0, start) + formattedText + content.substring(end);
+    setContent(newContent);
+    
+    // Restore focus and cursor position
+    setTimeout(() => {
+      textarea.focus();
+      const newPosition = start + formattedText.length;
+      textarea.setSelectionRange(newPosition, newPosition);
+    }, 0);
   };
 
   return (
@@ -252,28 +308,15 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
           </div>
         </div>
 
-        <div className="flex-1 overflow-hidden relative">
-          <div
-            ref={editorRef}
-            contentEditable
-            suppressContentEditableWarning={true}
-            onInput={(e) => setContent(e.currentTarget.innerHTML)}
-            dangerouslySetInnerHTML={{ __html: content }}
-            className="w-full h-96 bg-slate-900 border border-slate-700 text-slate-100 p-4 rounded-md overflow-y-auto focus:border-emerald-500 focus:outline-none"
-            style={{
-              minHeight: '384px',
-              lineHeight: '1.6',
-              fontSize: '14px'
-            }}
+        <div className="flex-1 overflow-hidden">
+          <Textarea
+            ref={textareaRef}
+            name="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Start writing your document here..."
+            className="w-full h-96 bg-slate-900 border-slate-700 text-slate-100 placeholder-slate-400 resize-none focus:border-emerald-500"
           />
-          {!content && (
-            <div 
-              className="absolute top-4 left-4 text-slate-400 pointer-events-none"
-              style={{ marginTop: '20px' }}
-            >
-              Start writing your document here...
-            </div>
-          )}
         </div>
       </DialogContent>
     </Dialog>
