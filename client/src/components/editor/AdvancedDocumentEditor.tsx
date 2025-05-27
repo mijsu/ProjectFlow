@@ -650,18 +650,19 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
 
   const renderPreview = () => {
     return content
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-emerald-300">$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em class="italic text-blue-300">$1</em>')
-      .replace(/<u>(.*?)<\/u>/g, '<u class="underline text-purple-300">$1</u>')
-      .replace(/`(.*?)`/g, '<code class="bg-slate-800 text-green-300 px-2 py-1 rounded text-sm font-mono">$1</code>')
-      .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold mb-6 text-emerald-400 border-b border-emerald-600 pb-2">$1</h1>')
-      .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-bold mb-4 text-emerald-300">$1</h2>')
-      .replace(/^### (.*$)/gm, '<h3 class="text-xl font-bold mb-3 text-emerald-200">$1</h3>')
-      .replace(/^- (.*$)/gm, '<div class="flex items-start mb-2"><span class="text-emerald-400 mr-2">•</span><span class="text-slate-200">$1</span></div>')
-      .replace(/^\d+\. (.*$)/gm, '<div class="flex items-start mb-2"><span class="text-emerald-400 mr-2 font-mono">1.</span><span class="text-slate-200">$1</span></div>')
-      .replace(/^> (.*$)/gm, '<blockquote class="border-l-4 border-emerald-500 bg-slate-800/50 pl-4 py-3 italic text-slate-300 my-4 rounded-r">$1</blockquote>')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline transition-colors">$1</a>')
-      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-lg my-4 border border-slate-700" />')
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-900 dark:text-gray-100">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="italic text-gray-700 dark:text-gray-300">$1</em>')
+      .replace(/<u>(.*?)<\/u>/g, '<u class="underline decoration-blue-500 decoration-2 underline-offset-2">$1</u>')
+      .replace(/`(.*?)`/g, '<code class="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-md text-sm font-mono border border-gray-200 dark:border-gray-600">$1</code>')
+      .replace(/^# (.*$)/gm, '<h1 class="text-4xl font-bold mb-8 text-gray-900 dark:text-gray-100 border-b-2 border-blue-500 pb-4 leading-tight">$1</h1>')
+      .replace(/^## (.*$)/gm, '<h2 class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-200 leading-tight">$1</h2>')
+      .replace(/^### (.*$)/gm, '<h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200 leading-tight">$1</h3>')
+      .replace(/^- (.*$)/gm, '<div class="flex items-start mb-3 pl-4"><span class="text-blue-500 mr-3 mt-2 text-sm">●</span><span class="text-gray-700 dark:text-gray-300 leading-relaxed">$1</span></div>')
+      .replace(/^\d+\. (.*$)/gm, '<div class="flex items-start mb-3 pl-4"><span class="text-blue-500 mr-3 font-semibold min-w-6">1.</span><span class="text-gray-700 dark:text-gray-300 leading-relaxed">$1</span></div>')
+      .replace(/^> (.*$)/gm, '<blockquote class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 pl-6 py-4 my-6 rounded-r-lg shadow-sm"><p class="text-gray-700 dark:text-gray-300 italic leading-relaxed margin-0">$1</p></blockquote>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline decoration-2 underline-offset-2 transition-colors font-medium">$1</a>')
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-xl my-6 shadow-lg border border-gray-200 dark:border-gray-600" />')
+      .replace(/\n\n/g, '</p><p class="mb-4 leading-relaxed text-gray-700 dark:text-gray-300">')
       .replace(/\n/g, '<br>');
   };
 
@@ -1077,11 +1078,20 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                     </div>
                   </div>
                   <div className="flex-1 p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 min-h-0">
-                    <div className="h-full overflow-y-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm" style={{ height: 'calc(100vh - 400px)', minHeight: '300px' }}>
-                      <div 
-                        className="prose prose-gray dark:prose-invert prose-lg max-w-none leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: renderPreview() }}
-                      />
+                    <div className="h-full overflow-y-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm" style={{ height: 'calc(100vh - 400px)', minHeight: '300px' }}>
+                      <div className="p-8">
+                        <div 
+                          className="max-w-none leading-relaxed text-gray-800 dark:text-gray-200"
+                          dangerouslySetInnerHTML={{ 
+                            __html: `<div class="space-y-4">${renderPreview()}</div>` 
+                          }}
+                          style={{
+                            fontFamily: '"Inter", "Segoe UI", "Helvetica Neue", sans-serif',
+                            fontSize: '16px',
+                            lineHeight: '1.75'
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
