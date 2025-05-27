@@ -492,80 +492,607 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
     setContent(mindMapTemplate);
   };
 
-  const insertWireframeTemplate = () => {
-    const wireframeTemplate = `
-# UI Wireframe
+  // Document Template Functions
+  const insertMeetingNotesTemplate = () => {
+    const meetingTemplate = `# Meeting Notes
 
-## Web Application Layout
+**Date:** ${new Date().toLocaleDateString()}
+**Time:** 
+**Location:** 
+**Meeting Type:** 
 
-### Desktop Wireframe:
-\`\`\`
-┌────────────────────────────────────────────────────────────┐
-│  [Logo]           Navigation Menu           [User] [Login] │ Header
-├────────────────────────────────────────────────────────────┤
-│                                                            │
-│  ┌─────────────┐  ┌─────────────────────────────────────┐  │
-│  │             │  │                                     │  │
-│  │  Sidebar    │  │           Main Content              │  │ Main
-│  │             │  │                                     │  │
-│  │ □ Menu 1    │  │  ┌─────────────┐ ┌─────────────┐   │  │
-│  │ □ Menu 2    │  │  │    Card 1   │ │    Card 2   │   │  │
-│  │ □ Menu 3    │  │  │             │ │             │   │  │
-│  │ □ Menu 4    │  │  │  Content    │ │  Content    │   │  │
-│  │             │  │  │             │ │             │   │  │
-│  │             │  │  └─────────────┘ └─────────────┘   │  │
-│  └─────────────┘  │                                     │  │
-│                   │  [Button]    [Button]    [Button]   │  │
-│                   └─────────────────────────────────────┘  │
-├────────────────────────────────────────────────────────────┤
-│         Footer Links    |    Copyright    |    Contact     │ Footer
-└────────────────────────────────────────────────────────────┘
-\`\`\`
+## Attendees
+- 
+- 
+- 
 
-### Mobile Wireframe:
-\`\`\`
-┌─────────────────┐
-│ [☰] App [🔍][⚙] │ Header
-├─────────────────┤
-│                 │
-│  ┌─────────────┐│
-│  │   Banner    ││ Main
-│  │   Content   ││
-│  └─────────────┘│
-│                 │
-│  ┌─────────────┐│
-│  │    Card     ││
-│  │             ││
-│  │  Content    ││
-│  │             ││
-│  │  [Action]   ││
-│  └─────────────┘│
-│                 │
-│  ┌─────────────┐│
-│  │    Card     ││
-│  │             ││
-│  │  Content    ││
-│  │             ││
-│  │  [Action]   ││
-│  └─────────────┘│
-├─────────────────┤
-│ [🏠] [📊] [👤] │ Nav
-└─────────────────┘
-\`\`\`
+## Agenda
+1. 
+2. 
+3. 
 
-## Wireframe Elements:
-- **Boxes**: Containers and sections
-- **Lines**: Borders and dividers
-- **Text**: Content placeholders
-- **Icons**: Functional elements
+## Discussion Points
 
-### Design Principles:
-1. **Hierarchy**: Important elements are prominent
-2. **Alignment**: Elements line up consistently
-3. **Spacing**: Adequate white space between elements
-4. **Grouping**: Related items are visually connected
+### Topic 1
+**Discussion:**
+
+**Decisions:**
+
+**Action Items:**
+- [ ] Action item 1 - Assigned to: - Due: 
+- [ ] Action item 2 - Assigned to: - Due: 
+
+### Topic 2
+**Discussion:**
+
+**Decisions:**
+
+**Action Items:**
+- [ ] Action item 1 - Assigned to: - Due: 
+
+## Next Steps
+- 
+- 
+
+## Next Meeting
+**Date:** 
+**Time:** 
+**Agenda Preview:** 
 `;
-    setContent(wireframeTemplate);
+    setContent(meetingTemplate);
+  };
+
+  const insertProjectPlanTemplate = () => {
+    const projectTemplate = `# Project Plan
+
+## Project Overview
+**Project Name:** 
+**Project Manager:** 
+**Start Date:** 
+**End Date:** 
+**Budget:** 
+
+### Project Description
+
+
+### Project Goals
+1. 
+2. 
+3. 
+
+## Scope
+### In Scope
+- 
+- 
+
+### Out of Scope
+- 
+- 
+
+## Timeline & Milestones
+
+### Phase 1: Planning
+**Duration:** 
+**Key Deliverables:**
+- 
+- 
+
+### Phase 2: Development
+**Duration:** 
+**Key Deliverables:**
+- 
+- 
+
+### Phase 3: Testing
+**Duration:** 
+**Key Deliverables:**
+- 
+- 
+
+### Phase 4: Deployment
+**Duration:** 
+**Key Deliverables:**
+- 
+- 
+
+## Team & Responsibilities
+| Name | Role | Responsibilities |
+|------|------|------------------|
+|      |      |                  |
+|      |      |                  |
+
+## Risk Management
+| Risk | Impact | Probability | Mitigation |
+|------|--------|-------------|------------|
+|      |        |             |            |
+|      |        |             |            |
+
+## Success Criteria
+- 
+- 
+- 
+`;
+    setContent(projectTemplate);
+  };
+
+  const insertReportTemplate = () => {
+    const reportTemplate = `# Report Title
+
+**Date:** ${new Date().toLocaleDateString()}
+**Author:** 
+**Department:** 
+**Report Period:** 
+
+## Executive Summary
+
+
+## Introduction
+### Purpose
+### Scope
+### Methodology
+
+## Key Findings
+
+### Finding 1
+**Data:**
+**Analysis:**
+**Impact:**
+
+### Finding 2
+**Data:**
+**Analysis:**
+**Impact:**
+
+### Finding 3
+**Data:**
+**Analysis:**
+**Impact:**
+
+## Recommendations
+
+### Recommendation 1
+**Priority:** High/Medium/Low
+**Timeline:** 
+**Resources Required:** 
+**Expected Outcome:** 
+
+### Recommendation 2
+**Priority:** High/Medium/Low
+**Timeline:** 
+**Resources Required:** 
+**Expected Outcome:** 
+
+## Data & Metrics
+| Metric | Current | Target | Variance |
+|--------|---------|--------|----------|
+|        |         |        |          |
+|        |         |        |          |
+
+## Conclusion
+
+
+## Next Steps
+1. 
+2. 
+3. 
+
+## Appendix
+### Supporting Data
+### References
+`;
+    setContent(reportTemplate);
+  };
+
+  const insertProposalTemplate = () => {
+    const proposalTemplate = `# Project Proposal
+
+**Proposal Title:** 
+**Submitted By:** 
+**Date:** ${new Date().toLocaleDateString()}
+**Department:** 
+**Requested Budget:** 
+
+## Executive Summary
+
+
+## Problem Statement
+### Current Situation
+### Challenges
+### Impact of Inaction
+
+## Proposed Solution
+### Overview
+### Key Features
+### Benefits
+
+## Implementation Plan
+### Phase 1: Preparation
+**Timeline:** 
+**Activities:**
+- 
+- 
+
+### Phase 2: Execution
+**Timeline:** 
+**Activities:**
+- 
+- 
+
+### Phase 3: Evaluation
+**Timeline:** 
+**Activities:**
+- 
+- 
+
+## Resource Requirements
+### Human Resources
+| Role | Time Commitment | Skills Required |
+|------|-----------------|-----------------|
+|      |                 |                 |
+
+### Technology Resources
+- 
+- 
+
+### Budget Breakdown
+| Category | Amount | Justification |
+|----------|--------|---------------|
+|          |        |               |
+|          |        |               |
+| **Total** | **$** |               |
+
+## Risk Assessment
+| Risk | Likelihood | Impact | Mitigation Strategy |
+|------|------------|--------|-------------------|
+|      |            |        |                   |
+
+## Success Metrics
+- 
+- 
+- 
+
+## Timeline
+**Start Date:** 
+**End Date:** 
+**Key Milestones:**
+- 
+- 
+
+## Approval Required
+- [ ] Department Head
+- [ ] IT Department
+- [ ] Finance Department
+- [ ] Executive Team
+`;
+    setContent(proposalTemplate);
+  };
+
+  const insertRequirementsTemplate = () => {
+    const requirementsTemplate = `# Requirements Document
+
+**Project:** 
+**Version:** 1.0
+**Date:** ${new Date().toLocaleDateString()}
+**Author:** 
+
+## Document Overview
+### Purpose
+### Scope
+### Definitions
+
+## Functional Requirements
+
+### User Management
+**REQ-001:** User Registration
+**Description:** 
+**Priority:** High/Medium/Low
+**Acceptance Criteria:**
+- 
+- 
+
+**REQ-002:** User Authentication
+**Description:** 
+**Priority:** High/Medium/Low
+**Acceptance Criteria:**
+- 
+- 
+
+### Core Functionality
+**REQ-003:** 
+**Description:** 
+**Priority:** High/Medium/Low
+**Acceptance Criteria:**
+- 
+- 
+
+## Non-Functional Requirements
+
+### Performance
+**NFR-001:** Response Time
+**Requirement:** 
+**Measurement:** 
+
+**NFR-002:** Concurrent Users
+**Requirement:** 
+**Measurement:** 
+
+### Security
+**NFR-003:** Data Protection
+**Requirement:** 
+**Compliance:** 
+
+**NFR-004:** Authentication
+**Requirement:** 
+**Implementation:** 
+
+### Usability
+**NFR-005:** User Interface
+**Requirement:** 
+**Standards:** 
+
+## Technical Requirements
+### Platform
+### Browser Support
+### Database
+### Integration Points
+
+## Constraints
+- 
+- 
+- 
+
+## Assumptions
+- 
+- 
+- 
+
+## Dependencies
+| Dependency | Impact | Mitigation |
+|------------|--------|------------|
+|            |        |            |
+
+## Acceptance Criteria
+- [ ] All functional requirements implemented
+- [ ] Performance targets met
+- [ ] Security requirements satisfied
+- [ ] User acceptance testing passed
+`;
+    setContent(requirementsTemplate);
+  };
+
+  const insertUserStoryTemplate = () => {
+    const userStoryTemplate = `# User Story
+
+**Story ID:** US-001
+**Epic:** 
+**Sprint:** 
+**Story Points:** 
+
+## User Story
+**As a** [type of user]
+**I want** [some goal]
+**So that** [some reason/benefit]
+
+## Acceptance Criteria
+**Given** [context]
+**When** [action]
+**Then** [outcome]
+
+- [ ] Acceptance criterion 1
+- [ ] Acceptance criterion 2
+- [ ] Acceptance criterion 3
+
+## Definition of Done
+- [ ] Code written and tested
+- [ ] Unit tests pass
+- [ ] Code review completed
+- [ ] Documentation updated
+- [ ] Deployed to staging
+- [ ] Product owner approval
+
+## Technical Notes
+### API Endpoints
+### Database Changes
+### UI Components
+
+## Dependencies
+- 
+- 
+
+## Risks
+- 
+- 
+
+## Testing Scenarios
+### Happy Path
+1. 
+2. 
+3. 
+
+### Edge Cases
+1. 
+2. 
+
+### Error Handling
+1. 
+2. 
+
+## Design Assets
+- Mockups: 
+- Prototypes: 
+- Style Guide: 
+
+## Notes
+`;
+    setContent(userStoryTemplate);
+  };
+
+  const insertSpecificationTemplate = () => {
+    const specTemplate = `# Technical Specification
+
+**Project:** 
+**Version:** 1.0
+**Date:** ${new Date().toLocaleDateString()}
+**Author:** 
+
+## Overview
+### Purpose
+### Scope
+### Architecture Overview
+
+## System Architecture
+### High-Level Design
+### Components
+### Data Flow
+
+## API Specification
+### Endpoints
+\`\`\`
+GET /api/users
+POST /api/users
+PUT /api/users/{id}
+DELETE /api/users/{id}
+\`\`\`
+
+### Request/Response Format
+\`\`\`json
+{
+  "id": "string",
+  "name": "string",
+  "email": "string",
+  "created_at": "datetime"
+}
+\`\`\`
+
+## Database Schema
+### Tables
+#### Users Table
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | UUID | PRIMARY KEY |
+| name | VARCHAR(255) | NOT NULL |
+| email | VARCHAR(255) | UNIQUE, NOT NULL |
+
+### Relationships
+### Indexes
+
+## Security Considerations
+### Authentication
+### Authorization
+### Data Protection
+### Input Validation
+
+## Performance Requirements
+### Response Time
+### Throughput
+### Scalability
+### Caching Strategy
+
+## Deployment
+### Environment Setup
+### Configuration
+### Monitoring
+### Backup Strategy
+
+## Error Handling
+### Error Codes
+### Error Messages
+### Logging Strategy
+
+## Testing Strategy
+### Unit Testing
+### Integration Testing
+### Performance Testing
+### Security Testing
+
+## Documentation
+### Code Documentation
+### API Documentation
+### User Documentation
+
+## Maintenance
+### Updates
+### Monitoring
+### Support Procedures
+`;
+    setContent(specTemplate);
+  };
+
+  const insertReleaseNotesTemplate = () => {
+    const releaseTemplate = `# Release Notes
+
+## Version 1.0.0
+**Release Date:** ${new Date().toLocaleDateString()}
+**Release Type:** Major Release
+
+### 🎉 New Features
+- **Feature Name**: Description of the new feature and its benefits
+- **Another Feature**: What this feature does and why users will love it
+- **Integration**: New integration with [service/tool]
+
+### 🐛 Bug Fixes
+- Fixed issue where [specific problem] occurred when [conditions]
+- Resolved performance issue in [component/feature]
+- Corrected display bug in [specific area]
+
+### 🔧 Improvements
+- Enhanced performance of [specific feature] by 50%
+- Improved user interface for [specific screen/component]
+- Updated error messages to be more helpful
+
+### ⚠️ Breaking Changes
+- **API Change**: [Endpoint/method] has been modified
+  - **Migration**: How to update existing code
+- **Database**: Schema changes require migration
+  - **Action Required**: Run migration script
+
+### 🔒 Security Updates
+- Updated dependencies to latest secure versions
+- Enhanced authentication system
+- Improved data encryption
+
+### 📱 Mobile Updates
+- Fixed responsive design issues on tablets
+- Improved touch interactions
+- Better offline support
+
+### 🏗️ Technical Improvements
+- Upgraded framework to version X.X.X
+- Improved code organization
+- Enhanced testing coverage to 95%
+
+## Installation/Update Instructions
+### For New Installations
+1. Download the latest version
+2. Follow installation guide
+3. Configure settings
+
+### For Existing Users
+1. Backup your data
+2. Run update script
+3. Verify functionality
+
+## Known Issues
+- Issue with [specific feature] in [browser/environment]
+  - **Workaround**: [temporary solution]
+- Performance impact when [conditions]
+  - **Expected Fix**: Next patch release
+
+## Coming Next
+### Version 1.1.0 (Planned for [Date])
+- [ ] New dashboard design
+- [ ] Advanced reporting features
+- [ ] Mobile app improvements
+
+## Support
+- **Documentation**: [link]
+- **Support Email**: support@company.com
+- **Community**: [forum/discord link]
+
+---
+*For technical questions, contact the development team at dev@company.com*
+`;
+    setContent(releaseTemplate);
   };
 
   const insertLink = () => {
@@ -784,16 +1311,14 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
               <div className="flex items-center space-x-4">
                 {/* Template Insertion */}
                 <Select onValueChange={(value) => {
-                  if (value === "flowchart") insertFlowchartTemplate();
-                  else if (value === "dfd") insertDFDTemplate();
-                  else if (value === "erd") insertERDTemplate();
-                  else if (value === "uml") insertUMLTemplate();
-                  else if (value === "network") insertNetworkDiagramTemplate();
-                  else if (value === "process") insertProcessFlowTemplate();
-                  else if (value === "system") insertSystemArchitectureTemplate();
-                  else if (value === "sequence") insertSequenceDiagramTemplate();
-                  else if (value === "mindmap") insertMindMapTemplate();
-                  else if (value === "wireframe") insertWireframeTemplate();
+                  if (value === "meeting-notes") insertMeetingNotesTemplate();
+                  else if (value === "project-plan") insertProjectPlanTemplate();
+                  else if (value === "report") insertReportTemplate();
+                  else if (value === "proposal") insertProposalTemplate();
+                  else if (value === "requirements") insertRequirementsTemplate();
+                  else if (value === "user-story") insertUserStoryTemplate();
+                  else if (value === "specification") insertSpecificationTemplate();
+                  else if (value === "release-notes") insertReleaseNotesTemplate();
                 }}>
                   <SelectTrigger className="w-64 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm">
                     <div className="flex items-center space-x-2">
@@ -802,64 +1327,52 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
                     </div>
                   </SelectTrigger>
                   <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                    <SelectItem value="flowchart">
+                    <SelectItem value="meeting-notes">
                       <div className="flex items-center space-x-2">
-                        <span>🔄</span>
-                        <span>Flowchart</span>
+                        <span>📝</span>
+                        <span>Meeting Notes</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="dfd">
+                    <SelectItem value="project-plan">
+                      <div className="flex items-center space-x-2">
+                        <span>📋</span>
+                        <span>Project Plan</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="report">
                       <div className="flex items-center space-x-2">
                         <span>📊</span>
-                        <span>Data Flow Diagram</span>
+                        <span>Report</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="erd">
+                    <SelectItem value="proposal">
                       <div className="flex items-center space-x-2">
-                        <span>🗄️</span>
-                        <span>Database Schema</span>
+                        <span>💼</span>
+                        <span>Project Proposal</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="uml">
+                    <SelectItem value="requirements">
                       <div className="flex items-center space-x-2">
-                        <span>📐</span>
-                        <span>UML Class Diagram</span>
+                        <span>📋</span>
+                        <span>Requirements Document</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="network">
+                    <SelectItem value="user-story">
                       <div className="flex items-center space-x-2">
-                        <span>🌐</span>
-                        <span>Network Architecture</span>
+                        <span>👤</span>
+                        <span>User Story</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="process">
+                    <SelectItem value="specification">
                       <div className="flex items-center space-x-2">
-                        <span>⚙️</span>
-                        <span>Business Process</span>
+                        <span>📄</span>
+                        <span>Technical Specification</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="system">
+                    <SelectItem value="release-notes">
                       <div className="flex items-center space-x-2">
-                        <span>🏗️</span>
-                        <span>System Architecture</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="sequence">
-                      <div className="flex items-center space-x-2">
-                        <span>🔄</span>
-                        <span>Sequence Diagram</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="mindmap">
-                      <div className="flex items-center space-x-2">
-                        <span>🧠</span>
-                        <span>Mind Map</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="wireframe">
-                      <div className="flex items-center space-x-2">
-                        <span>📱</span>
-                        <span>UI Wireframe</span>
+                        <span>🚀</span>
+                        <span>Release Notes</span>
                       </div>
                     </SelectItem>
                   </SelectContent>
