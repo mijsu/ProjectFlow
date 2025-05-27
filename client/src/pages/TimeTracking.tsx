@@ -26,8 +26,7 @@ export default function TimeTracking() {
   const [entryDescription, setEntryDescription] = useState("");
   const [entryDate, setEntryDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [entryDuration, setEntryDuration] = useState("");
-  const [entryProject, setEntryProject] = useState(""); // For timer project selection
-  const [progressTaskProject, setProgressTaskProject] = useState(""); // Separate state for progress task modal
+  const [entryProject, setEntryProject] = useState("");
   const [selectedTask, setSelectedTask] = useState("");
   const [newTaskProgress, setNewTaskProgress] = useState("");
   const [loading, setLoading] = useState(false);
@@ -249,7 +248,7 @@ export default function TimeTracking() {
     e.preventDefault();
     if (!user) return;
 
-    if (!entryDescription.trim() || !progressTaskProject || !newTaskProgress) {
+    if (!entryDescription.trim() || !entryProject || !newTaskProgress) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -270,39 +269,31 @@ export default function TimeTracking() {
 
     setLoading(true);
     try {
-      // Create a progress task in the tasks collection (matching project system)
-      const taskData = {
-        title: entryDescription.trim(),
+      // Create a progress entry directly in the progress tracking system
+      await addDocument("progressEntries", {
         description: entryDescription.trim(),
-        progressContribution: progressPercentage,
-        projectId: progressTaskProject,
-        status: "completed",
-        type: "progress",
+        percentage: progressPercentage,
+        projectId: entryProject,
+        userId: user.uid,
         createdAt: new Date(),
-        completedAt: new Date(),
-        ownerId: user.uid,
-        assigneeId: user.uid
-      };
-
-      console.log("Creating task with data:", taskData);
-      const taskDoc = await addDocument("tasks", taskData);
-      console.log("Task created successfully:", taskDoc);
+        date: new Date(),
+        type: "manual_entry"
+      });
 
       toast({
         title: "Success",
-        description: `Progress task added: ${entryDescription.trim()} (${progressPercentage}% contribution)`,
+        description: `Progress added: ${entryDescription.trim()} (${progressPercentage}% contribution)`,
       });
 
       // Reset form
       setEntryDescription("");
       setNewTaskProgress("");
-      setProgressTaskProject("");
+      setEntryProject("");
       setIsManualEntryOpen(false);
     } catch (error: any) {
-      console.error("Error creating progress task:", error);
       toast({
         title: "Error",
-        description: `Failed to add progress task: ${error.message || "Unknown error"}`,
+        description: "Failed to add progress task",
         variant: "destructive",
       });
     } finally {
@@ -510,7 +501,7 @@ export default function TimeTracking() {
             <form onSubmit={handleManualEntry} className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-slate-200">Select Project</Label>
-                <Select value={progressTaskProject} onValueChange={setProgressTaskProject} required>
+                <Select value={entryProject} onValueChange={setEntryProject} required>
                   <SelectTrigger className="bg-slate-800 border-slate-700">
                     <SelectValue placeholder="Choose a project" />
                   </SelectTrigger>

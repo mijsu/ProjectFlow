@@ -25,63 +25,6 @@ export default function ActiveProjects() {
     where("userId", "==", user?.uid || "")
   ]);
 
-  // Get all tasks to calculate real-time progress
-  const { data: allTasks } = useCollection("tasks", [
-    where("ownerId", "==", user?.uid || "")
-  ]);
-
-  // Calculate real-time progress for a project
-  const calculateProjectProgress = (projectId: string) => {
-    if (!allTasks) return 0;
-    
-    // Debug: Show ALL tasks for this project first
-    const allProjectTasks = allTasks.filter(task => task.projectId === projectId);
-    console.log(`ALL tasks for project ${projectId}:`, allProjectTasks.map(t => ({
-      title: t.title,
-      status: t.status,
-      type: t.type,
-      projectId: t.projectId,
-      progressContribution: t.progressContribution,
-      progressPercentage: t.progressPercentage,
-      progressValue: t.progressValue,
-      progress: t.progress
-    })));
-    
-    // Find all completed tasks for this project, regardless of type
-    const completedTasks = allTasks.filter(task => 
-      task.projectId === projectId && 
-      task.status === "completed"
-    );
-    
-    const totalProgress = completedTasks.reduce((sum, task) => {
-      // Check multiple possible fields for progress contribution
-      const contribution = task.progressContribution || 
-                          task.progressPercentage || 
-                          task.progressValue ||
-                          task.progress ||
-                          0;
-      return sum + contribution;
-    }, 0);
-    
-    // Debug logging to help identify the issue
-    console.log(`Project ${projectId} COMPLETED tasks:`, {
-      totalTasks: completedTasks.length,
-      tasks: completedTasks.map(t => ({ 
-        title: t.title, 
-        status: t.status,
-        type: t.type,
-        progressContribution: t.progressContribution,
-        progressPercentage: t.progressPercentage,
-        progressValue: t.progressValue,
-        progress: t.progress,
-        calculatedContribution: t.progressContribution || t.progressPercentage || t.progressValue || t.progress || 0
-      })),
-      totalProgress
-    });
-    
-    return Math.min(totalProgress, 100); // Cap at 100%
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "in-progress":
@@ -227,11 +170,11 @@ export default function ActiveProjects() {
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="text-slate-400">Progress</span>
                     <span className="text-slate-300">
-                      {calculateProjectProgress(project.id)}%
+                      {project.progress || 0}%
                     </span>
                   </div>
                   <Progress
-                    value={calculateProjectProgress(project.id)}
+                    value={project.progress || 0}
                     className="h-2 bg-slate-800"
                   />
                 </div>
