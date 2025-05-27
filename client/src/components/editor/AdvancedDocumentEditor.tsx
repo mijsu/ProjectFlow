@@ -532,6 +532,14 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
               <Save className="w-4 h-4 mr-1" />
               {saving ? "Saving..." : "Save"}
             </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="text-slate-400 hover:text-slate-200"
+            >
+              <X className="w-4 h-4" />
+            </Button>
           </div>
         </div>
 
