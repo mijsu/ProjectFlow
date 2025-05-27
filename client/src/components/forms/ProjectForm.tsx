@@ -358,6 +358,36 @@ export default function ProjectForm({
     }
   };
 
+  const handleDeleteProgressTask = async (task: any) => {
+    if (!project?.id) return;
+    
+    try {
+      // Delete the task from Firebase
+      await deleteDocument("tasks", task.id);
+      
+      // Calculate new project progress by deducting this task's contribution
+      const taskContribution = task.progressContribution || 0;
+      const currentProgress = project.progress || 0;
+      const newProgress = Math.max(0, currentProgress - taskContribution);
+      
+      // Update project progress
+      await updateDocument("projects", project.id, {
+        progress: newProgress
+      });
+      
+      toast({
+        title: "Task Deleted",
+        description: `Task removed and progress reduced by ${taskContribution}% (New total: ${newProgress}%)`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete progress task",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -604,14 +634,26 @@ export default function ProjectForm({
                               ) : (
                                 <>
                                   <span className="text-sm text-slate-200 flex-1">{task.title}</span>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleEditTask(task)}
-                                    variant="ghost"
-                                    className="h-6 w-6 p-0 text-slate-400 hover:text-slate-200"
-                                  >
-                                    <Pencil className="w-3 h-3" />
-                                  </Button>
+                                  <div className="flex items-center space-x-1">
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleEditTask(task)}
+                                      variant="ghost"
+                                      className="h-6 w-6 p-0 text-slate-400 hover:text-slate-200"
+                                      title="Rename task"
+                                    >
+                                      <Pencil className="w-3 h-3" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleDeleteProgressTask(task)}
+                                      variant="ghost"
+                                      className="h-6 w-6 p-0 text-slate-400 hover:text-red-400"
+                                      title="Delete task"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </div>
                                 </>
                               )}
                             </div>
