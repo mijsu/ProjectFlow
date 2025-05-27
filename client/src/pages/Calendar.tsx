@@ -214,7 +214,7 @@ export default function Calendar() {
                           event.type === "deadline" ? "bg-red-600/20 text-red-400" :
                           "bg-green-600/20 text-green-400"
                         }`}>
-                          {event.type}
+                          {event.type.charAt(0).toUpperCase() + event.type.slice(1)}
                         </span>
                       </div>
                     </div>
