@@ -340,20 +340,17 @@ External A
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl h-[95vh] bg-slate-950 border-slate-800 text-slate-100 p-0 overflow-hidden flex flex-col">
-        {/* Enhanced Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/50">
-          <div className="flex items-center space-x-3">
-            <Edit3 className="w-5 h-5 text-emerald-400" />
-            <Input
-              placeholder="Enter document title..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="text-lg font-medium bg-transparent border-none text-slate-100 placeholder-slate-400 focus:ring-0 w-96"
-            />
-          </div>
-          <div className="flex items-center space-x-3">
-            <div className="text-xs text-slate-400 bg-slate-800 px-3 py-1 rounded">
+      <DialogContent className="max-w-5xl h-[85vh] bg-slate-950 border-slate-800 text-slate-100 p-0 overflow-hidden flex flex-col">
+        {/* Compact Header */}
+        <div className="flex items-center justify-between p-3 border-b border-slate-800 bg-slate-900/50">
+          <Input
+            placeholder="Document title..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="text-lg font-medium bg-transparent border-none text-slate-100 placeholder-slate-400 focus:ring-0 w-80"
+          />
+          <div className="flex items-center space-x-2">
+            <div className="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded">
               {wordCount} words
             </div>
             <Button
@@ -362,7 +359,7 @@ External A
               onClick={() => setIsPreviewMode(!isPreviewMode)}
               className={`${isPreviewMode ? 'bg-slate-700 text-emerald-400' : 'text-slate-300'} hover:bg-slate-700`}
             >
-              <Eye className="w-4 h-4 mr-2" />
+              <Eye className="w-4 h-4 mr-1" />
               {isPreviewMode ? "Edit" : "Preview"}
             </Button>
             <Button
@@ -370,7 +367,7 @@ External A
               disabled={saving}
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
-              <Save className="w-4 h-4 mr-2" />
+              <Save className="w-4 h-4 mr-1" />
               {saving ? "Saving..." : "Save"}
             </Button>
             <Button
@@ -384,185 +381,60 @@ External A
           </div>
         </div>
 
-        {/* Professional Toolbar */}
+        {/* Compact Toolbar */}
         <div className="bg-slate-900/30 border-b border-slate-800">
-          <div className="flex items-center justify-between p-3">
-            <div className="flex items-center space-x-4">
-              <Select value={type} onValueChange={handleTypeChange}>
-                <SelectTrigger className="w-52 bg-slate-900 border-slate-700">
-                  <div className="flex items-center space-x-2">
-                    {getTypeIcon(type)}
-                    <SelectValue />
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-700">
-                  <SelectItem value="document">
-                    <div className="flex items-center space-x-2">
-                      <FileText className="w-4 h-4" />
-                      <span>Document</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="flowchart">
-                    <div className="flex items-center space-x-2">
-                      <Workflow className="w-4 h-4" />
-                      <span>Flowchart</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="dfd">
-                    <div className="flex items-center space-x-2">
-                      <Workflow className="w-4 h-4" />
-                      <span>Data Flow Diagram</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="code">
-                    <div className="flex items-center space-x-2">
-                      <FileCode className="w-4 h-4" />
-                      <span>Code Documentation</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex items-center justify-between p-2">
+            <Select value={type} onValueChange={handleTypeChange}>
+              <SelectTrigger className="w-44 bg-slate-900 border-slate-700">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-900 border-slate-700">
+                <SelectItem value="document">📄 Document</SelectItem>
+                <SelectItem value="flowchart">🔄 Flowchart</SelectItem>
+                <SelectItem value="dfd">📊 Data Flow Diagram</SelectItem>
+                <SelectItem value="code">💻 Code Documentation</SelectItem>
+              </SelectContent>
+            </Select>
 
-            <div className="text-xs text-slate-400 bg-slate-800/50 px-3 py-1 rounded-full">
-              💡 Select text and use formatting buttons, or type markdown directly
-            </div>
-          </div>
-
-          {!isPreviewMode && (
-            <div className="flex items-center space-x-2 px-3 pb-3">
-              {/* Text Formatting Group */}
-              <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={formatBold}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
-                  title="Bold (Ctrl+B)"
-                >
+            {!isPreviewMode && (
+              <div className="flex items-center space-x-1">
+                <Button variant="ghost" size="sm" onClick={formatBold} className="text-slate-300 hover:text-white" title="Bold">
                   <Bold className="w-4 h-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={formatItalic}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
-                  title="Italic (Ctrl+I)"
-                >
+                <Button variant="ghost" size="sm" onClick={formatItalic} className="text-slate-300 hover:text-white" title="Italic">
                   <Italic className="w-4 h-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={formatUnderline}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
-                  title="Underline"
-                >
-                  <Underline className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={formatCode}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
-                  title="Inline Code"
-                >
-                  <Code className="w-4 h-4" />
-                </Button>
-              </div>
-
-              {/* Headings Group */}
-              <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertHeading(1)}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-bold px-3"
-                  title="Heading 1"
-                >
+                <Button variant="ghost" size="sm" onClick={() => insertHeading(1)} className="text-slate-300 hover:text-white text-xs px-2" title="Heading">
                   H1
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertHeading(2)}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-bold px-3"
-                  title="Heading 2"
-                >
-                  H2
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertHeading(3)}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-bold px-3"
-                  title="Heading 3"
-                >
-                  H3
-                </Button>
-              </div>
-
-              {/* Lists Group */}
-              <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={insertList}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
-                  title="Bullet List"
-                >
+                <Button variant="ghost" size="sm" onClick={insertList} className="text-slate-300 hover:text-white" title="List">
                   <List className="w-4 h-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={insertOrderedList}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
-                  title="Numbered List"
-                >
-                  <ListOrdered className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={formatQuote}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
-                  title="Quote Block"
-                >
-                  <Quote className="w-4 h-4" />
-                </Button>
-              </div>
-
-              {/* Media & Tools Group */}
-              <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={insertLink}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
-                  title="Insert Link"
-                >
+                <Button variant="ghost" size="sm" onClick={insertLink} className="text-slate-300 hover:text-white" title="Link">
                   <Link className="w-4 h-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={insertImage}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
-                  title="Insert Image"
-                >
-                  <Image className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={insertTable}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700 text-xs px-3"
-                  title="Insert Table"
-                >
+                <Button variant="ghost" size="sm" onClick={insertTable} className="text-slate-300 hover:text-white text-xs px-2" title="Table">
                   Table
                 </Button>
               </div>
+            )}
+          </div>
+
+          {/* Template Load Section for Diagrams */}
+          {(type === 'flowchart' || type === 'dfd') && !isPreviewMode && (
+            <div className="px-3 pb-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  const template = getTemplateContent(type);
+                  setContent(template);
+                }}
+                className="text-emerald-400 hover:text-emerald-300 hover:bg-slate-700 text-xs"
+              >
+                <Palette className="w-3 h-3 mr-1" />
+                Load {type === 'flowchart' ? 'Flowchart' : 'DFD'} Template
+              </Button>
             </div>
           )}
         </div>
@@ -583,47 +455,23 @@ External A
               </div>
             </div>
           ) : (
-            <div className="h-full overflow-hidden flex flex-col">
-              {/* Template Load Button for Diagram Types */}
-              {(type === 'flowchart' || type === 'dfd') && (
-                <div className="p-3 bg-slate-800/30 border-b border-slate-700">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-slate-400">
-                      🎨 Professional {type === 'flowchart' ? 'Flowchart' : 'Data Flow Diagram'} Template
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const template = getTemplateContent(type);
-                        setContent(template);
-                      }}
-                      className="text-emerald-400 hover:text-emerald-300 hover:bg-slate-700"
-                    >
-                      <Palette className="w-4 h-4 mr-2" />
-                      Load Template
-                    </Button>
-                  </div>
-                </div>
-              )}
-              
-              <div className="flex-1 p-6 min-h-0 flex flex-col">
-                <Textarea
-                  ref={textareaRef}
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder={type === 'flowchart' || type === 'dfd' 
-                    ? `Create your ${type === 'flowchart' ? 'flowchart' : 'data flow diagram'}...
+            <div className="flex-1 p-4 overflow-hidden flex flex-col">
+              <Textarea
+                ref={textareaRef}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder={type === 'flowchart' || type === 'dfd' 
+                  ? `Create your ${type === 'flowchart' ? 'flowchart' : 'data flow diagram'}...
 
 🔥 Diagram Tips:
-• Use the "Load Template" button above for professional templates
+• Use the "Load Template" button in toolbar for professional templates
 • Edit the template directly - all text is customizable
 • Use ASCII art for visual flow representation
 • ┌─┐ │ └─┘ for boxes, ── for lines, ↓→← for arrows
 • Replace template text with your specific process steps
 
 Start with a template or create from scratch! 🚀`
-                    : `Start writing your document...
+                  : `Start writing your document...
 
 ✨ Pro Tips:
 • **Bold text** for emphasis
@@ -637,10 +485,8 @@ Start with a template or create from scratch! 🚀`
 • ![image description](image-url)
 
 Happy writing! 🚀`}
-                  className="flex-1 w-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-4 rounded-lg"
-                  style={{ minHeight: '500px' }}
-                />
-              </div>
+                className="flex-1 w-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-4 rounded-lg"
+              />
             </div>
           )}
         </div>
