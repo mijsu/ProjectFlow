@@ -32,7 +32,7 @@ export default function RecentActivity() {
     ...(projects?.map((p) => ({
       id: `project-${p.id}`,
       type: "project_updated",
-      description: `Updated project "${p.name}"`,
+      description: `Updated Project "${p.name}"`,
       createdAt: p.updatedAt,
     })) || []),
     ...(documents?.map((d) => ({
