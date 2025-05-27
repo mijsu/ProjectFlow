@@ -687,37 +687,93 @@ export default function ProjectForm({
                     <p className="text-xs text-slate-500">Tasks start as pending and need approval before time tracking</p>
                   </div>
 
-                  {/* List existing ongoing tasks */}
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {projectTasks && projectTasks.length > 0 ? (
-                      projectTasks
-                        .filter(task => task.type === "ongoing" || task.status === "in-progress")
-                        .map((task) => (
-                          <div key={task.id} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                            <div className="flex items-center space-x-3">
-                              <div className={`w-2 h-2 rounded-full ${
-                                task.status === 'completed' ? 'bg-emerald-400' :
-                                task.status === 'in-progress' ? 'bg-blue-400' : 'bg-slate-500'
-                              }`} />
-                              <div>
-                                <span className="text-slate-200 font-medium">{task.title}</span>
-                                <div className="flex items-center space-x-2 mt-1">
-                                  <span className={`text-xs px-2 py-1 rounded-full ${
-                                    task.priority === 'high' ? 'bg-red-600/20 text-red-300' :
-                                    task.priority === 'medium' ? 'bg-yellow-600/20 text-yellow-300' :
-                                    'bg-slate-600/20 text-slate-300'
-                                  }`}>
-                                    {task.priority} priority
-                                  </span>
-                                  <span className="text-xs text-slate-400">
-                                    Available for time tracking
-                                  </span>
+                  {/* Pending Tasks (Awaiting Approval) */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-amber-400">Pending Tasks (Awaiting Approval)</h4>
+                    {projectTasks?.filter(task => task.status === "pending").length > 0 ? (
+                      <div className="space-y-2 max-h-32 overflow-y-auto">
+                        {projectTasks
+                          .filter(task => task.status === "pending")
+                          .map((task) => (
+                            <div key={task.id} className="flex items-center justify-between p-3 bg-amber-900/20 rounded-lg border border-amber-700/50">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-2 h-2 rounded-full bg-amber-400" />
+                                <div>
+                                  <span className="text-slate-200 font-medium">{task.title}</span>
+                                  <div className="flex items-center space-x-2 mt-1">
+                                    <span className="text-xs px-2 py-1 rounded-full bg-emerald-600/20 text-emerald-300">
+                                      +{task.progressPercentage || 0}%
+                                    </span>
+                                    <span className={`text-xs px-2 py-1 rounded-full ${
+                                      task.priority === 'high' ? 'bg-red-600/20 text-red-300' :
+                                      task.priority === 'medium' ? 'bg-yellow-600/20 text-yellow-300' :
+                                      'bg-slate-600/20 text-slate-300'
+                                    }`}>
+                                      {task.priority}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
+                              
+                              <div className="flex items-center space-x-2">
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  onClick={() => handleApproveTask(task)}
+                                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3"
+                                >
+                                  Approve
+                                </Button>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleDeleteOngoingTask(task.id)}
+                                  className="text-red-400 hover:bg-red-900/20"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
                             </div>
-                            
-                            <div className="flex items-center space-x-2">
-                              {task.status !== 'completed' && (
+                          ))
+                        }
+                      </div>
+                    ) : (
+                      <div className="text-center text-slate-500 py-3 text-xs">
+                        No pending tasks
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Active Ongoing Tasks */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-blue-400">Active Tasks (Available for Time Tracking)</h4>
+                    {projectTasks?.filter(task => task.status === "in-progress").length > 0 ? (
+                      <div className="space-y-2 max-h-32 overflow-y-auto">
+                        {projectTasks
+                          .filter(task => task.status === "in-progress")
+                          .map((task) => (
+                            <div key={task.id} className="flex items-center justify-between p-3 bg-blue-900/20 rounded-lg border border-blue-700/50">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-2 h-2 rounded-full bg-blue-400" />
+                                <div>
+                                  <span className="text-slate-200 font-medium">{task.title}</span>
+                                  <div className="flex items-center space-x-2 mt-1">
+                                    <span className="text-xs px-2 py-1 rounded-full bg-emerald-600/20 text-emerald-300">
+                                      +{task.progressPercentage || 0}%
+                                    </span>
+                                    <span className={`text-xs px-2 py-1 rounded-full ${
+                                      task.priority === 'high' ? 'bg-red-600/20 text-red-300' :
+                                      task.priority === 'medium' ? 'bg-yellow-600/20 text-yellow-300' :
+                                      'bg-slate-600/20 text-slate-300'
+                                    }`}>
+                                      {task.priority}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center space-x-2">
                                 <Button
                                   type="button"
                                   size="sm"
@@ -728,25 +784,50 @@ export default function ProjectForm({
                                 >
                                   <CheckCircle className="w-4 h-4" />
                                 </Button>
-                              )}
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleDeleteOngoingTask(task.id)}
-                                className="text-red-400 hover:bg-red-900/20"
-                                title="Delete task"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleDeleteOngoingTask(task.id)}
+                                  className="text-red-400 hover:bg-red-900/20"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-                        ))
+                          ))
+                        }
+                      </div>
                     ) : (
-                      <div className="text-center text-slate-400 py-6 border border-slate-700 rounded-lg bg-slate-900/30">
-                        <CheckCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                        <p className="text-sm">No ongoing tasks yet</p>
-                        <p className="text-xs text-slate-500 mt-1">Add tasks that you can track time for</p>
+                      <div className="text-center text-slate-500 py-3 text-xs">
+                        No active tasks - approve pending tasks to make them available for time tracking
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Completed Tasks */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-emerald-400">Completed Tasks</h4>
+                    {projectTasks?.filter(task => task.status === "completed" && task.type === "ongoing").length > 0 ? (
+                      <div className="space-y-2 max-h-24 overflow-y-auto">
+                        {projectTasks
+                          .filter(task => task.status === "completed" && task.type === "ongoing")
+                          .map((task) => (
+                            <div key={task.id} className="flex items-center justify-between p-2 bg-emerald-900/20 rounded-lg border border-emerald-700/50">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                                <span className="text-slate-300 text-sm">{task.title}</span>
+                                <span className="text-xs px-2 py-1 rounded-full bg-emerald-600/20 text-emerald-300">
+                                  +{task.progressPercentage || 0}%
+                                </span>
+                              </div>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    ) : (
+                      <div className="text-center text-slate-500 py-3 text-xs">
+                        No completed tasks yet
                       </div>
                     )}
                   </div>
@@ -927,6 +1008,64 @@ export default function ProjectForm({
             className="bg-slate-800 border-slate-600 text-slate-200 hover:bg-slate-700"
           >
             Close
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* Task Approval Confirmation Modal */}
+    <Dialog open={showApprovalModal} onOpenChange={setShowApprovalModal}>
+      <DialogContent className="max-w-md bg-slate-950 border-slate-800 text-slate-100">
+        <DialogHeader>
+          <DialogTitle className="text-slate-100 flex items-center space-x-2">
+            <CheckCircle className="w-5 h-5 text-emerald-400" />
+            <span>Approve Task</span>
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <p className="text-slate-300">
+            Are you sure you want to approve this task for time tracking?
+          </p>
+          
+          {taskToApprove && (
+            <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-700">
+              <div className="flex items-center justify-between">
+                <span className="font-medium text-slate-200">{taskToApprove.title}</span>
+                <span className="text-sm px-2 py-1 rounded-full bg-emerald-600/20 text-emerald-300">
+                  +{taskToApprove.progressPercentage || 0}%
+                </span>
+              </div>
+              <div className="flex items-center space-x-2 mt-2">
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  taskToApprove.priority === 'high' ? 'bg-red-600/20 text-red-300' :
+                  taskToApprove.priority === 'medium' ? 'bg-yellow-600/20 text-yellow-300' :
+                  'bg-slate-600/20 text-slate-300'
+                }`}>
+                  {taskToApprove.priority} priority
+                </span>
+              </div>
+            </div>
+          )}
+          
+          <p className="text-xs text-slate-500">
+            Once approved, this task will be available for time tracking and can contribute to project progress when completed.
+          </p>
+        </div>
+
+        <div className="flex justify-end space-x-2 pt-4">
+          <Button
+            variant="outline"
+            onClick={() => setShowApprovalModal(false)}
+            className="bg-slate-800 border-slate-600 text-slate-200 hover:bg-slate-700"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={confirmApproveTask}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          >
+            Approve Task
           </Button>
         </div>
       </DialogContent>
