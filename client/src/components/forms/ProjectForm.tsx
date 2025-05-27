@@ -823,7 +823,7 @@ export default function ProjectForm({
                   </div>
 
                   {projectDocuments && projectDocuments.length > 0 ? (
-                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                    <div className="space-y-2 max-h-60 overflow-y-auto">
                       {projectDocuments.map((document) => (
                         <div
                           key={document.id}
