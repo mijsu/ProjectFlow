@@ -700,7 +700,7 @@ export default function ProjectForm({
                               )}
                             </div>
                             <span className="text-sm font-medium text-emerald-400 ml-2">
-                              +{task.progressContribution || 0}%
+                              +{task.progressContribution || task.progressPercentage || 0}%
                             </span>
                           </div>
                         ))}
