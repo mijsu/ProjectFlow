@@ -1,7 +1,6 @@
 import { useState } from "react";
 import TopBar from "@/components/layout/TopBar";
 import AdvancedDocumentEditor from "@/components/editor/AdvancedDocumentEditor";
-import VisualDiagramEditor from "@/components/editor/VisualDiagramEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -335,13 +334,6 @@ export default function Documents() {
 
       <AdvancedDocumentEditor
         isOpen={isEditorOpen}
-        onClose={() => setIsEditorOpen(false)}
-        document={selectedDocument}
-        projectId={newDocumentProject}
-      />
-
-      <VisualDiagramEditor
-        isOpen={isEditorOpen && (selectedDocument?.type === 'flowchart' || selectedDocument?.type === 'dfd')}
         onClose={() => setIsEditorOpen(false)}
         document={selectedDocument}
         projectId={newDocumentProject}

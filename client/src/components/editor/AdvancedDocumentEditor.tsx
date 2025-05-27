@@ -123,123 +123,283 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
     }
   };
 
-  // Professional diagram templates
+  // Enhanced editable diagram templates
   const getTemplateContent = (docType: string) => {
     switch (docType) {
       case "flowchart":
-        return `# Flowchart Template
+        return `# Professional Flowchart Template
 
-## Process Flow
-\`\`\`
-┌─────────────┐
-│    Start    │
-└─────┬───────┘
-      │
-      v
-┌─────────────┐
-│  Input Data │
-└─────┬───────┘
-      │
-      v
-┌─────────────┐     No
-│  Validation │────────┐
-│   Process   │        │
-└─────┬───────┘        │
-      │ Yes            │
-      v                │
-┌─────────────┐        │
-│   Process   │        │
-│    Data     │        │
-└─────┬───────┘        │
-      │                │
-      v                │
-┌─────────────┐        │
-│   Output    │        │
-│   Results   │        │
-└─────┬───────┘        │
-      │                │
-      v                │
-┌─────────────┐        │
-│     End     │←───────┘
-└─────────────┘
-\`\`\`
+**Instructions:** Edit the sections below to customize your flowchart. Replace the example content with your specific process steps.
 
-## Key Steps:
-1. **Start Process** - Initialize workflow
-2. **Input Data** - Collect required information
-3. **Validation** - Check data integrity
-4. **Process Data** - Execute main logic
-5. **Output Results** - Display final outcome
-6. **End Process** - Complete workflow
+## 🎯 Process Overview
+**Process Name:** [Enter your process name here]
+**Purpose:** [Describe what this flowchart accomplishes]
+**Owner:** [Who is responsible for this process]
 
-## Decision Points:
-- **Validation Check**: Determines if data meets criteria
-- **Error Handling**: Routes to appropriate error resolution
+---
 
-## Notes:
-- Replace text above with your specific process steps
-- Use ASCII art for visual flow representation
-- Add decision diamonds where needed`;
+## 📋 Step-by-Step Process
+
+### Step 1: Start
+**Action:** [Define the starting point]
+**Trigger:** [What initiates this process]
+**Inputs Required:** [List any initial inputs needed]
+
+↓
+
+### Step 2: Input Collection
+**Action:** [Describe data/information gathering]
+**Data Sources:** [Where does the data come from]
+**Format:** [How is the data structured]
+
+↓
+
+### Step 3: Validation & Checks
+**Validation Rules:**
+- [ ] [Rule 1 - edit this]
+- [ ] [Rule 2 - edit this] 
+- [ ] [Rule 3 - edit this]
+
+**If validation fails:** → Go to Error Handling
+**If validation passes:** → Continue to Step 4
+
+↓
+
+### Step 4: Main Processing
+**Processing Actions:**
+1. [Action 1 - customize this]
+2. [Action 2 - customize this]
+3. [Action 3 - customize this]
+
+**Systems Involved:** [List systems or tools used]
+**Processing Time:** [Estimated duration]
+
+↓
+
+### Step 5: Output Generation
+**Output Format:** [Describe the final output]
+**Delivery Method:** [How results are delivered]
+**Recipients:** [Who receives the output]
+
+↓
+
+### Step 6: Completion
+**Final Actions:**
+- [Cleanup task 1]
+- [Notification task 2]
+- [Documentation task 3]
+
+---
+
+## 🔄 Decision Points & Branches
+
+### Decision Point A: [Custom Decision Name]
+**Question:** [What decision needs to be made?]
+- **Option 1:** [Outcome A] → [Next step]
+- **Option 2:** [Outcome B] → [Different step]
+- **Option 3:** [Outcome C] → [Another path]
+
+### Decision Point B: [Another Decision]
+**Criteria:** [What determines the choice?]
+- **Yes:** → [Continue process]
+- **No:** → [Alternative action]
+
+---
+
+## ⚠️ Error Handling
+
+### Error Type 1: [Validation Errors]
+**Response:** [How to handle this error]
+**Recovery:** [Steps to recover and continue]
+
+### Error Type 2: [Processing Errors]  
+**Response:** [Error handling procedure]
+**Escalation:** [When to escalate to supervisor]
+
+---
+
+## 📊 Success Metrics
+- **Metric 1:** [How you measure success]
+- **Metric 2:** [Another measurement]
+- **Target:** [What constitutes successful completion]
+
+---
+
+## 🔧 Customization Notes
+- Replace all [bracketed text] with your specific content
+- Add or remove steps as needed for your process
+- Modify decision points to match your workflow
+- Update error handling for your specific scenarios
+- Include any regulatory or compliance requirements`;
 
       case "dfd":
-        return `# Data Flow Diagram Template
+        return `# Professional Data Flow Diagram Template
 
-## Level 0: Context Diagram
-\`\`\`
-External Entity 1    ┌─────────────────┐    External Entity 2
-     │               │                 │               │
-     │    Data A     │   System Name   │    Data C     │
-     └──────────────→│                 │←──────────────┘
-                     │   (Process 0)   │
-     ┌──────────────→│                 │←──────────────┐
-     │    Data B     │                 │    Data D     │
-     │               └─────────────────┘               │
-External Entity 3                              External Entity 4
-\`\`\`
+**Instructions:** Customize this template by replacing the example content with your specific system's data flows, processes, and entities.
 
-## Level 1: Decomposition
-\`\`\`
-External A
-     │
-     │ Data Input
-     v
-┌─────────────┐    Process Data    ┌─────────────┐
-│  Process 1  │──────────────────→│  Process 2  │
-│   Validate  │                   │   Transform │
-└─────┬───────┘                   └─────┬───────┘
-      │                                 │
-      │ Validated Data                  │ Processed Data
-      v                                 v
-┌─────────────┐                   ┌─────────────┐
-│   Data      │                   │  Process 3  │
-│   Store 1   │                   │   Output    │
-└─────────────┘                   └─────┬───────┘
-                                        │
-                                        │ Results
-                                        v
-                                  External B
-\`\`\`
+## 🎯 System Overview
+**System Name:** [Enter your system name]
+**Purpose:** [What does this system accomplish]
+**Scope:** [What's included/excluded from this diagram]
 
-## Data Stores:
-- **D1: Data Store 1** - Validated input data
-- **D2: Data Store 2** - Processed results
-- **D3: Data Store 3** - Configuration data
+---
 
-## External Entities:
-- **User Interface** - System user interaction
-- **Database** - Persistent data storage
-- **External API** - Third-party services
-- **Reports** - Generated output
+## 🌐 Level 0: Context Diagram
 
-## Data Flows:
-1. **Input Validation** - Raw data → Validated data
-2. **Data Processing** - Validated data → Processed data
-3. **Output Generation** - Processed data → Final results
+### External Entities (Customize these)
+1. **[Customer/User Entity]**
+   - Role: [Primary system user]
+   - Data provided: [What they input]
+   - Data received: [What they get back]
 
-## Notes:
-- Customize processes for your specific system
-- Add/remove data stores as needed
-- Include all external data sources`;
+2. **[Admin Entity]**
+   - Role: [System administrator]
+   - Data provided: [Configuration, updates]
+   - Data received: [Reports, status]
+
+3. **[External System A]**
+   - Role: [Integration partner]
+   - Data exchanged: [Bidirectional data]
+
+4. **[External System B]**
+   - Role: [Data provider]
+   - Data received: [What you get from them]
+
+### Core System Process
+**Process 0: [Your System Name]**
+- **Input Flows:**
+  - [Data Type A] from [Entity 1]
+  - [Data Type B] from [Entity 2]
+  - [Data Type C] from [External System]
+
+- **Output Flows:**
+  - [Results A] to [Entity 1]
+  - [Reports B] to [Entity 2]
+  - [Data Updates] to [External System]
+
+---
+
+## 🔍 Level 1: Detailed Process Breakdown
+
+### Process 1: [Input Processing]
+**Function:** [What this process does]
+**Inputs:**
+- [Data A] from [External Entity]
+- [Configuration] from [Data Store 1]
+
+**Outputs:**
+- [Validated Data] to [Process 2]
+- [Error Log] to [Data Store 2]
+
+**Business Rules:**
+- [Rule 1: Validation criteria]
+- [Rule 2: Processing logic]
+
+### Process 2: [Data Transformation]
+**Function:** [Core processing logic]
+**Inputs:**
+- [Validated Data] from [Process 1]
+- [Reference Data] from [Data Store 3]
+
+**Outputs:**
+- [Processed Results] to [Process 3]
+- [Updated Records] to [Data Store 1]
+
+**Algorithms:** [Brief description of processing logic]
+
+### Process 3: [Output Generation]
+**Function:** [How results are formatted and delivered]
+**Inputs:**
+- [Processed Results] from [Process 2]
+- [Templates] from [Data Store 4]
+
+**Outputs:**
+- [Final Reports] to [External Entities]
+- [Archive Data] to [Data Store 2]
+
+---
+
+## 🗄️ Data Stores (Customize these)
+
+### D1: [Primary Database]
+**Contents:** [What's stored here]
+**Access:** [Who can read/write]
+**Retention:** [How long data is kept]
+
+### D2: [Log/Audit Store]
+**Contents:** [Transaction logs, errors]
+**Purpose:** [Compliance, debugging]
+**Backup:** [Backup frequency and method]
+
+### D3: [Configuration Store]
+**Contents:** [System settings, parameters]
+**Maintenance:** [Who updates this]
+**Version Control:** [How changes are tracked]
+
+### D4: [Template/Reference Store]
+**Contents:** [Templates, lookup tables]
+**Updates:** [How often refreshed]
+**Source:** [Where reference data comes from]
+
+---
+
+## 🔄 Data Flow Details
+
+### Critical Data Flows
+1. **[Flow Name A]**
+   - From: [Source]
+   - To: [Destination]
+   - Format: [JSON, XML, CSV, etc.]
+   - Frequency: [Real-time, batch, scheduled]
+   - Volume: [Typical data volume]
+
+2. **[Flow Name B]**
+   - From: [Source]
+   - To: [Destination]
+   - Trigger: [What initiates this flow]
+   - Validation: [Data quality checks]
+
+3. **[Flow Name C]**
+   - Bidirectional: [Source ↔ Destination]
+   - Purpose: [Why this exchange happens]
+   - Error Handling: [What happens if flow fails]
+
+---
+
+## 🔒 Security & Compliance
+
+### Data Security
+- **Encryption:** [What data is encrypted]
+- **Access Control:** [Who can access what]
+- **Audit Trail:** [What activities are logged]
+
+### Compliance Requirements
+- **Regulation:** [GDPR, HIPAA, etc.]
+- **Data Retention:** [How long to keep data]
+- **Privacy:** [Personal data handling]
+
+---
+
+## 📈 Performance Considerations
+- **Peak Load:** [Maximum expected data volume]
+- **Response Time:** [Required processing speed]
+- **Availability:** [Uptime requirements]
+
+---
+
+## 🔧 Customization Guide
+1. Replace all [bracketed items] with your specific details
+2. Add or remove processes based on your system complexity
+3. Modify data stores to match your architecture
+4. Update external entities for your stakeholders
+5. Include any industry-specific requirements
+6. Add compliance and security details relevant to your domain
+
+**Next Steps:**
+- Review with stakeholders
+- Validate data flows with technical team
+- Document any assumptions
+- Plan for system changes and updates`;
 
       default:
         return "";
