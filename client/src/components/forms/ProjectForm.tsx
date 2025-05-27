@@ -55,6 +55,10 @@ export default function ProjectForm({
   const [editingTaskTitle, setEditingTaskTitle] = useState("");
   const [viewingDocument, setViewingDocument] = useState(null);
   const [isDocumentViewerOpen, setIsDocumentViewerOpen] = useState(false);
+  
+  // Ongoing tasks state
+  const [newOngoingTaskTitle, setNewOngoingTaskTitle] = useState("");
+  const [newOngoingTaskPriority, setNewOngoingTaskPriority] = useState("medium");
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -218,6 +222,74 @@ export default function ProjectForm({
       toast({
         title: "Error",
         description: "Failed to delete document",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Ongoing tasks functions
+  const handleAddOngoingTask = async () => {
+    if (!newOngoingTaskTitle.trim() || !project?.id) return;
+    
+    try {
+      await addDocument("tasks", {
+        title: newOngoingTaskTitle,
+        projectId: project.id,
+        assigneeId: user?.uid,
+        status: "in-progress", // Ongoing tasks start as in-progress
+        priority: newOngoingTaskPriority,
+        type: "ongoing", // Mark as ongoing task for time tracking
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      
+      setNewOngoingTaskTitle("");
+      setNewOngoingTaskPriority("medium");
+      
+      toast({
+        title: "Ongoing Task Added",
+        description: "Task created successfully and ready for time tracking",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create ongoing task",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCompleteOngoingTask = async (taskId: string) => {
+    try {
+      await updateDocument("tasks", taskId, {
+        status: "completed",
+        updatedAt: new Date()
+      });
+      
+      toast({
+        title: "Task Completed",
+        description: "Ongoing task marked as completed",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update task status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteOngoingTask = async (taskId: string) => {
+    try {
+      await deleteDocument("tasks", taskId);
+      toast({
+        title: "Task Deleted",
+        description: "Ongoing task removed successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete task",
         variant: "destructive",
       });
     }
@@ -499,6 +571,114 @@ export default function ProjectForm({
                 )}
               </div>
             </div>
+
+            {/* Ongoing Tasks Section */}
+            {project && (
+              <div className="border-t border-slate-700 pt-4">
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-5 h-5 text-emerald-400" />
+                    <h3 className="text-lg font-semibold text-slate-100">Ongoing Tasks</h3>
+                    <span className="text-xs text-slate-400">Track time for these tasks</span>
+                  </div>
+                  
+                  {/* Add new ongoing task */}
+                  <div className="space-y-2">
+                    <div className="flex space-x-2">
+                      <Input
+                        placeholder="Add ongoing task (e.g., Research phase, Code review)"
+                        value={newOngoingTaskTitle}
+                        onChange={(e) => setNewOngoingTaskTitle(e.target.value)}
+                        className="flex-1 bg-slate-800 border-slate-600 text-slate-100"
+                        onKeyPress={(e) => e.key === 'Enter' && handleAddOngoingTask()}
+                      />
+                      <Select value={newOngoingTaskPriority} onValueChange={setNewOngoingTaskPriority}>
+                        <SelectTrigger className="w-28 bg-slate-800 border-slate-600">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-slate-600">
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        type="button"
+                        onClick={handleAddOngoingTask}
+                        disabled={!newOngoingTaskTitle.trim()}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* List existing ongoing tasks */}
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {projectTasks && projectTasks.length > 0 ? (
+                      projectTasks
+                        .filter(task => task.type === "ongoing" || task.status === "in-progress")
+                        .map((task) => (
+                          <div key={task.id} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-2 h-2 rounded-full ${
+                                task.status === 'completed' ? 'bg-emerald-400' :
+                                task.status === 'in-progress' ? 'bg-blue-400' : 'bg-slate-500'
+                              }`} />
+                              <div>
+                                <span className="text-slate-200 font-medium">{task.title}</span>
+                                <div className="flex items-center space-x-2 mt-1">
+                                  <span className={`text-xs px-2 py-1 rounded-full ${
+                                    task.priority === 'high' ? 'bg-red-600/20 text-red-300' :
+                                    task.priority === 'medium' ? 'bg-yellow-600/20 text-yellow-300' :
+                                    'bg-slate-600/20 text-slate-300'
+                                  }`}>
+                                    {task.priority} priority
+                                  </span>
+                                  <span className="text-xs text-slate-400">
+                                    Available for time tracking
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center space-x-2">
+                              {task.status !== 'completed' && (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleCompleteOngoingTask(task.id)}
+                                  className="text-emerald-400 hover:bg-emerald-900/20"
+                                  title="Mark as completed"
+                                >
+                                  <CheckCircle className="w-4 h-4" />
+                                </Button>
+                              )}
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDeleteOngoingTask(task.id)}
+                                className="text-red-400 hover:bg-red-900/20"
+                                title="Delete task"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))
+                    ) : (
+                      <div className="text-center text-slate-400 py-6 border border-slate-700 rounded-lg bg-slate-900/30">
+                        <CheckCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">No ongoing tasks yet</p>
+                        <p className="text-xs text-slate-500 mt-1">Add tasks that you can track time for</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Attached Documents Section */}
             {project && (
