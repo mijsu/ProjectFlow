@@ -189,7 +189,7 @@ export default function Documents() {
       title: template?.name === "Blank Document" ? "Untitled Document" : template?.name || "New Document",
       content: template?.content || "",
       type: template?.type || newDocumentType,
-      projectId: newDocumentProject || null
+      projectId: newDocumentProject === "none" ? null : newDocumentProject || null
     };
     
     setSelectedDocument(newDocument);
@@ -393,7 +393,7 @@ export default function Documents() {
                     <SelectValue placeholder="Select a project" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-700">
-                    <SelectItem value="">No project</SelectItem>
+                    <SelectItem value="none">No project</SelectItem>
                     {projects?.map((project) => (
                       <SelectItem key={project.id} value={project.id}>
                         {project.name}
