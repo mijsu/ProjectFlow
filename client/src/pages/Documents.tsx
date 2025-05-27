@@ -333,23 +333,19 @@ export default function Documents() {
         )}
       </div>
 
-      {selectedDocument?.type === 'flowchart' || selectedDocument?.type === 'dfd' || 
-       (isCreateDialogOpen && newDocument?.type === 'flowchart') || 
-       (isCreateDialogOpen && newDocument?.type === 'dfd') ? (
-        <VisualDiagramEditor
-          isOpen={isEditorOpen}
-          onClose={() => setIsEditorOpen(false)}
-          document={selectedDocument}
-          projectId={newDocumentProject}
-        />
-      ) : (
-        <AdvancedDocumentEditor
-          isOpen={isEditorOpen}
-          onClose={() => setIsEditorOpen(false)}
-          document={selectedDocument}
-          projectId={newDocumentProject}
-        />
-      )}
+      <AdvancedDocumentEditor
+        isOpen={isEditorOpen}
+        onClose={() => setIsEditorOpen(false)}
+        document={selectedDocument}
+        projectId={newDocumentProject}
+      />
+
+      <VisualDiagramEditor
+        isOpen={isEditorOpen && (selectedDocument?.type === 'flowchart' || selectedDocument?.type === 'dfd')}
+        onClose={() => setIsEditorOpen(false)}
+        document={selectedDocument}
+        projectId={newDocumentProject}
+      />
 
       {/* Enhanced Document Creation Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>

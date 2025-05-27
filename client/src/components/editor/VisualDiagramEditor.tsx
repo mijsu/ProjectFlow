@@ -122,11 +122,15 @@ export default function VisualDiagramEditor({ isOpen, onClose, document, project
   // Add global mouse event listeners
   React.useEffect(() => {
     if (draggedElement) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      const handleMove = (e: MouseEvent) => handleMouseMove(e);
+      const handleUp = () => handleMouseUp();
+      
+      document.addEventListener('mousemove', handleMove);
+      document.addEventListener('mouseup', handleUp);
+      
       return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('mousemove', handleMove);
+        document.removeEventListener('mouseup', handleUp);
       };
     }
   }, [draggedElement, handleMouseMove, handleMouseUp]);
