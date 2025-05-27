@@ -332,7 +332,7 @@ export default function Documents() {
         )}
       </div>
 
-      <DocumentEditor
+      <AdvancedDocumentEditor
         isOpen={isEditorOpen}
         onClose={() => setIsEditorOpen(false)}
         document={selectedDocument}
