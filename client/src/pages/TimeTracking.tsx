@@ -289,13 +289,13 @@ export default function TimeTracking() {
 
       // Reset form
       setEntryDescription("");
-      setEntryDuration("");
+      setNewTaskProgress("");
       setEntryProject("");
       setIsManualEntryOpen(false);
     } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to add time entry",
+        description: "Failed to add progress task",
         variant: "destructive",
       });
     } finally {
