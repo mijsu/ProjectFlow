@@ -12,7 +12,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCollection } from "@/hooks/useFirestore";
 import { where, orderBy } from "firebase/firestore";
 import { formatDistanceToNow } from "date-fns";
-import { Plus, Search, FileText, Workflow, FileCode, MoreHorizontal, FolderOpen, Layers } from "lucide-react";
+import { Plus, Search, FileText, Workflow, FileCode, MoreHorizontal, FolderOpen, Layers, Trash2, Edit } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { deleteDocument } from "@/hooks/useFirestore";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Documents() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -23,6 +26,7 @@ export default function Documents() {
   const [newDocumentProject, setNewDocumentProject] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const { user } = useAuth();
+  const { toast } = useToast();
   
   const { data: documents, loading } = useCollection("documents", [
     where("ownerId", "==", user?.uid || ""),
@@ -179,6 +183,22 @@ export default function Documents() {
     setIsEditorOpen(true);
   };
 
+  const handleDeleteDocument = async (document: any) => {
+    try {
+      await deleteDocument("documents", document.id);
+      toast({
+        title: "Success",
+        description: "Document deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error", 
+        description: "Failed to delete document",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleNewDocument = () => {
     setIsCreateDialogOpen(true);
   };
@@ -292,17 +312,40 @@ export default function Documents() {
                       <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${colorClasses}`}>
                         <Icon className="w-6 h-6" />
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Handle more options
-                        }}
-                      >
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreHorizontal className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-slate-900 border-slate-700">
+                          <DropdownMenuItem 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditDocument(document);
+                            }}
+                            className="text-slate-200 hover:bg-slate-800 focus:bg-slate-800"
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteDocument(document);
+                            }}
+                            className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </CardHeader>
                   <CardContent>
