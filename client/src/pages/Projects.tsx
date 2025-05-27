@@ -425,11 +425,11 @@ export default function Projects() {
                       <div className="flex items-center justify-between text-sm mb-2">
                         <span className="text-slate-400">Progress</span>
                         <span className="text-slate-300">
-                          {calculateProjectProgress(project.id)}%
+                          {project.progress || 0}%
                         </span>
                       </div>
                       <Progress
-                        value={calculateProjectProgress(project.id)}
+                        value={project.progress || 0}
                         className="h-2 bg-slate-800"
                       />
                     </div>
