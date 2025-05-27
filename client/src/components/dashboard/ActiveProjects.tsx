@@ -34,30 +34,34 @@ export default function ActiveProjects() {
   const calculateProjectProgress = (projectId: string) => {
     if (!allTasks) return 0;
     
-    // Include both types of progress tasks:
-    // 1. Tasks with type="progress" from Time Tracking (use progressContribution)
-    // 2. Regular completed tasks from Project system (use progressPercentage)
-    const progressTasks = allTasks.filter(task => 
+    // Find all completed tasks for this project, regardless of type
+    const completedTasks = allTasks.filter(task => 
       task.projectId === projectId && 
-      task.status === "completed" &&
-      (task.type === "progress" || (task.progressPercentage !== undefined && task.progressPercentage !== null))
+      task.status === "completed"
     );
     
-    const totalProgress = progressTasks.reduce((sum, task) => {
-      // Use progressContribution for Time Tracking tasks, progressPercentage for Project tasks
-      const contribution = task.progressContribution || task.progressPercentage || 0;
+    const totalProgress = completedTasks.reduce((sum, task) => {
+      // Check multiple possible fields for progress contribution
+      const contribution = task.progressContribution || 
+                          task.progressPercentage || 
+                          task.progressValue ||
+                          task.progress ||
+                          0;
       return sum + contribution;
     }, 0);
     
     // Debug logging to help identify the issue
     console.log(`Project ${projectId} progress calculation:`, {
-      totalTasks: progressTasks.length,
-      tasks: progressTasks.map(t => ({ 
+      totalTasks: completedTasks.length,
+      tasks: completedTasks.map(t => ({ 
         title: t.title, 
+        status: t.status,
         type: t.type,
         progressContribution: t.progressContribution,
         progressPercentage: t.progressPercentage,
-        contribution: t.progressContribution || t.progressPercentage || 0
+        progressValue: t.progressValue,
+        progress: t.progress,
+        calculatedContribution: t.progressContribution || t.progressPercentage || t.progressValue || t.progress || 0
       })),
       totalProgress
     });
@@ -210,11 +214,11 @@ export default function ActiveProjects() {
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="text-slate-400">Progress</span>
                     <span className="text-slate-300">
-                      {project.progress || 0}%
+                      {calculateProjectProgress(project.id)}%
                     </span>
                   </div>
                   <Progress
-                    value={project.progress || 0}
+                    value={calculateProjectProgress(project.id)}
                     className="h-2 bg-slate-800"
                   />
                 </div>
