@@ -1304,12 +1304,12 @@ DELETE /api/users/{id}
           </div>
         </div>
 
-        {/* Modern Toolbar */}
-        {!isDiagramMode && (
+        {/* Template Selection - Only for New Documents */}
+        {!isDiagramMode && !document && (
           <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center space-x-4">
-                {/* Template Insertion */}
+                {/* Template Selection for New Documents */}
                 <Select onValueChange={(value) => {
                   if (value === "meeting-notes") insertMeetingNotesTemplate();
                   else if (value === "project-plan") insertProjectPlanTemplate();
@@ -1323,10 +1323,16 @@ DELETE /api/users/{id}
                   <SelectTrigger className="w-64 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm">
                     <div className="flex items-center space-x-2">
                       <Workflow className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      <span>📋 Insert Template</span>
+                      <span>📋 Choose Template</span>
                     </div>
                   </SelectTrigger>
                   <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                    <SelectItem value="blank">
+                      <div className="flex items-center space-x-2">
+                        <span>📄</span>
+                        <span>Blank Document</span>
+                      </div>
+                    </SelectItem>
                     <SelectItem value="meeting-notes">
                       <div className="flex items-center space-x-2">
                         <span>📝</span>
@@ -1380,12 +1386,16 @@ DELETE /api/users/{id}
               </div>
 
               <div className="text-xs text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800">
-                💡 Use markdown formatting or select templates above
+                💡 Select a template to get started quickly
               </div>
             </div>
+          </div>
+        )}
 
-            {/* Formatting Toolbar */}
-            <div className="flex items-center space-x-3 px-4 pb-4">
+        {/* Simple Formatting Toolbar - Only for Document Editing */}
+        {!isDiagramMode && (
+          <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center space-x-3 px-4 py-3">
               {/* Text Formatting */}
               <div className="flex items-center bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
                 <Button
@@ -1540,79 +1550,43 @@ DELETE /api/users/{id}
               initialElements={diagramElements}
             />
           ) : (
-            // Professional Document Editor with Live Formatting
-            <div className="h-full bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+            // Simple Document Editor
+            <div className="h-full bg-gray-50 dark:bg-gray-900">
               <div className="h-full flex flex-col">
                 <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-center space-x-2">
                     <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Professional Document Editor</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Document Editor</span>
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full">
-                    Live formatted editing
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Edit your document content
                   </div>
                 </div>
-                <div className="flex-1 p-8 min-h-0 relative">
-                  {/* Beautiful Document Container */}
-                  <div 
-                    className="h-full max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-600 overflow-hidden"
-                    style={{ height: 'calc(100vh - 350px)', minHeight: '500px' }}
-                  >
-                    {/* Document Paper Effect */}
-                    <div className="h-full p-12 overflow-y-auto">
-                      <div className="relative">
-                        {/* Invisible Textarea for Input */}
-                        <textarea
-                          ref={textareaRef}
-                          value={content}
-                          onChange={(e) => setContent(e.target.value)}
-                          placeholder=""
-                          className="absolute inset-0 w-full h-full bg-transparent border-none text-transparent resize-none focus:outline-none z-10 cursor-text"
-                          style={{
-                            minHeight: 'calc(100vh - 450px)',
-                            fontFamily: '"Inter", "Segoe UI", "Helvetica Neue", sans-serif',
-                            fontSize: '16px',
-                            lineHeight: '1.75'
-                          }}
-                        />
-                        
-                        {/* Formatted Content Overlay */}
-                        <div 
-                          className="relative z-0 min-h-full"
-                          style={{
-                            fontFamily: '"Inter", "Segoe UI", "Helvetica Neue", sans-serif',
-                            fontSize: '16px',
-                            lineHeight: '1.75'
-                          }}
-                        >
-                          {content ? (
-                            <div 
-                              className="prose prose-lg max-w-none text-gray-800 dark:text-gray-200"
-                              dangerouslySetInnerHTML={{ 
-                                __html: renderPreview()
-                              }}
-                            />
-                          ) : (
-                            <div className="text-gray-400 dark:text-gray-500 italic">
-                              <h1 className="text-4xl font-bold mb-8 text-gray-300 dark:text-gray-600">Start writing your document...</h1>
-                              <div className="space-y-4 text-base">
-                                <p><strong>✨ Professional Formatting:</strong></p>
-                                <ul className="list-disc pl-6 space-y-2">
-                                  <li><strong>**Bold text**</strong> for emphasis</li>
-                                  <li><em>*Italic text*</em> for style</li>
-                                  <li><code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"># Headings</code> for structure</li>
-                                  <li>- Bullet lists for organization</li>
-                                  <li>{'>'} Block quotes for highlights</li>
-                                  <li><code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">`code`</code> for technical terms</li>
-                                </ul>
-                                <p className="mt-6">💡 <strong>Pro Tip:</strong> Use the template dropdown above for instant professional document structures!</p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <div className="flex-1 p-6 min-h-0">
+                  <textarea
+                    ref={textareaRef}
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Start writing your document...
+
+You can use markdown formatting:
+# Heading 1
+## Heading 2
+**Bold text**
+*Italic text*
+- Bullet lists
+1. Numbered lists
+> Block quotes
+`Code snippets`
+
+Write your content here..."
+                    className="w-full h-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 text-base resize-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 leading-relaxed p-6 rounded-lg shadow-sm overflow-y-auto"
+                    style={{ 
+                      height: 'calc(100vh - 350px)', 
+                      minHeight: '400px',
+                      fontFamily: '"Inter", "Segoe UI", "Helvetica Neue", sans-serif'
+                    }}
+                  />
                 </div>
               </div>
             </div>
