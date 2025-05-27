@@ -508,6 +508,8 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="text-lg font-medium bg-transparent border-none text-slate-100 placeholder-slate-400 focus:ring-0 w-80"
+            autoFocus={false}
+            onFocus={(e) => e.target.blur()}
           />
           <div className="flex items-center space-x-2">
             <div className="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded">
@@ -529,14 +531,6 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
             >
               <Save className="w-4 h-4 mr-1" />
               {saving ? "Saving..." : "Save"}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="text-slate-400 hover:text-slate-200"
-            >
-              <X className="w-4 h-4" />
             </Button>
           </div>
         </div>
