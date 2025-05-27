@@ -77,7 +77,7 @@ export default function QuickActions() {
           <h4 className="text-sm font-medium text-slate-400 mb-3 flex-shrink-0">Upcoming Schedule</h4>
           <div className={`space-y-3 flex-1 ${upcomingEvents?.length > 3 ? 'overflow-y-auto pr-2' : ''}`}>
             {upcomingEvents?.length === 0 ? (
-              <p className="text-slate-500 text-sm">No upcoming events</p>
+              <p className="text-slate-500 text-sm">No upcoming schedule</p>
             ) : (
               upcomingEvents?.map((event) => (
                 <div key={event.id} className="p-3 bg-slate-900 rounded-lg border border-slate-800">
