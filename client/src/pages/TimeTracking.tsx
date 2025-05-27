@@ -27,11 +27,12 @@ export default function TimeTracking() {
   const [entryDate, setEntryDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [entryDuration, setEntryDuration] = useState("");
   const [entryProject, setEntryProject] = useState("");
+  const [selectedTask, setSelectedTask] = useState("");
   const [loading, setLoading] = useState(false);
   
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   // Load timer state from localStorage on component mount
   useEffect(() => {
     const savedTimerState = localStorage.getItem('timer-state');
@@ -71,6 +72,12 @@ export default function TimeTracking() {
     where("ownerId", "==", user?.uid || ""),
     orderBy("name", "asc")
   ]);
+
+  // Fetch ongoing tasks for the selected project
+  const { data: projectTasks } = useCollection("tasks", entryProject && entryProject !== "none" ? [
+    where("projectId", "==", entryProject),
+    where("status", "==", "in-progress")
+  ] : []);
 
   // Timer effect
   useEffect(() => {
@@ -407,18 +414,54 @@ export default function TimeTracking() {
             </DialogHeader>
 
             <form onSubmit={handleManualEntry} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="description" className="text-slate-200">Description</Label>
-                <Textarea
-                  id="description"
-                  value={entryDescription}
-                  onChange={(e) => setEntryDescription(e.target.value)}
-                  required
-                  className="bg-slate-800 border-slate-700 text-slate-100 resize-none"
-                  placeholder="What did you work on?"
-                  rows={2}
-                />
-              </div>
+              {!entryProject || entryProject === "none" ? (
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-slate-200">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={entryDescription}
+                    onChange={(e) => setEntryDescription(e.target.value)}
+                    required
+                    className="bg-slate-800 border-slate-700 text-slate-100 resize-none"
+                    placeholder="What did you work on?"
+                    rows={2}
+                  />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label className="text-slate-200">Select Ongoing Task</Label>
+                  <Select value={selectedTask} onValueChange={setSelectedTask} required>
+                    <SelectTrigger className="bg-slate-800 border-slate-700">
+                      <SelectValue placeholder="Choose an ongoing task to track time for" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900 border-slate-700">
+                      {projectTasks && projectTasks.length > 0 ? (
+                        projectTasks.map((task) => (
+                          <SelectItem key={task.id} value={task.id}>
+                            <div className="flex items-center space-x-2">
+                              <div className={`w-2 h-2 rounded-full ${
+                                task.priority === 'high' ? 'bg-red-400' :
+                                task.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
+                              }`} />
+                              <span>{task.title}</span>
+                              <span className="text-xs text-slate-400">({task.priority} priority)</span>
+                            </div>
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-tasks" disabled>
+                          No ongoing tasks available - Add tasks in project settings
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  {projectTasks && projectTasks.length === 0 && (
+                    <p className="text-xs text-slate-400 mt-1">
+                      Add ongoing tasks to your project to enable task-specific time tracking
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="date" className="text-slate-200">Date</Label>
