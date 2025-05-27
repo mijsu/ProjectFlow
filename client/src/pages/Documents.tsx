@@ -385,38 +385,21 @@ export default function Documents() {
             </div>
 
             {/* Project Selection */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-slate-200">Link to Project (Optional)</Label>
-                <Select value={newDocumentProject} onValueChange={setNewDocumentProject}>
-                  <SelectTrigger className="bg-slate-900 border-slate-700">
-                    <SelectValue placeholder="Select a project" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-slate-700">
-                    <SelectItem value="none">No project</SelectItem>
-                    {projects?.map((project) => (
-                      <SelectItem key={project.id} value={project.id}>
-                        {project.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-slate-200">Document Type</Label>
-                <Select value={newDocumentType} onValueChange={setNewDocumentType}>
-                  <SelectTrigger className="bg-slate-900 border-slate-700">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-slate-700">
-                    <SelectItem value="document">Document</SelectItem>
-                    <SelectItem value="flowchart">Flowchart</SelectItem>
-                    <SelectItem value="dfd">Data Flow Diagram</SelectItem>
-                    <SelectItem value="code">Code Documentation</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label className="text-slate-200">Link to Project (Optional)</Label>
+              <Select value={newDocumentProject} onValueChange={setNewDocumentProject}>
+                <SelectTrigger className="bg-slate-900 border-slate-700">
+                  <SelectValue placeholder="Select a project" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-slate-700">
+                  <SelectItem value="none">No project</SelectItem>
+                  {projects?.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Action Buttons */}
