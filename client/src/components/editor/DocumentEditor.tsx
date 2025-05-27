@@ -31,7 +31,7 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
   const [content, setContent] = useState("");
   const [type, setType] = useState("document");
   const [saving, setSaving] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -96,47 +96,48 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
   };
 
   const formatText = (command: string) => {
-    if (!textareaRef.current) return;
+    if (!editorRef.current) return;
 
-    const textarea = textareaRef.current;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = content.substring(start, end);
+    // Focus the editor first
+    editorRef.current.focus();
     
-    let formattedText = "";
-    switch (command) {
-      case "bold":
-        formattedText = selectedText ? `**${selectedText}**` : "**text**";
-        break;
-      case "italic":
-        formattedText = selectedText ? `*${selectedText}*` : "*text*";
-        break;
-      case "underline":
-        formattedText = selectedText ? `<u>${selectedText}</u>` : "<u>text</u>";
-        break;
-      case "list":
-        formattedText = selectedText ? `\n- ${selectedText}` : "\n- ";
-        break;
-      case "listOrdered":
-        formattedText = selectedText ? `\n1. ${selectedText}` : "\n1. ";
-        break;
-      case "link":
-        formattedText = selectedText ? `[${selectedText}](url)` : "[text](url)";
-        break;
-      case "image":
-        formattedText = "![image description](image-url)";
-        break;
+    // Use browser's built-in rich text commands
+    try {
+      switch (command) {
+        case "bold":
+          document.execCommand("bold", false);
+          break;
+        case "italic":
+          document.execCommand("italic", false);
+          break;
+        case "underline":
+          document.execCommand("underline", false);
+          break;
+        case "list":
+          document.execCommand("insertUnorderedList", false);
+          break;
+        case "listOrdered":
+          document.execCommand("insertOrderedList", false);
+          break;
+        case "link":
+          const url = prompt("Enter URL:");
+          if (url) {
+            document.execCommand("createLink", false, url);
+          }
+          break;
+        case "image":
+          const imageUrl = prompt("Enter image URL:");
+          if (imageUrl) {
+            document.execCommand("insertImage", false, imageUrl);
+          }
+          break;
+      }
+      
+      // Update content state with the rich text HTML
+      setContent(editorRef.current.innerHTML);
+    } catch (error) {
+      console.warn("Rich text command failed:", error);
     }
-
-    const newContent = content.substring(0, start) + formattedText + content.substring(end);
-    setContent(newContent);
-    
-    // Restore focus and cursor position
-    setTimeout(() => {
-      textarea.focus();
-      const newPosition = start + formattedText.length;
-      textarea.setSelectionRange(newPosition, newPosition);
-    }, 0);
   };
 
   return (
@@ -247,14 +248,28 @@ export default function DocumentEditor({ isOpen, onClose, document, projectId }:
         </div>
 
         <div className="flex-1 overflow-hidden">
-          <Textarea
-            ref={textareaRef}
-            name="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+          <div
+            ref={editorRef}
+            contentEditable
+            suppressContentEditableWarning={true}
+            onInput={(e) => setContent(e.currentTarget.innerHTML)}
+            dangerouslySetInnerHTML={{ __html: content }}
+            className="w-full h-96 bg-slate-900 border border-slate-700 text-slate-100 p-4 rounded-md overflow-y-auto focus:border-emerald-500 focus:outline-none"
+            style={{
+              minHeight: '384px',
+              lineHeight: '1.6',
+              fontSize: '14px'
+            }}
             placeholder="Start writing your document here..."
-            className="w-full h-96 bg-slate-900 border-slate-700 text-slate-100 placeholder-slate-400 resize-none focus:border-emerald-500"
           />
+          {!content && (
+            <div 
+              className="absolute top-4 left-4 text-slate-400 pointer-events-none"
+              style={{ marginTop: '4px' }}
+            >
+              Start writing your document here...
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
