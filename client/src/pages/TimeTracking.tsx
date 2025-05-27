@@ -26,7 +26,8 @@ export default function TimeTracking() {
   const [entryDescription, setEntryDescription] = useState("");
   const [entryDate, setEntryDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [entryDuration, setEntryDuration] = useState("");
-  const [entryProject, setEntryProject] = useState("");
+  const [entryProject, setEntryProject] = useState(""); // For timer project selection
+  const [progressTaskProject, setProgressTaskProject] = useState(""); // Separate state for progress task modal
   const [selectedTask, setSelectedTask] = useState("");
   const [newTaskProgress, setNewTaskProgress] = useState("");
   const [loading, setLoading] = useState(false);
@@ -248,7 +249,7 @@ export default function TimeTracking() {
     e.preventDefault();
     if (!user) return;
 
-    if (!entryDescription.trim() || !entryProject || !newTaskProgress) {
+    if (!entryDescription.trim() || !progressTaskProject || !newTaskProgress) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -274,7 +275,7 @@ export default function TimeTracking() {
         title: entryDescription.trim(),
         description: entryDescription.trim(),
         progressContribution: progressPercentage,
-        projectId: entryProject,
+        projectId: progressTaskProject,
         status: "completed",
         type: "progress",
         createdAt: new Date(),
@@ -295,7 +296,7 @@ export default function TimeTracking() {
       // Reset form
       setEntryDescription("");
       setNewTaskProgress("");
-      setEntryProject("");
+      setProgressTaskProject("");
       setIsManualEntryOpen(false);
     } catch (error: any) {
       console.error("Error creating progress task:", error);
@@ -509,7 +510,7 @@ export default function TimeTracking() {
             <form onSubmit={handleManualEntry} className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-slate-200">Select Project</Label>
-                <Select value={entryProject} onValueChange={setEntryProject} required>
+                <Select value={progressTaskProject} onValueChange={setProgressTaskProject} required>
                   <SelectTrigger className="bg-slate-800 border-slate-700">
                     <SelectValue placeholder="Choose a project" />
                   </SelectTrigger>
