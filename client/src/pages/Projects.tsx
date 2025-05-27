@@ -244,7 +244,7 @@ export default function Projects() {
                       </div>
                       <div className="flex items-center space-x-2">
                         <span className="text-blue-400 font-medium">
-                          {getProjectDocuments(project.id).length} connected
+                          {getProjectDocuments(project.id).length} attached
                         </span>
                         {expandedProjects.has(project.id) ? (
                           <ChevronUp className="w-4 h-4 text-slate-400" />
@@ -259,7 +259,7 @@ export default function Projects() {
                       <div className="mt-2 space-y-1 pl-2 border-l-2 border-slate-700">
                         {getProjectDocuments(project.id).length === 0 ? (
                           <p className="text-xs text-slate-400 italic">
-                            No documents linked to this project yet
+                            No documents attached to this project yet
                           </p>
                         ) : (
                           getProjectDocuments(project.id).map((doc) => (
