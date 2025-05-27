@@ -660,7 +660,7 @@ export default function Projects() {
                           <p>No documents attached to this project</p>
                         </div>
                       ) : (
-                        <div className="space-y-3">
+                        <div className={`space-y-3 ${getProjectDocuments(viewingProject.id).length > 4 ? 'max-h-80 overflow-y-auto pr-2' : ''}`}>
                           {getProjectDocuments(viewingProject.id).map((document) => (
                             <div key={document.id} className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg border border-slate-700">
                               <div className="flex items-center space-x-3">
@@ -712,40 +712,7 @@ export default function Projects() {
                       </div>
                     </div>
 
-                    {/* Project Tasks */}
-                    <div className="bg-slate-900/50 rounded-lg p-6 border border-slate-800">
-                      <h3 className="text-lg font-semibold text-emerald-400 mb-4 flex items-center">
-                        <CheckCircle className="w-5 h-5 mr-2" />
-                        Recent Tasks
-                      </h3>
-                      
-                      {getProjectTasks(viewingProject.id).length === 0 ? (
-                        <div className="text-center py-6 text-slate-400">
-                          <CircleDot className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                          <p className="text-sm">No tasks created</p>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {getProjectTasks(viewingProject.id).slice(0, 5).map((task) => (
-                            <div key={task.id} className="flex items-center space-x-3 p-3 bg-slate-800/50 rounded-lg">
-                              <div className={`w-2 h-2 rounded-full ${
-                                task.status === 'completed' ? 'bg-emerald-400' : 
-                                task.status === 'in-progress' ? 'bg-blue-400' : 'bg-slate-500'
-                              }`} />
-                              <div className="flex-1">
-                                <p className="text-sm text-slate-200">{task.title}</p>
-                                <p className="text-xs text-slate-500 capitalize">{task.priority} priority</p>
-                              </div>
-                            </div>
-                          ))}
-                          {getProjectTasks(viewingProject.id).length > 5 && (
-                            <p className="text-xs text-slate-500 text-center pt-2">
-                              +{getProjectTasks(viewingProject.id).length - 5} more tasks
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </div>
+
                   </div>
                 </div>
 
