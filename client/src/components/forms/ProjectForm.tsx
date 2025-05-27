@@ -805,32 +805,7 @@ export default function ProjectForm({
                     )}
                   </div>
 
-                  {/* Completed Tasks */}
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-emerald-400">Completed Tasks</h4>
-                    {projectTasks?.filter(task => task.status === "completed" && task.type === "ongoing").length > 0 ? (
-                      <div className="space-y-2 max-h-24 overflow-y-auto">
-                        {projectTasks
-                          .filter(task => task.status === "completed" && task.type === "ongoing")
-                          .map((task) => (
-                            <div key={task.id} className="flex items-center justify-between p-2 bg-emerald-900/20 rounded-lg border border-emerald-700/50">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                                <span className="text-slate-300 text-sm">{task.title}</span>
-                                <span className="text-xs px-2 py-1 rounded-full bg-emerald-600/20 text-emerald-300">
-                                  +{task.progressPercentage || 0}%
-                                </span>
-                              </div>
-                            </div>
-                          ))
-                        }
-                      </div>
-                    ) : (
-                      <div className="text-center text-slate-500 py-3 text-xs">
-                        No completed tasks yet
-                      </div>
-                    )}
-                  </div>
+
                 </div>
               </div>
             )}
