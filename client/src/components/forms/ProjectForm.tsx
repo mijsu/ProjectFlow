@@ -467,8 +467,8 @@ export default function ProjectForm({
       // Only call onSuccess after successful form submission
       if (isFormSubmitting) {
         onSuccess?.();
+        onClose();
       }
-      onClose();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -659,13 +659,16 @@ export default function ProjectForm({
                                     </Button>
                                     <Button
                                       size="sm"
-                                      onClick={() => {
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
                                         setTaskToDelete(task);
                                         setShowDeleteConfirmation(true);
                                       }}
                                       variant="ghost"
                                       className="h-6 w-6 p-0 text-slate-400 hover:text-red-400"
                                       title="Delete task"
+                                      type="button"
                                     >
                                       <Trash2 className="w-3 h-3" />
                                     </Button>
