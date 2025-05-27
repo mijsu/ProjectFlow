@@ -87,108 +87,14 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
     
     setTimeout(() => {
       textarea.focus();
-      if (selectedText) {
-        // Keep the formatted text selected
-        textarea.setSelectionRange(start + before.length, end + before.length);
-      } else {
-        // Place cursor between the markers
-        textarea.setSelectionRange(start + before.length, start + before.length);
-      }
+      textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
     }, 0);
   };
 
-  const formatBold = () => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = content.substring(start, end);
-    
-    if (selectedText) {
-      // Only format the selected text
-      const newText = content.substring(0, start) + `**${selectedText}**` + content.substring(end);
-      setContent(newText);
-      
-      setTimeout(() => {
-        textarea.focus();
-        // Select the newly formatted text
-        textarea.setSelectionRange(start, end + 4);
-      }, 0);
-    } else {
-      insertTextAtCursor("**", "**");
-    }
-  };
-
-  const formatItalic = () => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = content.substring(start, end);
-    
-    if (selectedText) {
-      // Only format the selected text
-      const newText = content.substring(0, start) + `*${selectedText}*` + content.substring(end);
-      setContent(newText);
-      
-      setTimeout(() => {
-        textarea.focus();
-        // Select the newly formatted text
-        textarea.setSelectionRange(start, end + 2);
-      }, 0);
-    } else {
-      insertTextAtCursor("*", "*");
-    }
-  };
-
-  const formatUnderline = () => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = content.substring(start, end);
-    
-    if (selectedText) {
-      // Only format the selected text
-      const newText = content.substring(0, start) + `<u>${selectedText}</u>` + content.substring(end);
-      setContent(newText);
-      
-      setTimeout(() => {
-        textarea.focus();
-        // Select the newly formatted text
-        textarea.setSelectionRange(start, end + 7);
-      }, 0);
-    } else {
-      insertTextAtCursor("<u>", "</u>");
-    }
-  };
-
-  const formatCode = () => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = content.substring(start, end);
-    
-    if (selectedText) {
-      // Only format the selected text
-      const newText = content.substring(0, start) + `\`${selectedText}\`` + content.substring(end);
-      setContent(newText);
-      
-      setTimeout(() => {
-        textarea.focus();
-        // Select the newly formatted text
-        textarea.setSelectionRange(start, end + 2);
-      }, 0);
-    } else {
-      insertTextAtCursor("`", "`");
-    }
-  };
-
+  const formatBold = () => insertTextAtCursor("**", "**");
+  const formatItalic = () => insertTextAtCursor("*", "*");
+  const formatUnderline = () => insertTextAtCursor("<u>", "</u>");
+  const formatCode = () => insertTextAtCursor("`", "`");
   const formatQuote = () => insertTextAtCursor("> ");
   
   const insertHeading = (level: number) => {
@@ -586,607 +492,80 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
     setContent(mindMapTemplate);
   };
 
-  // Document Template Functions
-  const insertMeetingNotesTemplate = () => {
-    const meetingTemplate = `# Meeting Notes
+  const insertWireframeTemplate = () => {
+    const wireframeTemplate = `
+# UI Wireframe
 
-**Date:** ${new Date().toLocaleDateString()}
-**Time:** 
-**Location:** 
-**Meeting Type:** 
+## Web Application Layout
 
-## Attendees
-- 
-- 
-- 
-
-## Agenda
-1. 
-2. 
-3. 
-
-## Discussion Points
-
-### Topic 1
-**Discussion:**
-
-**Decisions:**
-
-**Action Items:**
-- [ ] Action item 1 - Assigned to: - Due: 
-- [ ] Action item 2 - Assigned to: - Due: 
-
-### Topic 2
-**Discussion:**
-
-**Decisions:**
-
-**Action Items:**
-- [ ] Action item 1 - Assigned to: - Due: 
-
-## Next Steps
-- 
-- 
-
-## Next Meeting
-**Date:** 
-**Time:** 
-**Agenda Preview:** 
-`;
-    setContent(meetingTemplate);
-  };
-
-  const insertProjectPlanTemplate = () => {
-    const projectTemplate = `# Project Plan
-
-## Project Overview
-**Project Name:** 
-**Project Manager:** 
-**Start Date:** 
-**End Date:** 
-**Budget:** 
-
-### Project Description
-
-
-### Project Goals
-1. 
-2. 
-3. 
-
-## Scope
-### In Scope
-- 
-- 
-
-### Out of Scope
-- 
-- 
-
-## Timeline & Milestones
-
-### Phase 1: Planning
-**Duration:** 
-**Key Deliverables:**
-- 
-- 
-
-### Phase 2: Development
-**Duration:** 
-**Key Deliverables:**
-- 
-- 
-
-### Phase 3: Testing
-**Duration:** 
-**Key Deliverables:**
-- 
-- 
-
-### Phase 4: Deployment
-**Duration:** 
-**Key Deliverables:**
-- 
-- 
-
-## Team & Responsibilities
-| Name | Role | Responsibilities |
-|------|------|------------------|
-|      |      |                  |
-|      |      |                  |
-
-## Risk Management
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-|      |        |             |            |
-|      |        |             |            |
-
-## Success Criteria
-- 
-- 
-- 
-`;
-    setContent(projectTemplate);
-  };
-
-  const insertReportTemplate = () => {
-    const reportTemplate = `# Report Title
-
-**Date:** ${new Date().toLocaleDateString()}
-**Author:** 
-**Department:** 
-**Report Period:** 
-
-## Executive Summary
-
-
-## Introduction
-### Purpose
-### Scope
-### Methodology
-
-## Key Findings
-
-### Finding 1
-**Data:**
-**Analysis:**
-**Impact:**
-
-### Finding 2
-**Data:**
-**Analysis:**
-**Impact:**
-
-### Finding 3
-**Data:**
-**Analysis:**
-**Impact:**
-
-## Recommendations
-
-### Recommendation 1
-**Priority:** High/Medium/Low
-**Timeline:** 
-**Resources Required:** 
-**Expected Outcome:** 
-
-### Recommendation 2
-**Priority:** High/Medium/Low
-**Timeline:** 
-**Resources Required:** 
-**Expected Outcome:** 
-
-## Data & Metrics
-| Metric | Current | Target | Variance |
-|--------|---------|--------|----------|
-|        |         |        |          |
-|        |         |        |          |
-
-## Conclusion
-
-
-## Next Steps
-1. 
-2. 
-3. 
-
-## Appendix
-### Supporting Data
-### References
-`;
-    setContent(reportTemplate);
-  };
-
-  const insertProposalTemplate = () => {
-    const proposalTemplate = `# Project Proposal
-
-**Proposal Title:** 
-**Submitted By:** 
-**Date:** ${new Date().toLocaleDateString()}
-**Department:** 
-**Requested Budget:** 
-
-## Executive Summary
-
-
-## Problem Statement
-### Current Situation
-### Challenges
-### Impact of Inaction
-
-## Proposed Solution
-### Overview
-### Key Features
-### Benefits
-
-## Implementation Plan
-### Phase 1: Preparation
-**Timeline:** 
-**Activities:**
-- 
-- 
-
-### Phase 2: Execution
-**Timeline:** 
-**Activities:**
-- 
-- 
-
-### Phase 3: Evaluation
-**Timeline:** 
-**Activities:**
-- 
-- 
-
-## Resource Requirements
-### Human Resources
-| Role | Time Commitment | Skills Required |
-|------|-----------------|-----------------|
-|      |                 |                 |
-
-### Technology Resources
-- 
-- 
-
-### Budget Breakdown
-| Category | Amount | Justification |
-|----------|--------|---------------|
-|          |        |               |
-|          |        |               |
-| **Total** | **$** |               |
-
-## Risk Assessment
-| Risk | Likelihood | Impact | Mitigation Strategy |
-|------|------------|--------|-------------------|
-|      |            |        |                   |
-
-## Success Metrics
-- 
-- 
-- 
-
-## Timeline
-**Start Date:** 
-**End Date:** 
-**Key Milestones:**
-- 
-- 
-
-## Approval Required
-- [ ] Department Head
-- [ ] IT Department
-- [ ] Finance Department
-- [ ] Executive Team
-`;
-    setContent(proposalTemplate);
-  };
-
-  const insertRequirementsTemplate = () => {
-    const requirementsTemplate = `# Requirements Document
-
-**Project:** 
-**Version:** 1.0
-**Date:** ${new Date().toLocaleDateString()}
-**Author:** 
-
-## Document Overview
-### Purpose
-### Scope
-### Definitions
-
-## Functional Requirements
-
-### User Management
-**REQ-001:** User Registration
-**Description:** 
-**Priority:** High/Medium/Low
-**Acceptance Criteria:**
-- 
-- 
-
-**REQ-002:** User Authentication
-**Description:** 
-**Priority:** High/Medium/Low
-**Acceptance Criteria:**
-- 
-- 
-
-### Core Functionality
-**REQ-003:** 
-**Description:** 
-**Priority:** High/Medium/Low
-**Acceptance Criteria:**
-- 
-- 
-
-## Non-Functional Requirements
-
-### Performance
-**NFR-001:** Response Time
-**Requirement:** 
-**Measurement:** 
-
-**NFR-002:** Concurrent Users
-**Requirement:** 
-**Measurement:** 
-
-### Security
-**NFR-003:** Data Protection
-**Requirement:** 
-**Compliance:** 
-
-**NFR-004:** Authentication
-**Requirement:** 
-**Implementation:** 
-
-### Usability
-**NFR-005:** User Interface
-**Requirement:** 
-**Standards:** 
-
-## Technical Requirements
-### Platform
-### Browser Support
-### Database
-### Integration Points
-
-## Constraints
-- 
-- 
-- 
-
-## Assumptions
-- 
-- 
-- 
-
-## Dependencies
-| Dependency | Impact | Mitigation |
-|------------|--------|------------|
-|            |        |            |
-
-## Acceptance Criteria
-- [ ] All functional requirements implemented
-- [ ] Performance targets met
-- [ ] Security requirements satisfied
-- [ ] User acceptance testing passed
-`;
-    setContent(requirementsTemplate);
-  };
-
-  const insertUserStoryTemplate = () => {
-    const userStoryTemplate = `# User Story
-
-**Story ID:** US-001
-**Epic:** 
-**Sprint:** 
-**Story Points:** 
-
-## User Story
-**As a** [type of user]
-**I want** [some goal]
-**So that** [some reason/benefit]
-
-## Acceptance Criteria
-**Given** [context]
-**When** [action]
-**Then** [outcome]
-
-- [ ] Acceptance criterion 1
-- [ ] Acceptance criterion 2
-- [ ] Acceptance criterion 3
-
-## Definition of Done
-- [ ] Code written and tested
-- [ ] Unit tests pass
-- [ ] Code review completed
-- [ ] Documentation updated
-- [ ] Deployed to staging
-- [ ] Product owner approval
-
-## Technical Notes
-### API Endpoints
-### Database Changes
-### UI Components
-
-## Dependencies
-- 
-- 
-
-## Risks
-- 
-- 
-
-## Testing Scenarios
-### Happy Path
-1. 
-2. 
-3. 
-
-### Edge Cases
-1. 
-2. 
-
-### Error Handling
-1. 
-2. 
-
-## Design Assets
-- Mockups: 
-- Prototypes: 
-- Style Guide: 
-
-## Notes
-`;
-    setContent(userStoryTemplate);
-  };
-
-  const insertSpecificationTemplate = () => {
-    const specTemplate = `# Technical Specification
-
-**Project:** 
-**Version:** 1.0
-**Date:** ${new Date().toLocaleDateString()}
-**Author:** 
-
-## Overview
-### Purpose
-### Scope
-### Architecture Overview
-
-## System Architecture
-### High-Level Design
-### Components
-### Data Flow
-
-## API Specification
-### Endpoints
+### Desktop Wireframe:
 \`\`\`
-GET /api/users
-POST /api/users
-PUT /api/users/{id}
-DELETE /api/users/{id}
+┌────────────────────────────────────────────────────────────┐
+│  [Logo]           Navigation Menu           [User] [Login] │ Header
+├────────────────────────────────────────────────────────────┤
+│                                                            │
+│  ┌─────────────┐  ┌─────────────────────────────────────┐  │
+│  │             │  │                                     │  │
+│  │  Sidebar    │  │           Main Content              │  │ Main
+│  │             │  │                                     │  │
+│  │ □ Menu 1    │  │  ┌─────────────┐ ┌─────────────┐   │  │
+│  │ □ Menu 2    │  │  │    Card 1   │ │    Card 2   │   │  │
+│  │ □ Menu 3    │  │  │             │ │             │   │  │
+│  │ □ Menu 4    │  │  │  Content    │ │  Content    │   │  │
+│  │             │  │  │             │ │             │   │  │
+│  │             │  │  └─────────────┘ └─────────────┘   │  │
+│  └─────────────┘  │                                     │  │
+│                   │  [Button]    [Button]    [Button]   │  │
+│                   └─────────────────────────────────────┘  │
+├────────────────────────────────────────────────────────────┤
+│         Footer Links    |    Copyright    |    Contact     │ Footer
+└────────────────────────────────────────────────────────────┘
 \`\`\`
 
-### Request/Response Format
-\`\`\`json
-{
-  "id": "string",
-  "name": "string",
-  "email": "string",
-  "created_at": "datetime"
-}
+### Mobile Wireframe:
+\`\`\`
+┌─────────────────┐
+│ [☰] App [🔍][⚙] │ Header
+├─────────────────┤
+│                 │
+│  ┌─────────────┐│
+│  │   Banner    ││ Main
+│  │   Content   ││
+│  └─────────────┘│
+│                 │
+│  ┌─────────────┐│
+│  │    Card     ││
+│  │             ││
+│  │  Content    ││
+│  │             ││
+│  │  [Action]   ││
+│  └─────────────┘│
+│                 │
+│  ┌─────────────┐│
+│  │    Card     ││
+│  │             ││
+│  │  Content    ││
+│  │             ││
+│  │  [Action]   ││
+│  └─────────────┘│
+├─────────────────┤
+│ [🏠] [📊] [👤] │ Nav
+└─────────────────┘
 \`\`\`
 
-## Database Schema
-### Tables
-#### Users Table
-| Column | Type | Constraints |
-|--------|------|-------------|
-| id | UUID | PRIMARY KEY |
-| name | VARCHAR(255) | NOT NULL |
-| email | VARCHAR(255) | UNIQUE, NOT NULL |
+## Wireframe Elements:
+- **Boxes**: Containers and sections
+- **Lines**: Borders and dividers
+- **Text**: Content placeholders
+- **Icons**: Functional elements
 
-### Relationships
-### Indexes
-
-## Security Considerations
-### Authentication
-### Authorization
-### Data Protection
-### Input Validation
-
-## Performance Requirements
-### Response Time
-### Throughput
-### Scalability
-### Caching Strategy
-
-## Deployment
-### Environment Setup
-### Configuration
-### Monitoring
-### Backup Strategy
-
-## Error Handling
-### Error Codes
-### Error Messages
-### Logging Strategy
-
-## Testing Strategy
-### Unit Testing
-### Integration Testing
-### Performance Testing
-### Security Testing
-
-## Documentation
-### Code Documentation
-### API Documentation
-### User Documentation
-
-## Maintenance
-### Updates
-### Monitoring
-### Support Procedures
+### Design Principles:
+1. **Hierarchy**: Important elements are prominent
+2. **Alignment**: Elements line up consistently
+3. **Spacing**: Adequate white space between elements
+4. **Grouping**: Related items are visually connected
 `;
-    setContent(specTemplate);
-  };
-
-  const insertReleaseNotesTemplate = () => {
-    const releaseTemplate = `# Release Notes
-
-## Version 1.0.0
-**Release Date:** ${new Date().toLocaleDateString()}
-**Release Type:** Major Release
-
-### 🎉 New Features
-- **Feature Name**: Description of the new feature and its benefits
-- **Another Feature**: What this feature does and why users will love it
-- **Integration**: New integration with [service/tool]
-
-### 🐛 Bug Fixes
-- Fixed issue where [specific problem] occurred when [conditions]
-- Resolved performance issue in [component/feature]
-- Corrected display bug in [specific area]
-
-### 🔧 Improvements
-- Enhanced performance of [specific feature] by 50%
-- Improved user interface for [specific screen/component]
-- Updated error messages to be more helpful
-
-### ⚠️ Breaking Changes
-- **API Change**: [Endpoint/method] has been modified
-  - **Migration**: How to update existing code
-- **Database**: Schema changes require migration
-  - **Action Required**: Run migration script
-
-### 🔒 Security Updates
-- Updated dependencies to latest secure versions
-- Enhanced authentication system
-- Improved data encryption
-
-### 📱 Mobile Updates
-- Fixed responsive design issues on tablets
-- Improved touch interactions
-- Better offline support
-
-### 🏗️ Technical Improvements
-- Upgraded framework to version X.X.X
-- Improved code organization
-- Enhanced testing coverage to 95%
-
-## Installation/Update Instructions
-### For New Installations
-1. Download the latest version
-2. Follow installation guide
-3. Configure settings
-
-### For Existing Users
-1. Backup your data
-2. Run update script
-3. Verify functionality
-
-## Known Issues
-- Issue with [specific feature] in [browser/environment]
-  - **Workaround**: [temporary solution]
-- Performance impact when [conditions]
-  - **Expected Fix**: Next patch release
-
-## Coming Next
-### Version 1.1.0 (Planned for [Date])
-- [ ] New dashboard design
-- [ ] Advanced reporting features
-- [ ] Mobile app improvements
-
-## Support
-- **Documentation**: [link]
-- **Support Email**: support@company.com
-- **Community**: [forum/discord link]
-
----
-*For technical questions, contact the development team at dev@company.com*
-`;
-    setContent(releaseTemplate);
+    setContent(wireframeTemplate);
   };
 
   const insertLink = () => {
@@ -1271,232 +650,219 @@ DELETE /api/users/{id}
 
   const renderPreview = () => {
     return content
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-900 dark:text-gray-100">$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em class="italic text-gray-700 dark:text-gray-300">$1</em>')
-      .replace(/<u>(.*?)<\/u>/g, '<u class="underline decoration-blue-500 decoration-2 underline-offset-2">$1</u>')
-      .replace(/`(.*?)`/g, '<code class="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-md text-sm font-mono border border-gray-200 dark:border-gray-600">$1</code>')
-      .replace(/^# (.*$)/gm, '<h1 class="text-4xl font-bold mb-8 text-gray-900 dark:text-gray-100 border-b-2 border-blue-500 pb-4 leading-tight">$1</h1>')
-      .replace(/^## (.*$)/gm, '<h2 class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-200 leading-tight">$1</h2>')
-      .replace(/^### (.*$)/gm, '<h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200 leading-tight">$1</h3>')
-      .replace(/^- (.*$)/gm, '<div class="flex items-start mb-3 pl-4"><span class="text-blue-500 mr-3 mt-2 text-sm">●</span><span class="text-gray-700 dark:text-gray-300 leading-relaxed">$1</span></div>')
-      .replace(/^\d+\. (.*$)/gm, '<div class="flex items-start mb-3 pl-4"><span class="text-blue-500 mr-3 font-semibold min-w-6">1.</span><span class="text-gray-700 dark:text-gray-300 leading-relaxed">$1</span></div>')
-      .replace(/^> (.*$)/gm, '<blockquote class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 pl-6 py-4 my-6 rounded-r-lg shadow-sm"><p class="text-gray-700 dark:text-gray-300 italic leading-relaxed margin-0">$1</p></blockquote>')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline decoration-2 underline-offset-2 transition-colors font-medium">$1</a>')
-      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-xl my-6 shadow-lg border border-gray-200 dark:border-gray-600" />')
-      .replace(/\n\n/g, '</p><p class="mb-4 leading-relaxed text-gray-700 dark:text-gray-300">')
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-emerald-300">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="italic text-blue-300">$1</em>')
+      .replace(/<u>(.*?)<\/u>/g, '<u class="underline text-purple-300">$1</u>')
+      .replace(/`(.*?)`/g, '<code class="bg-slate-800 text-green-300 px-2 py-1 rounded text-sm font-mono">$1</code>')
+      .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold mb-6 text-emerald-400 border-b border-emerald-600 pb-2">$1</h1>')
+      .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-bold mb-4 text-emerald-300">$1</h2>')
+      .replace(/^### (.*$)/gm, '<h3 class="text-xl font-bold mb-3 text-emerald-200">$1</h3>')
+      .replace(/^- (.*$)/gm, '<div class="flex items-start mb-2"><span class="text-emerald-400 mr-2">•</span><span class="text-slate-200">$1</span></div>')
+      .replace(/^\d+\. (.*$)/gm, '<div class="flex items-start mb-2"><span class="text-emerald-400 mr-2 font-mono">1.</span><span class="text-slate-200">$1</span></div>')
+      .replace(/^> (.*$)/gm, '<blockquote class="border-l-4 border-emerald-500 bg-slate-800/50 pl-4 py-3 italic text-slate-300 my-4 rounded-r">$1</blockquote>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline transition-colors">$1</a>')
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-lg my-4 border border-slate-700" />')
       .replace(/\n/g, '<br>');
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 p-0 overflow-hidden shadow-2xl flex flex-col">
-        <DialogTitle className="sr-only">Document Editor</DialogTitle>
-        {/* Professional Header */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between p-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <Edit3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div className="flex flex-col">
-                <Input
-                  placeholder="Enter document title..."
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="text-xl font-semibold bg-transparent border-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-0 p-0 h-auto w-96"
-                />
-                <div className="flex items-center space-x-3 mt-2">
-                  <Select value={type} onValueChange={setType}>
-                    <SelectTrigger className="w-64 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 shadow-sm">
-                      <div className="flex items-center space-x-2">
-                        {getTypeIcon(type)}
-                        <SelectValue />
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                      <SelectItem value="document">
-                        <div className="flex items-center space-x-2">
-                          <FileText className="w-4 h-4" />
-                          <span>Document</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="flowchart">
-                        <div className="flex items-center space-x-2">
-                          <Workflow className="w-4 h-4" />
-                          <span>Flowchart</span>
-                          <span className="text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">Visual Builder</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="dfd">
-                        <div className="flex items-center space-x-2">
-                          <Workflow className="w-4 h-4" />
-                          <span>Data Flow Diagram</span>
-                          <span className="text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">Visual Builder</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="code">
-                        <div className="flex items-center space-x-2">
-                          <FileCode className="w-4 h-4" />
-                          <span>Code Documentation</span>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
-                    {wordCount} words
-                  </div>
-                </div>
-              </div>
+      <DialogContent className="max-w-7xl max-h-[95vh] bg-slate-950 border-slate-800 text-slate-100 p-0 overflow-hidden">
+        {/* Enhanced Header */}
+        <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/50">
+          <div className="flex items-center space-x-3">
+            <Edit3 className="w-5 h-5 text-emerald-400" />
+            <Input
+              placeholder="Enter document title..."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="text-lg font-medium bg-transparent border-none text-slate-100 placeholder-slate-400 focus:ring-0 w-96"
+            />
+          </div>
+          <div className="flex items-center space-x-3">
+            <div className="text-xs text-slate-400 bg-slate-800 px-3 py-1 rounded">
+              {wordCount} words
             </div>
-            
-            <div className="flex items-center space-x-3">
-              {(type === 'flowchart' || type === 'dfd') && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsDiagramMode(!isDiagramMode)}
-                  className={`${isDiagramMode 
-                    ? 'bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600' 
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                  } shadow-sm`}
-                >
-                  <Shapes className="w-4 h-4 mr-2" />
-                  {isDiagramMode ? "Visual Builder" : "Enable Visual Builder"}
-                </Button>
-              )}
-              {!isDiagramMode && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsRealTimeView(!isRealTimeView)}
-                  className={`${isRealTimeView 
-                    ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600' 
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                  } shadow-sm`}
-                >
-                  <Eye className="w-4 h-4 mr-2" />
-                  {isRealTimeView ? "Live Preview" : "Text Only"}
-                </Button>
-              )}
-              <Button
-                onClick={handleSave}
-                disabled={saving}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md px-6"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                {saving ? "Saving..." : "Save Document"}
-              </Button>
+            {(type === 'flowchart' || type === 'dfd') && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={() => setIsDiagramMode(!isDiagramMode)}
+                className={`${isDiagramMode ? 'bg-emerald-700 text-white' : 'text-slate-300'} hover:bg-slate-700`}
               >
-                <X className="w-4 h-4" />
+                <Shapes className="w-4 h-4 mr-2" />
+                {isDiagramMode ? "Visual Builder" : "Text Mode"}
               </Button>
-            </div>
+            )}
+            {!isDiagramMode && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsRealTimeView(!isRealTimeView)}
+                className={`${isRealTimeView ? 'bg-slate-700 text-emerald-400' : 'text-slate-300'} hover:bg-slate-700`}
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                {isRealTimeView ? "Live View ON" : "Raw Text"}
+              </Button>
+            )}
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {saving ? "Saving..." : "Save"}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="text-slate-400 hover:text-slate-200"
+            >
+              <X className="w-4 h-4" />
+            </Button>
           </div>
         </div>
 
-        {/* Template Selection - Only for New Documents */}
-        {!isDiagramMode && !document && (
-          <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between p-4">
-              <div className="flex items-center space-x-4">
-                {/* Template Selection for New Documents */}
-                <Select onValueChange={(value) => {
-                  if (value === "meeting-notes") insertMeetingNotesTemplate();
-                  else if (value === "project-plan") insertProjectPlanTemplate();
-                  else if (value === "report") insertReportTemplate();
-                  else if (value === "proposal") insertProposalTemplate();
-                  else if (value === "requirements") insertRequirementsTemplate();
-                  else if (value === "user-story") insertUserStoryTemplate();
-                  else if (value === "specification") insertSpecificationTemplate();
-                  else if (value === "release-notes") insertReleaseNotesTemplate();
-                }}>
-                  <SelectTrigger className="w-64 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm">
+        {/* Professional Toolbar */}
+        <div className="bg-slate-900/30 border-b border-slate-800">
+          <div className="flex items-center justify-between p-3">
+            <div className="flex items-center space-x-4">
+              <Select value={type} onValueChange={setType}>
+                <SelectTrigger className="w-52 bg-slate-900 border-slate-700">
+                  <div className="flex items-center space-x-2">
+                    {getTypeIcon(type)}
+                    <SelectValue />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-slate-700">
+                  <SelectItem value="document">
                     <div className="flex items-center space-x-2">
-                      <Workflow className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      <span>📋 Choose Template</span>
+                      <FileText className="w-4 h-4" />
+                      <span>Document</span>
                     </div>
-                  </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                    <SelectItem value="blank">
-                      <div className="flex items-center space-x-2">
-                        <span>📄</span>
-                        <span>Blank Document</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="meeting-notes">
-                      <div className="flex items-center space-x-2">
-                        <span>📝</span>
-                        <span>Meeting Notes</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="project-plan">
-                      <div className="flex items-center space-x-2">
-                        <span>📋</span>
-                        <span>Project Plan</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="report">
-                      <div className="flex items-center space-x-2">
-                        <span>📊</span>
-                        <span>Report</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="proposal">
-                      <div className="flex items-center space-x-2">
-                        <span>💼</span>
-                        <span>Project Proposal</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="requirements">
-                      <div className="flex items-center space-x-2">
-                        <span>📋</span>
-                        <span>Requirements Document</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="user-story">
-                      <div className="flex items-center space-x-2">
-                        <span>👤</span>
-                        <span>User Story</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="specification">
-                      <div className="flex items-center space-x-2">
-                        <span>📄</span>
-                        <span>Technical Specification</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="release-notes">
-                      <div className="flex items-center space-x-2">
-                        <span>🚀</span>
-                        <span>Release Notes</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  </SelectItem>
+                  <SelectItem value="flowchart">
+                    <div className="flex items-center space-x-2">
+                      <Workflow className="w-4 h-4" />
+                      <span>Flowchart</span>
+                      <span className="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded">Visual Builder</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="dfd">
+                    <div className="flex items-center space-x-2">
+                      <Workflow className="w-4 h-4" />
+                      <span>Data Flow Diagram</span>
+                      <span className="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded">Visual Builder</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="code">
+                    <div className="flex items-center space-x-2">
+                      <FileCode className="w-4 h-4" />
+                      <span>Code Documentation</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
 
-              <div className="text-xs text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800">
-                💡 Select a template to get started quickly
-              </div>
+              {/* Advanced Diagram Templates Dropdown */}
+              <Select onValueChange={(value) => {
+                if (value === "flowchart") insertFlowchartTemplate();
+                else if (value === "dfd") insertDFDTemplate();
+                else if (value === "erd") insertERDTemplate();
+                else if (value === "uml") insertUMLTemplate();
+                else if (value === "network") insertNetworkDiagramTemplate();
+                else if (value === "process") insertProcessFlowTemplate();
+                else if (value === "system") insertSystemArchitectureTemplate();
+                else if (value === "sequence") insertSequenceDiagramTemplate();
+                else if (value === "mindmap") insertMindMapTemplate();
+                else if (value === "wireframe") insertWireframeTemplate();
+              }}>
+                <SelectTrigger className="w-60 bg-emerald-900/30 border-emerald-600 text-emerald-200">
+                  <div className="flex items-center space-x-2">
+                    <Workflow className="w-4 h-4" />
+                    <span>📊 Insert Diagram Template</span>
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-slate-700">
+                  <SelectItem value="flowchart">
+                    <div className="flex items-center space-x-2">
+                      <span>🔄</span>
+                      <span>Flowchart - Process Flow</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="dfd">
+                    <div className="flex items-center space-x-2">
+                      <span>📊</span>
+                      <span>Data Flow Diagram (DFD)</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="erd">
+                    <div className="flex items-center space-x-2">
+                      <span>🗄️</span>
+                      <span>Entity Relationship Diagram</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="uml">
+                    <div className="flex items-center space-x-2">
+                      <span>📐</span>
+                      <span>UML Class Diagram</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="network">
+                    <div className="flex items-center space-x-2">
+                      <span>🌐</span>
+                      <span>Network Architecture</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="process">
+                    <div className="flex items-center space-x-2">
+                      <span>⚙️</span>
+                      <span>Business Process Flow</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="system">
+                    <div className="flex items-center space-x-2">
+                      <span>🏗️</span>
+                      <span>System Architecture</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="sequence">
+                    <div className="flex items-center space-x-2">
+                      <span>🔄</span>
+                      <span>Sequence Diagram</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="mindmap">
+                    <div className="flex items-center space-x-2">
+                      <span>🧠</span>
+                      <span>Mind Map</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="wireframe">
+                    <div className="flex items-center space-x-2">
+                      <span>📱</span>
+                      <span>UI Wireframe</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="text-xs text-slate-400 bg-slate-800/50 px-3 py-1 rounded-full">
+              💡 Select text and use formatting buttons, or type markdown directly
             </div>
           </div>
-        )}
 
-        {/* Simple Formatting Toolbar - Only for Document Editing */}
-        {!isDiagramMode && (
-          <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-3 px-4 py-3">
-              {/* Text Formatting */}
-              <div className="flex items-center bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+          {true && (
+            <div className="flex items-center space-x-2 px-3 pb-3">
+              {/* Text Formatting Group */}
+              <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={formatBold}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none first:rounded-l-lg"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700"
                   title="Bold (Ctrl+B)"
                 >
                   <Bold className="w-4 h-4" />
@@ -1505,7 +871,7 @@ DELETE /api/users/{id}
                   variant="ghost"
                   size="sm"
                   onClick={formatItalic}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700"
                   title="Italic (Ctrl+I)"
                 >
                   <Italic className="w-4 h-4" />
@@ -1514,7 +880,7 @@ DELETE /api/users/{id}
                   variant="ghost"
                   size="sm"
                   onClick={formatUnderline}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700"
                   title="Underline"
                 >
                   <Underline className="w-4 h-4" />
@@ -1523,20 +889,20 @@ DELETE /api/users/{id}
                   variant="ghost"
                   size="sm"
                   onClick={formatCode}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none last:rounded-r-lg"
-                  title="Code"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                  title="Inline Code"
                 >
                   <Code className="w-4 h-4" />
                 </Button>
               </div>
 
-              {/* Headings */}
-              <div className="flex items-center bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+              {/* Headings Group */}
+              <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => insertHeading(1)}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 text-xs font-bold px-3 rounded-none first:rounded-l-lg"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-bold px-3"
                   title="Heading 1"
                 >
                   H1
@@ -1545,7 +911,7 @@ DELETE /api/users/{id}
                   variant="ghost"
                   size="sm"
                   onClick={() => insertHeading(2)}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 text-xs font-bold px-3 rounded-none"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-bold px-3"
                   title="Heading 2"
                 >
                   H2
@@ -1554,20 +920,20 @@ DELETE /api/users/{id}
                   variant="ghost"
                   size="sm"
                   onClick={() => insertHeading(3)}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 text-xs font-bold px-3 rounded-none last:rounded-r-lg"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-bold px-3"
                   title="Heading 3"
                 >
                   H3
                 </Button>
               </div>
 
-              {/* Lists */}
-              <div className="flex items-center bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+              {/* Lists Group */}
+              <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={insertList}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none first:rounded-l-lg"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700"
                   title="Bullet List"
                 >
                   <List className="w-4 h-4" />
@@ -1576,7 +942,7 @@ DELETE /api/users/{id}
                   variant="ghost"
                   size="sm"
                   onClick={insertOrderedList}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700"
                   title="Numbered List"
                 >
                   <ListOrdered className="w-4 h-4" />
@@ -1585,20 +951,20 @@ DELETE /api/users/{id}
                   variant="ghost"
                   size="sm"
                   onClick={formatQuote}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none last:rounded-r-lg"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700"
                   title="Quote Block"
                 >
                   <Quote className="w-4 h-4" />
                 </Button>
               </div>
 
-              {/* Media & Tools */}
-              <div className="flex items-center bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+              {/* Media & Tools Group */}
+              <div className="flex items-center space-x-1 bg-slate-800 rounded-lg p-1">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={insertLink}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none first:rounded-l-lg"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700"
                   title="Insert Link"
                 >
                   <Link className="w-4 h-4" />
@@ -1607,7 +973,7 @@ DELETE /api/users/{id}
                   variant="ghost"
                   size="sm"
                   onClick={insertImage}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-none"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700"
                   title="Insert Image"
                 >
                   <Image className="w-4 h-4" />
@@ -1616,18 +982,18 @@ DELETE /api/users/{id}
                   variant="ghost"
                   size="sm"
                   onClick={insertTable}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 text-xs px-3 rounded-none last:rounded-r-lg"
+                  className="text-slate-300 hover:text-white hover:bg-slate-700 text-xs px-3"
                   title="Insert Table"
                 >
                   Table
                 </Button>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Content Area - Visual Builder or Text Editor */}
-        <div className="flex-1 overflow-hidden min-h-0">
+        <div className="flex-1 overflow-hidden">
           {isDiagramMode ? (
             // Visual Diagram Builder
             <DiagramCanvas
@@ -1643,68 +1009,83 @@ DELETE /api/users/{id}
               }}
               initialElements={diagramElements}
             />
-          ) : (
-            // Simple Document Editor
-            <div className="h-full bg-gray-50 dark:bg-gray-900">
-              <div className="h-full flex flex-col">
-                <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center space-x-2">
-                    <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Document Editor</span>
+          ) : isRealTimeView ? (
+            // Split-screen real-time editor
+            <div className="h-full flex">
+              {/* Left side - Editor */}
+              <div className="w-1/2 border-r border-slate-700">
+                <div className="h-full p-4">
+                  <div className="text-xs text-slate-400 mb-2 flex items-center">
+                    <Edit3 className="w-3 h-3 mr-1" />
+                    Editor (type here)
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    Edit your document content
-                  </div>
-                </div>
-                <div className="flex-1 p-6 min-h-0">
-                  <textarea
+                  <Textarea
                     ref={textareaRef}
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    placeholder="Start writing your document...
+                    placeholder="Start typing your document or diagram...
 
-You can use markdown formatting:
-# Heading 1
-## Heading 2
-**Bold text**
-*Italic text*
-- Bullet lists
-1. Numbered lists
-> Block quotes
-`Code snippets`
+📝 **Quick Start:**
+• **Bold text** for emphasis
+• *Italic text* for style  
+• # Heading 1, ## Heading 2
+• - Bullet lists
+• > Block quotes
+• `inline code`
+• [link text](url)
 
-Write your content here..."
-                    className="w-full h-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 text-base resize-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 leading-relaxed p-6 rounded-lg shadow-sm overflow-y-auto"
-                    style={{ 
-                      height: 'calc(100vh - 350px)', 
-                      minHeight: '400px',
-                      fontFamily: '"Inter", "Segoe UI", "Helvetica Neue", sans-serif'
-                    }}
+🎨 **Insert Diagram:**
+Use the dropdown above to insert professional diagram templates!"
+                    className="w-full h-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-4 rounded-lg"
                   />
                 </div>
               </div>
+
+              {/* Right side - Live Preview */}
+              <div className="w-1/2">
+                <div className="h-full p-4 bg-gradient-to-br from-slate-900 to-slate-950">
+                  <div className="text-xs text-slate-400 mb-2 flex items-center">
+                    <Eye className="w-3 h-3 mr-1" />
+                    Live Preview
+                  </div>
+                  <div className="h-full overflow-y-auto bg-slate-900/50 rounded-lg p-4">
+                    <div 
+                      className="prose prose-invert prose-lg max-w-none text-slate-200 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: renderPreview() }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            // Full-screen raw editor
+            <div className="h-full p-6">
+              <div className="text-xs text-slate-400 mb-2 flex items-center">
+                <Type className="w-3 h-3 mr-1" />
+                Raw Text Editor
+              </div>
+              <Textarea
+                ref={textareaRef}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Raw text editing mode - type markdown directly...
+
+✨ Pro Tips:
+• **Bold text** for emphasis
+• *Italic text* for style  
+• # Heading 1, ## Heading 2, ### Heading 3
+• - Bullet lists
+• 1. Numbered lists
+• > Block quotes
+• `inline code`
+• [link text](url)
+• ![image description](image-url)
+
+Happy writing! 🚀"
+                className="w-full h-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-4 rounded-lg"
+              />
             </div>
           )}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={saving || !title.trim()}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              {saving ? "Saving..." : document ? "Update Document" : "Create Document"}
-            </Button>
-          </div>
         </div>
       </DialogContent>
     </Dialog>
