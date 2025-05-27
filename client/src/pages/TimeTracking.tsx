@@ -78,8 +78,17 @@ export default function TimeTracking() {
     where("projectId", "==", entryProject)
   ] : []);
   
-  // Filter to only show in-progress tasks
-  const projectTasks = allTasks?.filter(task => task.status === "in-progress") || [];
+  // Filter to only show in-progress tasks and debug logging
+  const projectTasks = allTasks?.filter(task => {
+    console.log("Task debug:", { 
+      taskId: task.id, 
+      taskProjectId: task.projectId, 
+      selectedProject: entryProject, 
+      status: task.status,
+      title: task.title 
+    });
+    return task.status === "in-progress" && task.projectId === entryProject;
+  }) || [];
 
   // Timer effect
   useEffect(() => {
