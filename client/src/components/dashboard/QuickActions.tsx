@@ -74,7 +74,7 @@ export default function QuickActions() {
 
         {/* Upcoming Events */}
         <div className="mt-8 flex-1 flex flex-col overflow-hidden">
-          <h4 className="text-sm font-medium text-slate-400 mb-3 flex-shrink-0">Upcoming Events</h4>
+          <h4 className="text-sm font-medium text-slate-400 mb-3 flex-shrink-0">Upcoming Schedule</h4>
           <div className={`space-y-3 flex-1 ${upcomingEvents?.length > 3 ? 'overflow-y-auto pr-2' : ''}`}>
             {upcomingEvents?.length === 0 ? (
               <p className="text-slate-500 text-sm">No upcoming events</p>
