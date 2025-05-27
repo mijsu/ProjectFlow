@@ -9,13 +9,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCollection } from "@/hooks/useFirestore";
 import { where, orderBy } from "firebase/firestore";
 import { format } from "date-fns";
-import { Plus, Search, FolderOpen, Calendar, Users, Edit, Clock } from "lucide-react";
+import { Plus, Search, FolderOpen, Calendar, Users, Edit, Clock, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import ProjectForm from "@/components/forms/ProjectForm";
 
 export default function Projects() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [expandedProjects, setExpandedProjects] = useState(new Set());
   const { user } = useAuth();
 
   const { data: projects, loading } = useCollection("projects", [
@@ -26,6 +27,11 @@ export default function Projects() {
   // Get time entries for calculating project time totals
   const { data: timeEntries } = useCollection("timeEntries", [
     where("userId", "==", user?.uid || "")
+  ]);
+
+  // Get all documents to show project-document connections
+  const { data: documents } = useCollection("documents", [
+    where("ownerId", "==", user?.uid || "")
   ]);
 
   const getStatusColor = (status: string) => {
@@ -41,6 +47,23 @@ export default function Projects() {
       default:
         return "bg-slate-600/10 text-slate-400 border-slate-600/20";
     }
+  };
+
+  // Get documents connected to a specific project
+  const getProjectDocuments = (projectId: string) => {
+    if (!documents) return [];
+    return documents.filter(doc => doc.projectId === projectId);
+  };
+
+  // Toggle project expansion to show/hide documents
+  const toggleProjectExpansion = (projectId: string) => {
+    const newExpanded = new Set(expandedProjects);
+    if (newExpanded.has(projectId)) {
+      newExpanded.delete(projectId);
+    } else {
+      newExpanded.add(projectId);
+    }
+    setExpandedProjects(newExpanded);
   };
 
   // Calculate total time spent on each project
@@ -206,6 +229,54 @@ export default function Projects() {
                         {formatDurationMinutes(getProjectTotalTime(project.id))}
                       </span>
                     </div>
+
+                    {/* Connected Documents Display */}
+                    <div 
+                      className="flex items-center justify-between text-sm cursor-pointer hover:bg-slate-800/50 rounded p-2 -m-2 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleProjectExpansion(project.id);
+                      }}
+                    >
+                      <div className="flex items-center space-x-1 text-slate-400">
+                        <FolderOpen className="w-4 h-4" />
+                        <span>Documents</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-blue-400 font-medium">
+                          {getProjectDocuments(project.id).length} connected
+                        </span>
+                        {expandedProjects.has(project.id) ? (
+                          <ChevronUp className="w-4 h-4 text-slate-400" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-slate-400" />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Expanded Documents List */}
+                    {expandedProjects.has(project.id) && (
+                      <div className="mt-2 space-y-1 pl-2 border-l-2 border-slate-700">
+                        {getProjectDocuments(project.id).length === 0 ? (
+                          <p className="text-xs text-slate-400 italic">
+                            No documents linked to this project yet
+                          </p>
+                        ) : (
+                          getProjectDocuments(project.id).map((doc) => (
+                            <div
+                              key={doc.id}
+                              className="flex items-center space-x-2 text-xs text-slate-300 hover:text-blue-400 transition-colors"
+                            >
+                              <FileText className="w-3 h-3" />
+                              <span className="truncate">{doc.title}</span>
+                              <span className="text-slate-500 capitalize">
+                                ({doc.type})
+                              </span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
 
                     <div>
                       <div className="flex items-center justify-between text-sm mb-2">
