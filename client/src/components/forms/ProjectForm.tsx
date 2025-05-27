@@ -187,19 +187,22 @@ export default function ProjectForm({
     setIsDocumentViewerOpen(true);
   };
 
-  // Function to format document content for preview
+  // Function to format document content for preview (matching Documents page)
   const formatDocumentContent = (content: string) => {
     if (!content) return "";
     
     return content
-      .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold text-slate-100 mb-4">$1</h1>')
-      .replace(/^## (.*$)/gim, '<h2 class="text-xl font-semibold text-slate-200 mb-3">$1</h2>')
-      .replace(/^### (.*$)/gim, '<h3 class="text-lg font-medium text-slate-300 mb-2">$1</h3>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-slate-100">$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em class="italic text-slate-200">$1</em>')
-      .replace(/`([^`]+)`/g, '<code class="bg-slate-800 text-emerald-400 px-1 py-0.5 rounded text-sm font-mono">$1</code>')
-      .replace(/^\* (.+$)/gim, '<li class="text-slate-300 mb-1">$1</li>')
-      .replace(/^\d+\. (.+$)/gim, '<li class="text-slate-300 mb-1">$1</li>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-emerald-300">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="italic text-blue-300">$1</em>')
+      .replace(/<u>(.*?)<\/u>/g, '<u class="underline text-purple-300">$1</u>')
+      .replace(/`(.*?)`/g, '<code class="bg-slate-800 text-green-300 px-2 py-1 rounded text-sm font-mono">$1</code>')
+      .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold mb-6 text-emerald-400 border-b border-emerald-600 pb-2">$1</h1>')
+      .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-bold mb-4 text-emerald-300">$1</h2>')
+      .replace(/^### (.*$)/gm, '<h3 class="text-xl font-bold mb-3 text-emerald-200">$1</h3>')
+      .replace(/^- (.*$)/gm, '<div class="flex items-start mb-2"><span class="text-emerald-400 mr-2">•</span><span class="text-slate-200">$1</span></div>')
+      .replace(/^\d+\. (.*$)/gm, '<div class="flex items-start mb-2"><span class="text-emerald-400 mr-2 font-mono">1.</span><span class="text-slate-200">$1</span></div>')
+      .replace(/^> (.*$)/gm, '<blockquote class="border-l-4 border-emerald-500 bg-slate-800/50 pl-4 py-3 italic text-slate-300 my-4 rounded-r">$1</blockquote>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline transition-colors">$1</a>')
       .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-lg my-4 border border-slate-700" />')
       .replace(/\n/g, '<br>');
   };
