@@ -55,6 +55,8 @@ export default function ProjectForm({
   const [editingTaskTitle, setEditingTaskTitle] = useState("");
   const [viewingDocument, setViewingDocument] = useState(null);
   const [isDocumentViewerOpen, setIsDocumentViewerOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<any>(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   
   // Ongoing tasks state
   const [newOngoingTaskTitle, setNewOngoingTaskTitle] = useState("");
@@ -646,7 +648,10 @@ export default function ProjectForm({
                                     </Button>
                                     <Button
                                       size="sm"
-                                      onClick={() => handleDeleteProgressTask(task)}
+                                      onClick={() => {
+                                        setTaskToDelete(task);
+                                        setShowDeleteConfirmation(true);
+                                      }}
                                       variant="ghost"
                                       className="h-6 w-6 p-0 text-slate-400 hover:text-red-400"
                                       title="Delete task"
@@ -1083,6 +1088,63 @@ export default function ProjectForm({
             className="bg-emerald-600 hover:bg-emerald-700 text-white"
           >
             Approve Task
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* Delete Progress Task Confirmation Modal */}
+    <Dialog open={showDeleteConfirmation} onOpenChange={setShowDeleteConfirmation}>
+      <DialogContent className="max-w-md bg-slate-950 border-slate-800 text-slate-100">
+        <DialogHeader>
+          <DialogTitle className="text-slate-100 flex items-center space-x-2">
+            <Trash2 className="w-5 h-5 text-red-400" />
+            <span>Delete Progress Task</span>
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <p className="text-slate-300">
+            Are you sure you want to delete this progress task? This will automatically reduce the project progress.
+          </p>
+          
+          {taskToDelete && (
+            <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-700">
+              <div className="flex items-center justify-between">
+                <span className="font-medium text-slate-200">{taskToDelete.title}</span>
+                <span className="text-sm px-2 py-1 rounded-full bg-red-600/20 text-red-300">
+                  -{taskToDelete.progressContribution || 0}%
+                </span>
+              </div>
+              <div className="mt-2 text-xs text-slate-400">
+                Project progress will be reduced from {project?.progress || 0}% to {Math.max(0, (project?.progress || 0) - (taskToDelete.progressContribution || 0))}%
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <div className="flex space-x-2 pt-4">
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setShowDeleteConfirmation(false);
+              setTaskToDelete(null);
+            }}
+            className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800"
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={async () => {
+              if (taskToDelete) {
+                await handleDeleteProgressTask(taskToDelete);
+                setShowDeleteConfirmation(false);
+                setTaskToDelete(null);
+              }
+            }}
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+          >
+            Delete Task
           </Button>
         </div>
       </DialogContent>
