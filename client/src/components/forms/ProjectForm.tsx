@@ -109,7 +109,9 @@ export default function ProjectForm({
   // Calculate progress based on tasks
   useEffect(() => {
     if (projectTasks && projectTasks.length > 0) {
-      const totalProgress = projectTasks.reduce((sum, task) => sum + (task.progressContribution || 0), 0);
+      const totalProgress = projectTasks
+        .filter(task => task.status === "completed")
+        .reduce((sum, task) => sum + (task.progressContribution || task.progressPercentage || 0), 0);
       setProgress(Math.min(totalProgress, 100));
     }
   }, [projectTasks]);
