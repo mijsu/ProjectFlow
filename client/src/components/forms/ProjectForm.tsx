@@ -363,6 +363,8 @@ export default function ProjectForm({
   const handleDeleteProgressTask = async (task: any) => {
     if (!project?.id) return;
     
+    console.log("Actually deleting task:", task.title);
+    
     try {
       // Delete the task from Firebase
       await deleteDocument("tasks", task.id);
@@ -649,6 +651,7 @@ export default function ProjectForm({
                                     <Button
                                       size="sm"
                                       onClick={() => {
+                                        console.log("Trash icon clicked for task:", task.title);
                                         setTaskToDelete(task);
                                         setShowDeleteConfirmation(true);
                                       }}
