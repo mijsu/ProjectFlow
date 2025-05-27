@@ -75,13 +75,14 @@ export default function TimeTracking() {
     orderBy("name", "asc")
   ]);
 
-  // Fetch ongoing tasks for the selected project
-  const { data: allTasks } = useCollection("tasks", entryProject && entryProject !== "none" ? [
-    where("projectId", "==", entryProject)
+  // Fetch ongoing tasks for the selected project only when a project is selected
+  const { data: allTasks } = useCollection("tasks", entryProject ? [
+    where("projectId", "==", entryProject),
+    where("status", "==", "in-progress")
   ] : []);
   
-  // Filter to only show in-progress tasks
-  const projectTasks = allTasks?.filter(task => task.status === "in-progress") || [];
+  // Use the filtered results directly since we're already filtering in the query
+  const projectTasks = allTasks || [];
 
   // Timer effect
   useEffect(() => {
