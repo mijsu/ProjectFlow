@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { useCollection, addDocument } from "@/hooks/useFirestore";
+import { useCollection, addDocument, updateDocument } from "@/hooks/useFirestore";
 import { where, orderBy, limit } from "firebase/firestore";
 import { format, formatDuration, intervalToDuration } from "date-fns";
 import { Play, Pause, Square, Plus, Clock, Calendar } from "lucide-react";
@@ -29,6 +29,8 @@ export default function TimeTracking() {
   const [entryProject, setEntryProject] = useState("");
   const [selectedTask, setSelectedTask] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showTaskCompletionModal, setShowTaskCompletionModal] = useState(false);
+  const [pendingTimeEntry, setPendingTimeEntry] = useState<any>(null);
   
   const { user } = useAuth();
   const { toast } = useToast();
@@ -160,28 +162,71 @@ export default function TimeTracking() {
       return;
     }
 
+    // Get the selected task details for the description
+    const selectedTaskData = projectTasks?.find(task => task.id === currentTask);
+    const description = selectedTaskData ? selectedTaskData.title : "Unknown task";
+
+    // Store the time entry data to save after user confirms
+    const timeEntryData = {
+      description: description,
+      duration: duration,
+      startTime: startTime,
+      endTime: endTime,
+      userId: user.uid,
+      projectId: entryProject || null,
+      taskId: currentTask || null,
+    };
+
+    setPendingTimeEntry(timeEntryData);
+    setShowTaskCompletionModal(true);
+  };
+
+  const handleTaskComplete = async () => {
+    if (!pendingTimeEntry) return;
+
     try {
-      await addDocument("timeEntries", {
-        description: currentTask,
-        duration: duration,
-        startTime: startTime,
-        endTime: endTime,
-        userId: user.uid,
-        projectId: entryProject || null,
-      });
+      // Save the time entry
+      await addDocument("timeEntries", pendingTimeEntry);
+
+      // Mark the task as completed
+      if (currentTask) {
+        await updateDocument("tasks", currentTask, { status: "completed" });
+      }
 
       toast({
         title: "Success",
-        description: `Time entry saved: ${Math.floor(duration / 60)}h ${duration % 60}m`,
+        description: `Task completed! Time saved: ${Math.floor(pendingTimeEntry.duration / 60)}h ${pendingTimeEntry.duration % 60}m`,
       });
 
-      // Reset timer
-      setIsTimerRunning(false);
-      setStartTime(null);
-      setElapsedTime(0);
-      setPausedTime(0);
-      setCurrentTask("");
-      localStorage.removeItem('timer-state');
+      // Reset everything
+      resetTimer();
+      setShowTaskCompletionModal(false);
+      setPendingTimeEntry(null);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to save time entry or update task",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleTakeBreak = async () => {
+    if (!pendingTimeEntry) return;
+
+    try {
+      // Save the time entry but keep task in progress
+      await addDocument("timeEntries", pendingTimeEntry);
+
+      toast({
+        title: "Success",
+        description: `Break time! Time saved: ${Math.floor(pendingTimeEntry.duration / 60)}h ${pendingTimeEntry.duration % 60}m`,
+      });
+
+      // Reset timer but keep task selected
+      resetTimer();
+      setShowTaskCompletionModal(false);
+      setPendingTimeEntry(null);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -189,6 +234,16 @@ export default function TimeTracking() {
         variant: "destructive",
       });
     }
+  };
+
+  const resetTimer = () => {
+    setIsTimerRunning(false);
+    setStartTime(null);
+    setElapsedTime(0);
+    setPausedTime(0);
+    setCurrentTask("");
+    setEntryProject("");
+    localStorage.removeItem('timer-state');
   };
 
   const handleManualEntry = async (e: React.FormEvent) => {
@@ -567,6 +622,57 @@ export default function TimeTracking() {
                 </Button>
               </div>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Task Completion Modal */}
+        <Dialog open={showTaskCompletionModal} onOpenChange={setShowTaskCompletionModal}>
+          <DialogContent className="max-w-md bg-slate-950 border-slate-800 text-slate-100">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-semibold text-center">
+                🎉 Great work!
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4 text-center">
+              <div className="space-y-2">
+                <p className="text-slate-200">
+                  You've been working for <span className="font-semibold text-emerald-400">
+                    {pendingTimeEntry && `${Math.floor(pendingTimeEntry.duration / 60)}h ${pendingTimeEntry.duration % 60}m`}
+                  </span>
+                </p>
+                <p className="text-slate-300 text-sm">
+                  Are you done with this task or taking a break?
+                </p>
+              </div>
+
+              <div className="bg-slate-900 p-3 rounded-lg">
+                <p className="text-sm text-slate-400 mb-1">Working on:</p>
+                <p className="text-slate-200 font-medium">
+                  {pendingTimeEntry?.description || "Unknown task"}
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <Button
+                  onClick={handleTakeBreak}
+                  variant="outline"
+                  className="flex-1 border-slate-700 text-slate-300 hover:bg-slate-800"
+                >
+                  ☕ Take a Break
+                </Button>
+                <Button
+                  onClick={handleTaskComplete}
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  ✅ Task Complete
+                </Button>
+              </div>
+
+              <p className="text-xs text-slate-500 mt-2">
+                "Take a Break" saves your time but keeps the task ongoing. "Task Complete" marks it as finished.
+              </p>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
