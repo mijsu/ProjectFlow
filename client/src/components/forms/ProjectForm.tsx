@@ -58,6 +58,7 @@ export default function ProjectForm({
   const [taskToDelete, setTaskToDelete] = useState<any>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
+  const [isDeletingTask, setIsDeletingTask] = useState(false);
   
   // Ongoing tasks state
   const [newOngoingTaskTitle, setNewOngoingTaskTitle] = useState("");
@@ -364,6 +365,8 @@ export default function ProjectForm({
   const handleDeleteProgressTask = async (task: any) => {
     if (!project?.id) return;
     
+    setIsDeletingTask(true);
+    
     try {
       // Delete the task from Firebase
       await deleteDocument("tasks", task.id);
@@ -378,6 +381,9 @@ export default function ProjectForm({
         progress: newProgress
       });
       
+      // Add 2-second delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       toast({
         title: "Task Deleted",
         description: `Task removed and progress reduced by ${taskContribution}% (New total: ${newProgress}%)`,
@@ -388,6 +394,8 @@ export default function ProjectForm({
         description: "Failed to delete progress task",
         variant: "destructive",
       });
+    } finally {
+      setIsDeletingTask(false);
     }
   };
 
@@ -1150,15 +1158,23 @@ export default function ProjectForm({
           </Button>
           <Button 
             onClick={async () => {
-              if (taskToDelete) {
+              if (taskToDelete && !isDeletingTask) {
                 await handleDeleteProgressTask(taskToDelete);
                 setShowDeleteConfirmation(false);
                 setTaskToDelete(null);
               }
             }}
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+            disabled={isDeletingTask}
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Delete Task
+            {isDeletingTask ? (
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Deleting...</span>
+              </div>
+            ) : (
+              "Delete Task"
+            )}
           </Button>
         </div>
       </DialogContent>
