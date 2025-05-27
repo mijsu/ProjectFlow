@@ -25,30 +25,6 @@ export default function ActiveProjects() {
     where("userId", "==", user?.uid || "")
   ]);
 
-  // Get tasks for real-time progress calculation
-  const { data: tasks } = useCollection("tasks", [
-    where("assigneeId", "==", user?.uid || "")
-  ]);
-
-  // Calculate real-time project progress based on completed tasks
-  const calculateProjectProgress = (projectId: string) => {
-    if (!tasks) return 0;
-    
-    const projectTasks = tasks.filter(task => 
-      task.projectId === projectId && 
-      task.type === "progress" && 
-      task.status === "completed"
-    );
-    
-    if (projectTasks.length === 0) return 0;
-    
-    const totalProgress = projectTasks.reduce((sum, task) => {
-      return sum + (task.progressContribution || 0);
-    }, 0);
-    
-    return Math.min(100, totalProgress);
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "in-progress":
