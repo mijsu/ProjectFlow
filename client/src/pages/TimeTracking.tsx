@@ -31,6 +31,7 @@ export default function TimeTracking() {
   const [loading, setLoading] = useState(false);
   const [showTaskCompletionModal, setShowTaskCompletionModal] = useState(false);
   const [pendingTimeEntry, setPendingTimeEntry] = useState<any>(null);
+  const [isCompletingTask, setIsCompletingTask] = useState(false);
   
   const { user } = useAuth();
   const { toast } = useToast();
@@ -175,7 +176,9 @@ export default function TimeTracking() {
   };
 
   const handleTaskComplete = async () => {
-    if (!pendingTimeEntry) return;
+    if (!pendingTimeEntry || isCompletingTask) return;
+
+    setIsCompletingTask(true);
 
     try {
       // Save the time entry
@@ -185,6 +188,9 @@ export default function TimeTracking() {
       if (currentTask) {
         await updateDocument("tasks", currentTask, { status: "completed" });
       }
+
+      // Add 2-second delay for user feedback
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       toast({
         title: "Success",
@@ -201,6 +207,8 @@ export default function TimeTracking() {
         description: "Failed to save time entry or update task",
         variant: "destructive",
       });
+    } finally {
+      setIsCompletingTask(false);
     }
   };
 
@@ -642,9 +650,19 @@ export default function TimeTracking() {
                 </Button>
                 <Button
                   onClick={handleTaskComplete}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                  disabled={isCompletingTask}
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50"
                 >
-                  ✅ Task Complete
+                  {isCompletingTask ? (
+                    <>
+                      <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Completing...
+                    </>
+                  ) : (
+                    <>
+                      ✅ Task Complete
+                    </>
+                  )}
                 </Button>
               </div>
 
