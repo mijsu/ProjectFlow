@@ -44,6 +44,13 @@ export default function ActiveProjects() {
       sum + (task.progressContribution || 0), 0
     );
     
+    // Debug logging to help identify the issue
+    console.log(`Project ${projectId} progress calculation:`, {
+      totalTasks: progressTasks.length,
+      tasks: progressTasks.map(t => ({ title: t.title, contribution: t.progressContribution })),
+      totalProgress
+    });
+    
     return Math.min(totalProgress, 100); // Cap at 100%
   };
 
