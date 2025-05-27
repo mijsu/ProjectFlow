@@ -59,6 +59,11 @@ export default function ProjectForm({
   // Ongoing tasks state
   const [newOngoingTaskTitle, setNewOngoingTaskTitle] = useState("");
   const [newOngoingTaskPriority, setNewOngoingTaskPriority] = useState("medium");
+  const [newOngoingTaskPercentage, setNewOngoingTaskPercentage] = useState("10");
+  
+  // Approval state
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [taskToApprove, setTaskToApprove] = useState<any>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -231,29 +236,71 @@ export default function ProjectForm({
   const handleAddOngoingTask = async () => {
     if (!newOngoingTaskTitle.trim() || !project?.id) return;
     
+    const percentage = parseInt(newOngoingTaskPercentage);
+    if (isNaN(percentage) || percentage < 1 || percentage > 100) {
+      toast({
+        title: "Invalid Percentage",
+        description: "Please enter a percentage between 1 and 100",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
       await addDocument("tasks", {
         title: newOngoingTaskTitle,
         projectId: project.id,
         assigneeId: user?.uid,
-        status: "in-progress", // Ongoing tasks start as in-progress
+        status: "pending", // Start as pending for approval
         priority: newOngoingTaskPriority,
-        type: "ongoing", // Mark as ongoing task for time tracking
+        progressPercentage: percentage,
+        type: "ongoing",
         createdAt: new Date(),
         updatedAt: new Date()
       });
       
       setNewOngoingTaskTitle("");
       setNewOngoingTaskPriority("medium");
+      setNewOngoingTaskPercentage("10");
       
       toast({
-        title: "Ongoing Task Added",
-        description: "Task created successfully and ready for time tracking",
+        title: "Task Created",
+        description: "Task added as pending - awaiting approval",
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to create ongoing task",
+        description: "Failed to create task",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleApproveTask = (task: any) => {
+    setTaskToApprove(task);
+    setShowApprovalModal(true);
+  };
+
+  const confirmApproveTask = async () => {
+    if (!taskToApprove) return;
+
+    try {
+      await updateDocument("tasks", taskToApprove.id, {
+        status: "in-progress",
+        updatedAt: new Date()
+      });
+      
+      setShowApprovalModal(false);
+      setTaskToApprove(null);
+      
+      toast({
+        title: "Task Approved",
+        description: `"${taskToApprove.title}" is now available for time tracking`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to approve task",
         variant: "destructive",
       });
     }
@@ -261,14 +308,30 @@ export default function ProjectForm({
 
   const handleCompleteOngoingTask = async (taskId: string) => {
     try {
+      // Find the task to get its progress percentage
+      const task = projectTasks?.find(t => t.id === taskId);
+      const taskProgress = task?.progressPercentage || 0;
+      
       await updateDocument("tasks", taskId, {
         status: "completed",
         updatedAt: new Date()
       });
       
+      // Auto-update project progress
+      const currentProgress = parseInt(progress.toString()) || 0;
+      const newProgress = Math.min(100, currentProgress + taskProgress);
+      
+      if (newProgress !== currentProgress) {
+        await updateDocument("projects", project.id, {
+          progress: newProgress,
+          updatedAt: new Date()
+        });
+        setProgress(newProgress);
+      }
+      
       toast({
         title: "Task Completed",
-        description: "Ongoing task marked as completed",
+        description: `Task completed! Project progress updated to ${newProgress}%`,
       });
     } catch (error) {
       toast({
@@ -592,6 +655,16 @@ export default function ProjectForm({
                         className="flex-1 bg-slate-800 border-slate-600 text-slate-100"
                         onKeyPress={(e) => e.key === 'Enter' && handleAddOngoingTask()}
                       />
+                      <Input
+                        type="number"
+                        placeholder="%"
+                        value={newOngoingTaskPercentage}
+                        onChange={(e) => setNewOngoingTaskPercentage(e.target.value)}
+                        className="w-16 bg-slate-800 border-slate-600 text-slate-100 text-center"
+                        min="1"
+                        max="100"
+                        title="Progress percentage (1-100%)"
+                      />
                       <Select value={newOngoingTaskPriority} onValueChange={setNewOngoingTaskPriority}>
                         <SelectTrigger className="w-28 bg-slate-800 border-slate-600">
                           <SelectValue />
@@ -611,6 +684,7 @@ export default function ProjectForm({
                         <Plus className="w-4 h-4" />
                       </Button>
                     </div>
+                    <p className="text-xs text-slate-500">Tasks start as pending and need approval before time tracking</p>
                   </div>
 
                   {/* List existing ongoing tasks */}

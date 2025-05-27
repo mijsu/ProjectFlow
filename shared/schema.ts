@@ -46,6 +46,7 @@ export const tasks = pgTable("tasks", {
   projectId: integer("project_id").references(() => projects.id),
   documentId: integer("document_id").references(() => documents.id),
   dueDate: timestamp("due_date"),
+  progressPercentage: integer("progress_percentage").notNull().default(0), // 0-100 percentage for project progress contribution
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
