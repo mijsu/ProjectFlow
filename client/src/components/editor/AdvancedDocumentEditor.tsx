@@ -340,7 +340,7 @@ External A
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[95vh] bg-slate-950 border-slate-800 text-slate-100 p-0 overflow-hidden flex flex-col">
+      <DialogContent className="max-w-7xl h-[95vh] bg-slate-950 border-slate-800 text-slate-100 p-0 overflow-hidden flex flex-col">
         {/* Enhanced Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/50">
           <div className="flex items-center space-x-3">
@@ -607,7 +607,7 @@ External A
                 </div>
               )}
               
-              <div className="flex-1 p-6 overflow-hidden">
+              <div className="flex-1 p-6 min-h-0 flex flex-col">
                 <Textarea
                   ref={textareaRef}
                   value={content}
@@ -637,7 +637,8 @@ Start with a template or create from scratch! 🚀`
 • ![image description](image-url)
 
 Happy writing! 🚀`}
-                  className="w-full h-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-4 rounded-lg overflow-y-auto"
+                  className="flex-1 w-full bg-slate-900 border-slate-700 text-slate-100 font-mono text-sm resize-none focus:ring-2 focus:ring-emerald-500 leading-relaxed p-4 rounded-lg"
+                  style={{ minHeight: '500px' }}
                 />
               </div>
             </div>
