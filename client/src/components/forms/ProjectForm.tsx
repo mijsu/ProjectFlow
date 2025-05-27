@@ -509,19 +509,32 @@ export default function ProjectForm({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-5xl max-h-[90vh] bg-slate-950 border-slate-800 text-slate-100">
-        <DialogHeader className="pb-4 border-b border-slate-700">
-          <DialogTitle className="text-xl font-semibold">
-            {project ? "Edit Project" : "Create New Project"}
-          </DialogTitle>
-        </DialogHeader>
+        <DialogContent className="max-w-6xl max-h-[95vh] bg-gradient-to-br from-slate-950 via-slate-900/95 to-slate-950 border border-slate-700/50 shadow-2xl backdrop-blur-sm text-slate-100">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/3 via-transparent to-emerald-500/3 pointer-events-none"></div>
+          <div className="relative">
+            <DialogHeader className="pb-6 border-b border-slate-700/60">
+              <DialogTitle className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-blue-400 to-emerald-400 flex items-center space-x-4">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 border border-emerald-500/30 shadow-lg">
+                  <FolderOpen className="w-7 h-7 text-emerald-400" />
+                </div>
+                <div>
+                  <div className="text-2xl">{project ? "Project Management" : "New Project Setup"}</div>
+                  <div className="text-sm font-normal text-slate-400 mt-1">
+                    {project ? `Editing: ${project.name}` : "Configure your project workspace"}
+                  </div>
+                </div>
+              </DialogTitle>
+            </DialogHeader>
 
-        <div className="max-h-[70vh] overflow-y-auto">
-          <form onSubmit={handleSubmit} className="space-y-6 p-1">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column - Project Details */}
-              <div className="space-y-4">
-                <h3 className="text-base font-medium text-emerald-400 border-b border-slate-700 pb-2">Project Details</h3>
+            <div className="max-h-[75vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
+              <form onSubmit={handleSubmit} className="space-y-8 p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                  {/* Left Column - Project Details */}
+                  <div className="space-y-6">
+                    <div className="flex items-center space-x-3 mb-6">
+                      <div className="w-1 h-8 bg-gradient-to-b from-emerald-400 to-blue-400 rounded-full"></div>
+                      <h3 className="text-lg font-semibold text-emerald-400">Project Configuration</h3>
+                    </div>
                 
                 {/* Project name input */}
           <div className="space-y-2">
@@ -946,27 +959,35 @@ export default function ProjectForm({
 
 
 
-            <div className="flex gap-3 pt-4 border-t border-slate-700">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
-              >
-                {project ? "Update Project" : "Create Project"}
-              </Button>
+                <div className="flex gap-3 pt-6 mt-6 border-t border-slate-700/60">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onClose}
+                    className="flex-1 bg-slate-800/50 border-slate-600 hover:bg-slate-700/50 text-slate-300"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white shadow-lg"
+                  >
+                    {loading ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Saving...</span>
+                      </div>
+                    ) : (
+                      project ? "Update Project" : "Create Project"
+                    )}
+                  </Button>
+                </div>
+              </form>
             </div>
-          </form>
-        </div>
-      </DialogContent>
-    </Dialog>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     {/* Document Viewer Modal */}
     <Dialog open={isDocumentViewerOpen} onOpenChange={setIsDocumentViewerOpen}>
