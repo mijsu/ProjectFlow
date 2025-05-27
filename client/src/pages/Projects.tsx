@@ -10,6 +10,7 @@ import { useCollection } from "@/hooks/useFirestore";
 import { where, orderBy } from "firebase/firestore";
 import { format } from "date-fns";
 import { Plus, Search, FolderOpen, Calendar, Users, Edit, Clock, FileText, ChevronDown, ChevronUp, Eye, X, CheckCircle, AlertCircle, CircleDot } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ProjectForm from "@/components/forms/ProjectForm";
 
 export default function Projects() {
@@ -34,6 +35,11 @@ export default function Projects() {
   // Get all documents to show project-document connections
   const { data: documents } = useCollection("documents", [
     where("ownerId", "==", user?.uid || "")
+  ]);
+
+  // Get tasks for project details
+  const { data: tasks } = useCollection("tasks", [
+    where("assigneeId", "==", user?.uid || "")
   ]);
 
   const getStatusColor = (status: string) => {
@@ -80,6 +86,12 @@ export default function Projects() {
     return timeEntries
       .filter(entry => entry.projectId === projectId)
       .reduce((total, entry) => total + (entry.duration || 0), 0);
+  };
+
+  // Get tasks for a specific project
+  const getProjectTasks = (projectId: string) => {
+    if (!tasks) return [];
+    return tasks.filter(task => task.projectId === projectId);
   };
 
   const formatDurationMinutes = (minutes: number) => {
