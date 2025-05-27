@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { addDocument, updateDocument } from "@/hooks/useFirestore";
 import { useAuth } from "@/hooks/useAuth";
+import DiagramCanvas from "./DiagramCanvas";
 import { 
   Bold, 
   Italic, 
@@ -27,7 +28,8 @@ import {
   FileCode,
   Palette,
   RotateCcw,
-  RotateCw
+  RotateCw,
+  Shapes
 } from "lucide-react";
 
 interface AdvancedDocumentEditorProps {
@@ -43,7 +45,9 @@ export default function AdvancedDocumentEditor({ isOpen, onClose, document, proj
   const [type, setType] = useState("document");
   const [saving, setSaving] = useState(false);
   const [isRealTimeView, setIsRealTimeView] = useState(true);
+  const [isDiagramMode, setIsDiagramMode] = useState(false);
   const [wordCount, setWordCount] = useState(0);
+  const [diagramElements, setDiagramElements] = useState<any[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -678,12 +682,23 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsRealTimeView(!isRealTimeView)}
-              className={`${isRealTimeView ? 'bg-slate-700 text-emerald-400' : 'text-slate-300'} hover:bg-slate-700`}
+              onClick={() => setIsDiagramMode(!isDiagramMode)}
+              className={`${isDiagramMode ? 'bg-emerald-700 text-white' : 'text-slate-300'} hover:bg-slate-700`}
             >
-              <Eye className="w-4 h-4 mr-2" />
-              {isRealTimeView ? "Live View ON" : "Raw Text"}
+              <Shapes className="w-4 h-4 mr-2" />
+              {isDiagramMode ? "Visual Builder" : "Text Mode"}
             </Button>
+            {!isDiagramMode && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsRealTimeView(!isRealTimeView)}
+                className={`${isRealTimeView ? 'bg-slate-700 text-emerald-400' : 'text-slate-300'} hover:bg-slate-700`}
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                {isRealTimeView ? "Live View ON" : "Raw Text"}
+              </Button>
+            )}
             <Button
               onClick={handleSave}
               disabled={saving}
@@ -969,9 +984,24 @@ User        →  Frontend     →  API Gateway  →  Auth Service  →  Database
           )}
         </div>
 
-        {/* Real-Time Split Editor */}
+        {/* Content Area - Visual Builder or Text Editor */}
         <div className="flex-1 overflow-hidden">
-          {isRealTimeView ? (
+          {isDiagramMode ? (
+            // Visual Diagram Builder
+            <DiagramCanvas
+              onSave={(elements) => {
+                setDiagramElements(elements);
+                // Convert diagram to text representation
+                const diagramText = `# Visual Diagram\n\nDiagram created with ${elements.length} elements.\n\n${JSON.stringify(elements, null, 2)}`;
+                setContent(diagramText);
+                toast({
+                  title: "Success",
+                  description: "Diagram saved to document content",
+                });
+              }}
+              initialElements={diagramElements}
+            />
+          ) : isRealTimeView ? (
             // Split-screen real-time editor
             <div className="h-full flex">
               {/* Left side - Editor */}
